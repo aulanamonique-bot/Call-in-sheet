@@ -1,0 +1,726 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quote Calculator</title>
+  <style>
+    :root{      --green:#ff5aa5;
+      --grid:#d0d7de;
+      --soft-yellow:#ffe0f0;
+      --soft-blue:#ffd1e6;
+      --soft-blue-2:#ffe4f1;
+      --soft-green:#ffe0ef;
+      --bg:#ffffff;
+      --text:#111;
+    }
+    body{
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 18px;
+    }
+    .sheet{ max-width: 1100px; margin: 0 auto; }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    .brand img{ height: 95px; width:auto; }
+    h1{ font-size: 22px; margin: 0; font-weight: 800; letter-spacing: .3px; }
+    .btnRow{ display:flex; gap:12px; align-items:center; flex-wrap: wrap; }
+    button{
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-weight: 800;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .btn-clear{ background:#ff2f92; color:#fff; }
+    .btn-copy{ background:#1F4E79; color:#fff; }
+
+    .grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .section{ border: 1px solid var(--grid); border-radius: 10px; overflow: hidden; }
+    .section .header{ background: var(--green); color: #fff; font-weight: 800; padding: 10px 12px; font-size: 15px; }
+    .rows{ display: grid; grid-template-columns: 1.2fr 1fr; gap: 0; }
+    .row{ display: contents; }
+    .label{ padding: 10px 12px; border-top: 1px solid var(--grid); font-weight: 700; font-size: 14px; }
+    .cell{ padding: 8px 10px; border-top: 1px solid var(--grid); border-left: 1px solid var(--grid); display:flex; align-items:center; }
+
+    input[type="number"], input[type="text"], select{
+      width: 100%;
+      padding: 9px 10px;
+      border: 1px solid var(--grid);
+      border-radius: 8px;
+      font-size: 14px;
+      outline: none;
+      background: white;
+    }
+
+    /* remove number spinners */
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type=number] { -moz-appearance: textfield; }
+
+    .in-yellow input{ background: var(--soft-yellow); }
+    .in-blue input, .in-blue select{ background: var(--soft-blue); }
+    .in-blue2 input, .in-blue2 select{ background: var(--soft-blue-2); }
+
+    .out-green{
+      background: var(--soft-green);
+      border-radius: 8px;
+      padding: 9px 10px;
+      width: 100%;
+      border: 1px solid var(--grid);
+      font-weight: 800;
+      font-size: 16px;
+    }
+    .out-green.small{ font-size: 15px; }
+
+    .full{ grid-column: 1 / -1; }
+    .bundleTotals{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+
+    details{ margin-top: 10px; border-top: 1px dashed var(--grid); padding-top: 10px; }
+    details summary{ cursor:pointer; font-weight:800; }
+    table{ width:100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
+    th, td{ border:1px solid var(--grid); padding:8px 10px; text-align:left; }
+    th{ background:#f2f2f2; font-weight:800; }
+    .right{ text-align:right; }
+    .tierTag{ display:inline-block; padding: 3px 8px; border-radius: 999px; font-weight:800; font-size:12px; }
+  
+/* Customer Info (top) */
+.customer-card{
+  grid-column: 1 / -1;
+  background: linear-gradient(180deg, rgba(255, 105, 180, .14), rgba(255,255,255,1));
+  border: 1px solid rgba(255, 105, 180, .28);
+  border-radius: 18px;
+  overflow: hidden;
+}
+.customer-card .customer-head{
+  padding: 18px 18px 6px;
+}
+.customer-card .customer-head h2{
+  margin:0;
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: .2px;
+}
+.customer-card .customer-head p{
+  margin: 6px 0 0;
+  color: rgba(0,0,0,.62);
+  font-weight: 700;
+}
+
+.customer-card .customer-body{
+  padding: 14px 18px 18px;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 14px 14px;
+}
+.customer-card .customer-body .field{ grid-column: span 6; }
+.customer-card .customer-body .field.small{ grid-column: span 3; }
+.customer-card .customer-body .field.full{ grid-column: 1 / -1; }
+@media (max-width: 720px){
+  .customer-card .customer-body{ grid-template-columns: 1fr; }
+  .customer-card .customer-body .field,
+  .customer-card .customer-body .field.small,
+  .customer-card .customer-body .field.full{ grid-column: 1 / -1; }
+}
+
+}
+.field label{
+  display:block;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+.field input,.field select,.field textarea{
+  width:100%;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 105, 180, .32);
+  padding: 14px 14px;
+  font-size: 16px;
+  outline: none;
+  background: rgba(255,255,255,.78);
+}
+.field textarea{
+  min-height: 110px;
+  resize: vertical;
+}
+.field.full{grid-column: 1 / -1;}
+.field input[readonly]{
+  background: rgba(255,255,255,.55);
+}
+
+
+/* Compact sizing pass */
+.customer-card .customer-head{padding:14px 14px 6px}
+.customer-card .customer-head h2{font-size:18px}
+.customer-card .customer-body{padding:12px 14px 14px; gap:12px}
+.field label{margin-bottom:6px; font-size:12px}
+.field input,.field select,.field textarea{
+  padding:11px 12px;
+  font-size:14px;
+  border-radius:16px;
+}
+.field textarea{min-height:92px}
+
+
+/* Horizontal Checklist */
+.checklist-wrap{
+  grid-column: 1 / -1;
+  border: 1px dashed rgba(255, 105, 180, .38);
+  background: rgba(255, 224, 240, .55);
+  border-radius: 18px;
+  padding: 12px 14px;
+}
+.checklist-title{
+  font-weight: 900;
+  margin: 0 0 10px 0;
+  letter-spacing: .2px;
+}
+.checklist-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+.chk{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:10px 12px;
+  border:1px solid rgba(255, 105, 180, .32);
+  border-radius:999px;
+  background: rgba(255,255,255,.78);
+  font-weight:900;
+  user-select:none;
+}
+.chk input{
+  width:18px;
+  height:18px;
+  accent-color:#ff2f92;
+  cursor:pointer;
+}
+
+
+/* Customer info layout (no overlap) */
+.customer-card .customer-body{
+  padding: 14px 18px 18px;
+  display:grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 18px 18px;
+}
+.customer-card .customer-body .field{ grid-column: span 6; min-width:0; }
+.customer-card .customer-body .field.quarter{ grid-column: span 3; min-width:0; }
+.customer-card .customer-body .field.full{ grid-column: 1 / -1; min-width:0; }
+.field label{
+  display:block;
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+.field input,.field select,.field textarea{
+  width:100%;
+  box-sizing:border-box;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 105, 180, .32);
+  padding: 14px 14px;
+  font-size: 16px;
+  outline: none;
+  background: rgba(255,255,255,.78);
+}
+.field textarea{ min-height: 120px; resize: vertical; }
+@media (max-width: 900px){
+  .customer-card .customer-body{ grid-template-columns: 1fr; }
+  .customer-card .customer-body .field,
+  .customer-card .customer-body .field.quarter,
+  .customer-card .customer-body .field.full{ grid-column: 1 / -1; }
+}
+
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="topbar">
+      <div class="brand">
+        <h1>QUOTE CALCULATOR</h1>
+      </div>
+      <div class="btnRow">
+        <button class="btn-clear" type="button" id="clearBtn">NEW LEAD (Clear)</button>
+        <button class="btn-copy" type="button" id="copyBtn">Copy Quote Line</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      
+  
+  
+  <!-- Customer Info -->
+  <section class="customer-card" id="customerInfo">
+    <div class="customer-head">
+      <h2>Customer info</h2>
+    </div>
+
+    <div class="customer-body">
+      <div class="field quarter">
+        <label>Date</label>
+        <input id="custDate" type="date" placeholder="mm/dd/yyyy" />
+      </div>
+
+      <div class="field quarter">
+        <label>Time</label>
+        <input id="custTime" type="time" />
+      </div>
+
+      <div class="field" style="grid-column: span 6;">
+        <label>Lead Source</label>
+        <input id="custLeadSource" type="text" placeholder="Call / Web / Referral / Other" />
+      </div>
+
+      <div class="field">
+        <label>Customer Name</label>
+        <input id="custName" type="text" placeholder="First + Last" />
+      </div>
+
+      <div class="field">
+        <label>Phone</label>
+        <input id="custPhone" type="text" placeholder="(###) ###-####" />
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input id="custEmail" type="text" placeholder="name@email.com" />
+      </div>
+
+      <div class="field">
+        <label>Preferred Contact</label>
+        <select id="custPref">
+          <option value="" selected></option>
+          <option>Call</option>
+          <option>Text</option>
+          <option>Email</option>
+        </select>
+      </div>
+
+      <div class="field full">
+        <label>Service Address</label>
+        <input id="custAddress" type="text" placeholder="Street, City, State, ZIP" />
+      </div>
+
+      <div class="field quarter">
+        <label>Pests / Concern</label>
+        <input id="custPests" type="text" placeholder="Ants, roaches, mice, etc." />
+      </div>
+
+      <div class="field quarter">
+        <label>Timing</label>
+        <input id="custTiming" type="text" placeholder="ASAP / This week / Next month" />
+      </div>
+
+      <div class="field quarter">
+        <label>Status</label>
+        <select id="custStatus">
+          <option value="" selected></option>
+          <option>Booked</option>
+          <option>Pending</option>
+          <option>Declined</option>
+          <option>Sold QT</option>
+          <option>Sold Bundle</option>
+          <option>Sold Other</option>
+        </select>
+      </div>
+
+      <div class="field quarter">
+        <label>Appt Date/Time</label>
+        <input id="custAppt" type="text" placeholder="MM/DD @ 2pm" />
+      </div>
+
+      <div class="field full">
+        <label>Notes</label>
+        <textarea id="custNotes" placeholder="Objections, pets, gate code, special instructions..."></textarea>
+      </div>
+
+      <!-- Keep quoted price for calculator to write into -->
+      <input id="custQuote" type="hidden" value="" />
+      <input id="custSource" type="hidden" value="" />
+      <input id="custReason" type="hidden" value="" />
+    </div>
+  </section>
+
+
+
+
+  <!-- Checklist -->
+  <section class="checklist-wrap" id="checklist">
+    <div class="checklist-title">Checklist</div>
+    <div class="checklist-row" aria-label="Horizontal checklist">
+      <label class="chk"><input id="chkINT" type="checkbox" /> INT</label>
+      <label class="chk"><input id="chkPS" type="checkbox" /> PS</label>
+      <label class="chk"><input id="chkWD" type="checkbox" /> WD</label>
+      <label class="chk"><input id="chkGR" type="checkbox" /> GR</label>
+      <label class="chk"><input id="chkLB" type="checkbox" /> LB</label>
+      <label class="chk"><input id="chkRS" type="checkbox" /> RS</label>
+    </div>
+  </section>
+
+
+<!-- QT Square Footage -->
+      <div class="section">
+        <div class="header">QT Square Footage</div>
+        <div class="rows">
+          <div class="row">
+            <div class="label">SqFt</div>
+            <div class="cell in-blue2">
+              <input id="sqft" type="number" min="0" step="1" placeholder="" />
+            </div>
+          </div>
+        </div>
+
+        <details>
+          <summary>Show pricing tiers</summary>
+          <table>
+            <thead>
+              <tr><th>SqFt Range</th><th class="right">QT</th></tr>
+            </thead>
+            <tbody id="tiersTable"></tbody>
+          </table>
+        </details>
+      </div>
+
+      <!-- Termite Linear Feet -->
+      <div class="section">
+        <div class="header">Termite Linear Feet</div>
+        <div class="rows">
+          <div class="row">
+            <div class="label">Linear ft</div>
+            <div class="cell in-blue2">
+              <input id="lf" type="number" min="0" step="1" placeholder="" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bundle + Discounts -->
+      <div class="section full">
+        <div class="header">Bundle + Discounts</div>
+        <div class="rows">
+          <div class="row">
+            <div class="label">Include Termite? (bundle applies)</div>
+            <div class="cell in-blue2">
+              <select id="includeTermite">
+                <option value="No" selected>No</option>
+                <option value="Yes">Yes</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="label">Pay In Full (apply 5% discount)</div>
+            <div class="cell in-blue2">
+              <select id="payInFull">
+                <option value="None" selected>None</option>
+                <option value="Pest">Pest</option>
+                <option value="Termite">Termite</option>
+                <option value="Both">Both</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="label">YIF discount (%)</div>
+            <div class="cell in-blue2">
+              <input id="yifDisc" type="text" value="5" aria-label="YIF discount percent" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="label">Bundle discount per QT ($)</div>
+            <div class="cell in-blue2">
+              <input id="bundleDisc" type="text" value="10" aria-label="Bundle discount" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QT Rate -->
+      <div class="section">
+        <div class="header">QT Rate</div>
+        <div class="rows">
+          <div class="row">
+            <div class="label">Suggested QT rate</div>
+            <div class="cell in-yellow"><div class="out-green small" id="pestSuggested">$0.00</div></div>
+          </div>
+          <div class="row">
+            <div class="label">Your quote QT Rate</div>
+            <div class="cell in-blue">
+              <input id="pestQuote" type="number" min="0" step="0.01" placeholder="Negotiable" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="label">Initial service fee</div>
+            <div class="cell in-blue">
+              <input id="pestInit" type="number" min="0" step="0.01" value="399" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="label">Pest Monthly</div>
+            <div class="cell"><div class="out-green" id="pestMonthly">$0</div></div>
+          </div>
+          <div class="row">
+            <div class="label">Pest YIF</div>
+            <div class="cell"><div class="out-green" id="pestYIF">$0.00</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Termite Yearly Rate -->
+      <div class="section">
+        <div class="header">Termite Yearly Rate</div>
+        <div class="rows">
+          <div class="row">
+            <div class="label">Suggested SM Rate</div>
+            <div class="cell in-yellow"><div class="out-green small" id="termSuggested">$0.00</div></div>
+          </div>
+          <div class="row">
+            <div class="label">Your quote SM Rate</div>
+            <div class="cell in-blue">
+              <input id="termQuote" type="number" min="0" step="0.01" placeholder="Negotiable" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="label">Termite install fee</div>
+            <div class="cell in-blue">
+              <input id="termInstall" type="number" min="0" step="0.01" value="0" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="label">SM Monthly</div>
+            <div class="cell"><div class="out-green" id="termMonthly">$0</div></div>
+          </div>
+          <div class="row">
+            <div class="label">Termite YIF</div>
+            <div class="cell"><div class="out-green" id="termYIF">$0.00</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bundle Totals -->
+      <div class="section full">
+        <div class="header">Bundle Totals</div>
+        <div class="bundleTotals" style="padding:12px;">
+          <div>
+            <div class="label" style="border:0; padding:0 0 8px 0;">Bundle QT Rate</div>
+            <div class="out-green" id="bundleQT">$0.00</div>
+          </div>
+          <div>
+            <div class="label" style="border:0; padding:0 0 8px 0;">Bundle YIF (Pest + Termite)</div>
+            <div class="out-green" id="bundleYIF">$0.00</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const tiers = [
+    {min:1000, max:1499, qt:139},
+    {min:1500, max:2499, qt:159},
+    {min:2500, max:3499, qt:179},
+    {min:3500, max:3999, qt:199},
+    {min:4000, max:4499, qt:209},
+    {min:4500, max:5000, qt:219},
+  ];
+
+  const qtColors = {"219": "#ffb3d1", "209": "#ffc2dc", "199": "#ffd1e6", "179": "#ffe0f0", "169": "#ffd6ea", "159": "#ffcade", "149": "#ffbed4", "139": "#ffb3d1", "129": "#ffa3c8"};
+
+  const $ = (id) => document.getElementById(id);
+
+  function money(n){
+    const x = Number.isFinite(n) ? n : 0;
+    return x.toLocaleString(undefined, {style:'currency', currency:'USD'});
+  }
+  function money0(n){
+    const x = Number.isFinite(n) ? n : 0;
+    return x.toLocaleString(undefined, {style:'currency', currency:'USD', maximumFractionDigits:0});
+  }
+  function ceil(n){ return Math.ceil(n); }
+
+  function suggestedPestQT(sqft){
+    if(!Number.isFinite(sqft) || sqft<=0) return 0;
+    let best = 0;
+    for(const t of tiers){ if(sqft >= t.min) best = t.qt; }
+    return best;
+  }
+
+  function yifDiscount(){
+    const raw = String($('yifDisc').value || '').replace('%','').trim();
+    const pct = parseFloat(raw);
+    return Number.isFinite(pct) ? (pct/100) : 0;
+  }
+  function bundleDiscount(){
+    const raw = String($('bundleDisc').value || '').replace('$','').trim();
+    const n = parseFloat(raw);
+    return Number.isFinite(n) ? n : 0;
+  }
+  function payInFullMode(){ return $('payInFull').value; }
+
+  function calc(){
+    const sqft = parseFloat($('sqft').value);
+    const lf = parseFloat($('lf').value);
+    const include = $('includeTermite').value === 'Yes';
+
+    const yifDisc = yifDiscount(); // 0.05 default
+    const bundleDisc = bundleDiscount(); // 10 default
+    const mode = payInFullMode(); // None/Pest/Termite/Both
+
+    // Pest
+    const pestSuggested = suggestedPestQT(sqft);
+    $('pestSuggested').textContent = money(pestSuggested);
+
+    const pestQuote = parseFloat($('pestQuote').value);
+    const pestInit = parseFloat($('pestInit').value);
+    const pestFinal = Number.isFinite(pestQuote) ? pestQuote : pestSuggested;
+    const pestAfterBundle = include ? Math.max(0, pestFinal - bundleDisc) : pestFinal;
+
+    const pestMonthly = (pestAfterBundle>0) ? ceil(pestAfterBundle/3) : 0;
+
+    const pestYearBase = pestAfterBundle * 4;
+    const pestInitSafe = (Number.isFinite(pestInit)?pestInit:0);
+    const pestTotalBase = pestYearBase + pestInitSafe;
+    const pestYIF = (pestAfterBundle>0)
+      ? ((mode === 'Pest' || mode === 'Both') ? (pestTotalBase * (1 - yifDisc)) : pestTotalBase)
+      : 0;
+
+    $('pestMonthly').textContent = money0(pestMonthly);
+    $('pestYIF').textContent = money(pestYIF);
+
+    // Termite (yearly = lf * 1.5 unless quote override)
+    const termSuggested = (Number.isFinite(lf) && lf>0) ? (lf * 1.5) : 0;
+    $('termSuggested').textContent = money(termSuggested);
+
+    const termQuote = parseFloat($('termQuote').value);
+    const termInstall = parseFloat($('termInstall').value);
+    const termFinal = Number.isFinite(termQuote) ? termQuote : termSuggested;
+
+    const termMonthly = (termFinal>0) ? ceil(termFinal/12) : 0;
+    const termInstallSafe = (Number.isFinite(termInstall)?termInstall:0);
+    const termTotalBase = termFinal + termInstallSafe;
+    const termYIF = (termFinal>0)
+      ? ((mode === 'Termite' || mode === 'Both') ? (termTotalBase * (1 - yifDisc)) : termTotalBase)
+      : 0;
+
+    $('termMonthly').textContent = money0(termMonthly);
+    $('termYIF').textContent = money(termYIF);
+
+    // Bundle totals
+    $('bundleQT').textContent = money(pestAfterBundle);
+    $('bundleYIF').textContent = money(include ? (pestYIF + termYIF) : pestYIF);
+
+    // Copy line
+    const quoteLine = include
+      ? `Pest QT ${money(pestAfterBundle)} (Monthly ${money0(pestMonthly)}), Termite YR ${money(termFinal)} (Monthly ${money0(termMonthly)}), Bundle YIF ${money(pestYIF + termYIF)}`
+      : `Pest QT ${money(pestAfterBundle)} (Monthly ${money0(pestMonthly)}), Pest YIF ${money(pestYIF)}`;
+    $('copyBtn').dataset.quote = quoteLine;
+  }
+
+  function clearAll(){
+    $('sqft').value = '';
+    $('lf').value = '';
+    $('includeTermite').value = 'No';
+    $('payInFull').value = 'None';
+    $('yifDisc').value = '5';
+    $('bundleDisc').value = '10';
+
+    $('pestQuote').value = '';
+    $('pestInit').value = '399';
+
+    $('termQuote').value = '';
+    $('termInstall').value = '0';
+
+    
+    // Customer info fields
+    ['custName','custPhone','custEmail','custAddress','custNotes','custQuote'].forEach(id=>{
+      const el = document.getElementById(id); if(el) el.value='';
+    });
+    ['custSource','custReason','custStatus'].forEach(id=>{
+      const el = document.getElementById(id); if(el) el.value='';
+    });
+
+    // Checklist
+    ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS'].forEach(id=>{ const el=$(id); if(el) el.checked=false; });
+
+    calc();
+  }
+
+  function copyQuote(){
+    const text = $('copyBtn').dataset.quote || '';
+    if(!text) return;
+    navigator.clipboard.writeText(text).then(()=>{
+      const btn = $('copyBtn');
+      const old = btn.textContent;
+      btn.textContent = 'Copied';
+      setTimeout(()=>btn.textContent = old, 900);
+    }).catch(()=>{ alert('Copy failed. You can select and copy manually.'); });
+  }
+
+  // Populate tiers table with palette colors
+  const tbody = document.getElementById('tiersTable');
+  tiers.forEach(t=>{
+    const tr = document.createElement('tr');
+    const bg = qtColors[t.qt] || '#ffffff';
+    tr.innerHTML = `<td><span class="tierTag" style="background:${bg}">${t.min.toLocaleString()}–${t.max.toLocaleString()}</span></td>
+                    <td class="right" style="background:${bg}; font-weight:800;">${money(t.qt)}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Wire up events
+  ['sqft','lf','includeTermite','payInFull','yifDisc','bundleDisc','pestQuote','pestInit','termQuote','termInstall']
+    .forEach(id=> $(id).addEventListener('input', calc));
+  $('clearBtn').addEventListener('click', clearAll);
+  $('copyBtn').addEventListener('click', copyQuote);
+
+  // Initial
+  calc();
+
+  // Mirror calculator output into Customer Info "Quoted price (auto)"
+  function updateCustomerQuote(){
+    const outIds = ['yifTotal','final','grandTotal','total','quoteTotal','yif','qtTotal','finalTotal'];
+    let txt = '';
+    for(const id of outIds){
+      const el = document.getElementById(id);
+      if(el && (el.textContent||'').trim()){
+        txt = (el.textContent||'').trim();
+        break;
+      }
+    }
+    const quoteEl = document.getElementById('custQuote');
+    if(quoteEl){
+      quoteEl.value = txt || quoteEl.value || '';
+    }
+  }
+
+  // Hook into calc if present
+  (function(){
+    const _origCalc = window.calc;
+    if(typeof _origCalc === 'function'){
+      window.calc = function(){
+        const r = _origCalc.apply(this, arguments);
+        try{ updateCustomerQuote(); }catch(e){}
+        return r;
+      }
+      try{ updateCustomerQuote(); }catch(e){}
+    } else {
+      // best-effort: update on input changes
+      document.addEventListener('input', ()=>{ try{updateCustomerQuote();}catch(e){} }, true);
+    }
+  })();
+
+</script>
+</body>
+</html>
