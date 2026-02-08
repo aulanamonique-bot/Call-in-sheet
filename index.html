@@ -248,10 +248,30 @@
     .btn{ border:0; border-radius:10px; padding:10px 14px; font-weight:800; font-size:14px; cursor:pointer; }
     .btn:disabled{ opacity:.5; cursor:not-allowed; }
 
-  </style>
+  
+    .steps{ display:flex; gap:10px; flex-wrap:wrap; margin: 10px 0 14px; }
+    .step{ display:flex; align-items:center; gap:8px; padding:8px 12px; border:1px solid #f3b6d5; border-radius:999px; background:#fff; font-weight:800; font-size:13px; opacity:.85; }
+    .step .num{ width:22px; height:22px; border-radius:999px; background:#ff2f92; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:12px; }
+    .step.active{ box-shadow: 0 0 0 3px rgba(255,47,146,.18); opacity:1; }
+    .card{ border:1px solid #f3b6d5; border-radius:14px; background:#fff; padding:14px; }
+    .cardTitle{ font-weight:900; font-size:14px; margin:0 0 10px 0; }
+    .btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+
+    .suggestedBox{ font-size:13px !important; font-weight:700 !important; opacity:.75; }
+    .dominantInput input{ font-size:18px !important; font-weight:900 !important; padding:12px 12px !important; }
+
+</style>
 </head>
 <body>
   <div class="sheet">
+
+<div class="steps">
+  <div class="step active" id="step1Tag"><span class="num">1</span> Address</div>
+  <div class="step" id="step2Tag"><span class="num">2</span> Auto-fill / Measure</div>
+  <div class="step" id="step3Tag"><span class="num">3</span> Quote</div>
+</div>
+
     <div class="topbar">
       <div class="brand">
         <h1>QUOTE CALCULATOR</h1>
@@ -262,7 +282,7 @@
       </div>
     </div>
 
-    <div class="grid">
+    <div class="card" id="step3Card"><div class="cardTitle">Step 3 — Quote</div><div class="grid">
       
   
   
@@ -318,47 +338,34 @@
         <input id="custAddress" type="text" placeholder="Street, City, State, ZIP" />
       
 
-<div class="field" style="grid-column: 1 / -1;">
+</div></div><div class="card" id="step2Card"><div class="cardTitle">Step 2 — Auto-fill / Measure</div><div class="field" style="grid-column: 1 / -1;">
   <label>Auto-fill SqFt &amp; LF (GIS)</label>
   <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-    <select id="gisCounty" class="in" style="max-width:260px;">
+    <select id="gisCounty" class="in" style="max-width:220px;">
       <option value="wake">Wake</option>
       <option value="durham">Durham</option>
-      <option value="orange">Orange</option>
-      <option value="johnston">Johnston</option>
-      <option value="harnett">Harnett</option>
-      <option value="franklin">Franklin</option>
-      <option value="chatham">Chatham</option>
-      <option value="nash">Nash</option>
-      <option value="wilson">Wilson</option>
     </select>
-    <button type="button" class="btn btn-copy" id="gisLookup" style="white-space:nowrap;">Auto-fill from Address</button>
+    <button type="button" class="btn btn-copy" id="gisLookup" style="white-space:nowrap;">Lookup from Address</button>
     <span id="gisStatus" style="font-size:12px; opacity:.85;"></span>
   </div>
-  <div style="font-size:12px; opacity:.7; margin-top:6px;">
-    Tip: address has to be close to what the county GIS expects. If it can’t find it, you can still type SqFt/LF manually.
   </div>
-</div>
 
 <div class="field" style="grid-column: 1 / -1;">
   <details>
-    <summary><strong>Measure Termite LF on Map</strong> <span style="font-size:12px; opacity:.7;">(Google Maps)</span></summary>
+    <summary><strong>Measure</strong></summary>
+    
     <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-      <button type="button" class="btn btn-copy" id="mapLoadBtn">Load Map</button>
-      <button type="button" class="btn btn-copy" id="mapGoBtn" disabled>Find Address</button>
-      <button type="button" class="btn btn-copy" id="mapDrawPolyBtn" disabled>Draw Perimeter</button>
-      <button type="button" class="btn btn-copy" id="mapClearShapeBtn" disabled>Clear Shape</button>
-      <button type="button" class="btn btn-copy" id="mapUseLfBtn" disabled>Use LF →</button>
+      <button type="button" class="btn btn-copy" id="mapMeasureBtn">Measure</button>
+      <button type="button" class="btn btn-copy" id="mapClearShapeBtn" disabled>Clear</button>
+      <button type="button" class="btn btn-copy" id="mapUseLfBtn" disabled>Submit LF</button>
       <span id="mapStatus" style="font-size:12px; opacity:.85;"></span>
     </div>
-    <div style="font-size:12px; opacity:.75; margin-top:8px; line-height:1.35;">
-      1) Click <b>Load Map</b> (requires a Google Maps API key) • 2) Click <b>Find Address</b> • 3) Click around the home to outline the foundation • It auto-calculates LF.
-    </div>
+    
     <div id="mapWrap" style="margin-top:10px; border:1px solid #f3b6d5; border-radius:12px; overflow:hidden; display:none;">
       <div id="gmap" style="height:360px; width:100%;"></div>
     </div>
   </details>
-</div>
+</div></div>
 
 </div>
 
@@ -442,7 +449,7 @@
         </details>
       </div>
 
-      <!-- Termite Linear Feet -->
+      <!-- Termite Linear Feet --><div id="termiteLfWrap" style="display:none;">
       <div class="section">
         <div class="header">Termite Linear Feet</div>
         <div class="rows">
@@ -455,43 +462,35 @@
         </div>
       </div>
 
+      </div>
+
       <!-- Bundle + Discounts -->
       <div class="section full">
         <div class="header">Bundle + Discounts</div>
         <div class="rows">
           <div class="row">
-            <div class="label">Include Termite? (bundle applies)</div>
+            <div class="label">Termite Protection</div>
             <div class="cell in-blue2">
-              <select id="includeTermite">
-                <option value="No" selected>No</option>
-                <option value="Yes">Yes</option>
-              </select>
+              <button type="button" class="btn btn-copy" id="toggleTermiteBtn" style="width:100%;">Add Termite Protection</button>
             </div>
           </div>
+          <input type="hidden" id="includeTermite" value="No" />
+          
           <div class="row">
-            <div class="label">Pay In Full (apply 5% discount)</div>
-            <div class="cell in-blue2">
-              <select id="payInFull">
-                <option value="None" selected>None</option>
-                <option value="Pest">Pest</option>
-                <option value="Termite">Termite</option>
-                <option value="Both">Both</option>
-              </select>
+            <div class="label">YIF Discount</div>
+            <div class="cell in-blue2" style="gap:10px;">
+              <label style="display:flex; gap:8px; align-items:center; font-weight:800; font-size:13px;">
+                <input type="checkbox" id="yifPestChk" /> Pest
+              </label>
+              <label style="display:flex; gap:8px; align-items:center; font-weight:800; font-size:13px;">
+                <input type="checkbox" id="yifTermChk" /> Termite
+              </label>
+              <div id="yifPctWrap" style="display:none; flex:1; min-width:160px;">
+                <input id="yifDisc" type="text" value="5" aria-label="YIF discount percent" />
+              </div>
             </div>
           </div>
-          <div class="row">
-            <div class="label">YIF discount (%)</div>
-            <div class="cell in-blue2">
-              <input id="yifDisc" type="text" value="5" aria-label="YIF discount percent" />
-            </div>
-          </div>
-          <div class="row">
-            <div class="label">Bundle discount per QT ($)</div>
-            <div class="cell in-blue2">
-              <input id="bundleDisc" type="text" value="10" aria-label="Bundle discount" />
-            </div>
-          </div>
-        </div>
+    
       </div>
 
       <!-- QT Rate -->
@@ -500,11 +499,11 @@
         <div class="rows">
           <div class="row">
             <div class="label">Suggested QT rate</div>
-            <div class="cell in-yellow"><div class="out-green small" id="pestSuggested">$0.00</div></div>
+            <div class="cell in-yellow"><div class="out-green small suggestedBox" id="pestSuggested">$0.00</div></div>
           </div>
           <div class="row">
             <div class="label">Your quote QT Rate</div>
-            <div class="cell in-blue">
+            <div class="cell in-blue dominantInput">
               <input id="pestQuote" type="number" min="0" step="0.01" placeholder="Negotiable" />
             </div>
           </div>
@@ -525,17 +524,17 @@
         </div>
       </div>
 
-      <!-- Termite Yearly Rate -->
+      <!-- Termite Yearly Rate --><div id="termiteSectionWrap" style="display:none;">
       <div class="section">
         <div class="header">Termite Yearly Rate</div>
         <div class="rows">
           <div class="row">
             <div class="label">Suggested SM Rate</div>
-            <div class="cell in-yellow"><div class="out-green small" id="termSuggested">$0.00</div></div>
+            <div class="cell in-yellow"><div class="out-green small suggestedBox" id="termSuggested">$0.00</div></div>
           </div>
           <div class="row">
             <div class="label">Your quote SM Rate</div>
-            <div class="cell in-blue">
+            <div class="cell in-blue dominantInput">
               <input id="termQuote" type="number" min="0" step="0.01" placeholder="Negotiable" />
             </div>
           </div>
@@ -556,6 +555,9 @@
         </div>
       </div>
 
+      </div>
+
+      <div id="bundleTotalsWrap" style="display:none;">
       <!-- Bundle Totals -->
       <div class="section full">
         <div class="header">Bundle Totals</div>
@@ -572,6 +574,8 @@
       </div>
     </div>
   </div>
+</div>
+</div>
 
 <script>
   const tiers = [
@@ -614,7 +618,10 @@
     const n = parseFloat(raw);
     return Number.isFinite(n) ? n : 0;
   }
-  function payInFullMode(){ return $('payInFull').value; }
+  
+  function yifApplyPest(){ return document.getElementById('yifPestChk')?.checked === true; }
+  function yifApplyTermite(){ return document.getElementById('yifTermChk')?.checked === true; }
+
 
   function calc(){
     const sqft = parseFloat($('sqft').value);
@@ -634,13 +641,20 @@
     const pestFinal = Number.isFinite(pestQuote) ? pestQuote : pestSuggested;
     const pestAfterBundle = include ? Math.max(0, pestFinal - bundleDisc) : pestFinal;
 
+    // Default initial fee to match QT rate unless manually changed
+    if(!pestInitTouched && pestAfterBundle>0){
+      const pi = document.getElementById('pestInit');
+      if(pi) pi.value = String(pestAfterBundle.toFixed(2));
+    }
+
+
     const pestMonthly = (pestAfterBundle>0) ? ceil(pestAfterBundle/3) : 0;
 
     const pestYearBase = pestAfterBundle * 4;
     const pestInitSafe = (Number.isFinite(pestInit)?pestInit:0);
     const pestTotalBase = pestYearBase + pestInitSafe;
     const pestYIF = (pestAfterBundle>0)
-      ? ((mode === 'Pest' || mode === 'Both') ? (pestTotalBase * (1 - yifDisc)) : pestTotalBase)
+      ? (yifApplyPest() ? (pestTotalBase * (1 - yifDisc)) : pestTotalBase)
       : 0;
 
     $('pestMonthly').textContent = money0(pestMonthly);
@@ -658,7 +672,7 @@
     const termInstallSafe = (Number.isFinite(termInstall)?termInstall:0);
     const termTotalBase = termFinal + termInstallSafe;
     const termYIF = (termFinal>0)
-      ? ((mode === 'Termite' || mode === 'Both') ? (termTotalBase * (1 - yifDisc)) : termTotalBase)
+      ? (yifApplyTermite() ? (termTotalBase * (1 - yifDisc)) : termTotalBase)
       : 0;
 
     $('termMonthly').textContent = money0(termMonthly);
@@ -680,8 +694,11 @@
     $('sqft').value = '';
     $('lf').value = '';
     $('includeTermite').value = 'No';
-    $('payInFull').value = 'None';
+    
     $('yifDisc').value = '5';
+    const yp=document.getElementById('yifPestChk'); if(yp) yp.checked=false;
+    const yt=document.getElementById('yifTermChk'); if(yt) yt.checked=false;
+    if(typeof syncYifUi==='function') syncYifUi();
     $('bundleDisc').value = '10';
     $('pestQuote').value = '';
     $('pestInit').value = '399';
@@ -730,7 +747,7 @@
   });
 
   // Wire up events
-  ['sqft','lf','includeTermite','payInFull','yifDisc','bundleDisc','pestQuote','pestInit','termQuote','termInstall']
+  ['sqft','lf','includeTermite','yifDisc','bundleDisc','pestQuote','pestInit','termQuote','termInstall']
     .forEach(id=> $(id).addEventListener('input', calc));
   $('clearBtn').addEventListener('click', clearAll);
   $('copyBtn').addEventListener('click', copyQuote);
@@ -741,251 +758,140 @@
 
 
   // ------------------------
-// GIS AUTO-FILL (multi-county)
-// - Keeps the full address exactly as typed (for your records)
-// - Uses only the street portion to search county GIS (less picky)
-// ------------------------
+  // GIS AUTO-FILL (Wake / Durham)
+  // ------------------------
+  async function gisLookup(){
+    const status = document.getElementById('gisStatus');
+    const county = document.getElementById('gisCounty')?.value || 'wake';
+    const addr = (document.getElementById('custAddress')?.value || '').trim();
 
-function extractStreetForGis(full){
-  // "123 Main St Apt 4B, Raleigh, NC 27609" -> "123 MAIN ST"
-  const first = (full || '').split(',')[0] || '';
-  return first
-    .replace(/\b(APT|UNIT|STE|SUITE|#)\b.*$/i,'')   // strip unit info
-    .replace(/[^\w\s\-]/g,' ')                     // kill punctuation
-    .replace(/\s+/g,' ')
-    .trim()
-    .toUpperCase();
-}
-
-function safeLike(str){
-  return (str || '').replace(/'/g, "''");
-}
-
-function perimeterFtFromPolygon(geom){
-  // expects esriGeometryPolygon with rings; units depend on the service SR (we request outSR in feet)
-  if(!geom || !Array.isArray(geom.rings)) return null;
-  let total = 0;
-  for(const ring of geom.rings){
-    if(!Array.isArray(ring) || ring.length < 2) continue;
-    for(let i=1;i<ring.length;i++){
-      const a = ring[i-1], b = ring[i];
-      const dx = (b[0]-a[0]);
-      const dy = (b[1]-a[1]);
-      total += Math.hypot(dx,dy);
+    status.textContent = '';
+    if(!addr){
+      status.textContent = 'Enter an address first.';
+      return;
     }
-  }
-  return total > 0 ? total : null;
-}
 
-async function queryFirstMatch({base, where, outFields, outSR, returnGeometry=true, resultRecordCount=1}){
-  const url = base + '?' + new URLSearchParams({
-    f:'json',
-    where,
-    outFields,
-    returnGeometry: returnGeometry ? 'true' : 'false',
-    outSR: String(outSR || ''),
-    resultRecordCount: String(resultRecordCount || 1)
-  }).toString();
-  const r = await fetch(url);
-  const j = await r.json();
-  return j?.features?.[0] || null;
-}
+    const setStatus = (t)=>{ status.textContent = t; };
 
-async function gisLookup(){
-  const status = document.getElementById('gisStatus');
-  const county = document.getElementById('gisCounty')?.value || 'wake';
-  const fullAddr = (document.getElementById('custAddress')?.value || '').trim();
+    // Normalize for LIKE queries
+    const norm = addr.replace(/[,#]/g,' ').replace(/\s+/g,' ').trim().toUpperCase();
 
-  status.textContent = '';
-  if(!fullAddr){
-    status.textContent = 'Enter an address first.';
-    return;
-  }
+    try{
+      setStatus('');
 
-  const street = extractStreetForGis(fullAddr);
-  if(!street){
-    status.textContent = 'Enter a street address (e.g., 123 Main St).';
-    return;
-  }
+      if(county === 'wake'){
+        // Wake parcels: HEATEDAREA + SITE_ADDRESS
+        // Service: https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0  (fields include HEATEDAREA, SITE_ADDRESS)
+        const base = 'https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0/query';
+        const where = "UPPER(SITE_ADDRESS) LIKE '%" + norm.replace(/'/g,"''") + "%'";
+        const url = base + '?' + new URLSearchParams({
+          f:'json',
+          where,
+          outFields:'HEATEDAREA,SITE_ADDRESS',
+          returnGeometry:'false',
+          resultRecordCount:'1'
+        }).toString();
 
-  const setStatus = (t)=>{ status.textContent = t; };
-  const whereLike = (field)=> `UPPER(${field}) LIKE '%${safeLike(street)}%'`;
+        const r = await fetch(url);
+        const j = await r.json();
+        const feat = j?.features?.[0];
+        const sqft = feat?.attributes?.HEATEDAREA;
 
-  try{
-    setStatus(`Searching ${county.toUpperCase()} GIS for: ${street}`);
+        if(!feat){
+          setStatus('Not found');
+          return;
+        }
+        if(Number.isFinite(sqft)){
+          document.getElementById('sqft').value = String(Math.round(sqft));
+          setStatus('');
+          calc();
+        }else{
+          setStatus('Not found');
+        }
+        return;
+      }
 
-    // --- Wake ---
-    if(county === 'wake'){
-      const feat = await queryFirstMatch({
-        base: 'https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0/query',
-        where: whereLike('SITE_ADDRESS'),
-        outFields: 'HEATEDAREA,SITE_ADDRESS',
-        returnGeometry: false,
-        outSR: 2264
-      });
+      if(county === 'durham'){
+        // Durham parcels: HEATED_AREA + LOCATION_ADDR; we also try to estimate LF using city building footprints layer (within city limits)
+        // Parcels layer: https://webgis.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4
+        // Buildings layer (city limits): https://webgis2.durhamnc.gov/server/rest/services/PublicWorksServices/OnlineCheckerV2/MapServer/17
+        const parcelsBase = 'https://webgis.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4/query';
+        const where = "UPPER(LOCATION_ADDR) LIKE '%" + norm.replace(/'/g,"''") + "%'";
+        const parcelUrl = parcelsBase + '?' + new URLSearchParams({
+          f:'json',
+          where,
+          outFields:'HEATED_AREA,LOCATION_ADDR',
+          returnGeometry:'true',
+          outSR:'2264', // state plane feet (matches services)
+          resultRecordCount:'1'
+        }).toString();
 
-      const sqft = feat?.attributes?.HEATEDAREA;
-      if(!feat){ setStatus('No match from Wake GIS. Type SqFt/LF manually.'); return; }
-      if(Number.isFinite(sqft)){
-        document.getElementById('sqft').value = String(Math.round(sqft));
-        setStatus('SqFt filled from Wake GIS. (LF still manual.)');
+        const pr = await fetch(parcelUrl);
+        const pj = await pr.json();
+        const pFeat = pj?.features?.[0];
+        const sqft = pFeat?.attributes?.HEATED_AREA;
+
+        if(!pFeat){
+          setStatus('Not found');
+          return;
+        }
+
+        if(Number.isFinite(sqft)){
+          document.getElementById('sqft').value = String(Math.round(sqft));
+        }
+
+        // Try to estimate LF from building footprints intersecting the parcel polygon:
+        // We'll query for max SHAPE.STLength() in the building layer using outStatistics.
+        const geom = pFeat?.geometry;
+        if(!geom){
+          setStatus('');
+          calc();
+          return;
+        }
+
+        setStatus('');
+
+        const bBase = 'https://webgis2.durhamnc.gov/server/rest/services/PublicWorksServices/OnlineCheckerV2/MapServer/17/query';
+        const outStatistics = JSON.stringify([{
+          statisticType:'max',
+          onStatisticField:'Shape.STLength()',
+          outStatisticFieldName:'max_len'
+        }]);
+
+        const bUrl = bBase + '?' + new URLSearchParams({
+          f:'json',
+          geometry: JSON.stringify(geom),
+          geometryType:'esriGeometryPolygon',
+          inSR:'2264',
+          spatialRel:'esriSpatialRelIntersects',
+          outFields:'',
+          outStatistics,
+          returnGeometry:'false'
+        }).toString();
+
+        const br = await fetch(bUrl);
+        const bj = await br.json();
+        const maxLen = bj?.features?.[0]?.attributes?.max_len;
+
+        if(Number.isFinite(maxLen) && maxLen > 0){
+          // maxLen is in feet (StatePlane feet). Round to nearest whole.
+          document.getElementById('lf').value = String(Math.round(maxLen));
+          setStatus('');
+        }else{
+          setStatus('');
+        }
+
         calc();
-      }else{
-        setStatus('Found parcel, but SqFt missing. Type it manually.');
+        return;
       }
-      return;
+
+    }catch(err){
+      console.error(err);
+      setStatus('Blocked by browser/CORS. If you want this to work as a shared link, we’ll need a tiny proxy (Cloudflare/Netlify).');
     }
-
-    // --- Durham ---
-    if(county === 'durham'){
-      const pFeat = await queryFirstMatch({
-        base: 'https://webgis.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4/query',
-        where: whereLike('LOCATION_ADDR'),
-        outFields: 'HEATED_AREA,LOCATION_ADDR',
-        returnGeometry: true,
-        outSR: 2264
-      });
-
-      const sqft = pFeat?.attributes?.HEATED_AREA;
-      if(!pFeat){ setStatus('No match from Durham GIS. Type SqFt/LF manually.'); return; }
-      if(Number.isFinite(sqft)){
-        document.getElementById('sqft').value = String(Math.round(sqft));
-      }
-
-      const geom = pFeat?.geometry;
-      if(!geom){
-        setStatus('SqFt filled. Could not fetch parcel geometry for LF.');
-        calc(); return;
-      }
-
-      setStatus('SqFt filled. Estimating LF...');
-
-      const bBase = 'https://webgis2.durhamnc.gov/server/rest/services/PublicWorksServices/OnlineCheckerV2/MapServer/17/query';
-      const outStatistics = JSON.stringify([{
-        statisticType:'max',
-        onStatisticField:'Shape.STLength()',
-        outStatisticFieldName:'max_len'
-      }]);
-
-      const bUrl = bBase + '?' + new URLSearchParams({
-        f:'json',
-        geometry: JSON.stringify(geom),
-        geometryType:'esriGeometryPolygon',
-        inSR:'2264',
-        spatialRel:'esriSpatialRelIntersects',
-        outFields:'',
-        outStatistics,
-        returnGeometry:'false'
-      }).toString();
-
-      const br = await fetch(bUrl);
-      const bj = await br.json();
-      const maxLen = bj?.features?.[0]?.attributes?.max_len;
-
-      if(Number.isFinite(maxLen) && maxLen > 0){
-        document.getElementById('lf').value = String(Math.round(maxLen));
-        setStatus('SqFt + LF filled from Durham GIS.');
-      }else{
-        setStatus('SqFt filled. Could not estimate LF (likely outside footprint coverage).');
-      }
-      calc();
-      return;
-    }
-
-    // --- Orange (ArcGIS Online parcels) ---
-    if(county === 'orange'){
-      const feat = await queryFirstMatch({
-        base: 'https://services2.arcgis.com/N4cKzJ9dzXmsPNRs/ArcGIS/rest/services/orange_county_parcels/FeatureServer/0/query',
-        where: whereLike('SITUS'),
-        outFields: 'LIVING_AREA,SITUS',
-        returnGeometry: true,
-        outSR: 2236
-      });
-
-      if(!feat){ setStatus('No match from Orange GIS. Type SqFt/LF manually.'); return; }
-
-      const sqft = feat?.attributes?.LIVING_AREA;
-      if(Number.isFinite(sqft)){
-        document.getElementById('sqft').value = String(Math.round(sqft));
-      }
-
-      const per = perimeterFtFromPolygon(feat?.geometry);
-      if(Number.isFinite(per)){
-        document.getElementById('lf').value = String(Math.round(per));
-        setStatus('SqFt filled. LF estimated from parcel boundary.');
-      }else{
-        setStatus('SqFt filled. Could not estimate LF from parcel geometry.');
-      }
-      calc();
-      return;
-    }
-
-    // --- Nash (Parcel Records) ---
-    if(county === 'nash'){
-      const feat = await queryFirstMatch({
-        base: 'https://gis.nashcountync.gov/nashmaps/rest/services/OpenGov/GIS_Flags/MapServer/5/query',
-        where: whereLike('PHYS_ADDR'),
-        outFields: 'R_SQFT,PHYS_ADDR',
-        returnGeometry: true,
-        outSR: 2264
-      });
-
-      if(!feat){ setStatus('No match from Nash GIS. Type SqFt/LF manually.'); return; }
-
-      const sqft = feat?.attributes?.R_SQFT;
-      if(Number.isFinite(sqft)){
-        document.getElementById('sqft').value = String(Math.round(sqft));
-      }
-
-      const per = perimeterFtFromPolygon(feat?.geometry);
-      if(Number.isFinite(per)){
-        document.getElementById('lf').value = String(Math.round(per));
-        setStatus('SqFt filled. LF estimated from parcel boundary.');
-      }else{
-        setStatus('SqFt filled (if available). Could not estimate LF.');
-      }
-      calc();
-      return;
-    }
-
-    // --- Wilson (Parcels) ---
-    if(county === 'wilson'){
-      const feat = await queryFirstMatch({
-        base: 'https://gis.wilsonnc.org/services/rest/services/publiclayers/Parcels/MapServer/0/query',
-        where: whereLike('PhysicalStreetAddress'),
-        outFields: 'FinishedArea1Imp,PhysicalStreetAddress',
-        returnGeometry: true,
-        outSR: 2264
-      });
-
-      if(!feat){ setStatus('No match from Wilson GIS. Type SqFt/LF manually.'); return; }
-
-      const sqft = feat?.attributes?.FinishedArea1Imp;
-      if(Number.isFinite(sqft)){
-        document.getElementById('sqft').value = String(Math.round(sqft));
-      }
-
-      const per = perimeterFtFromPolygon(feat?.geometry);
-      if(Number.isFinite(per)){
-        document.getElementById('lf').value = String(Math.round(per));
-        setStatus('SqFt filled. LF estimated from parcel boundary.');
-      }else{
-        setStatus('SqFt filled (if available). Could not estimate LF.');
-      }
-      calc();
-      return;
-    }
-
-    // --- Chatham / Johnston / Harnett / Franklin ---
-    setStatus('That county is in the dropdown, but GIS auto-fill is not wired yet. (Manual SqFt/LF still works.)');
-
-  }catch(err){
-    console.error(err);
-    setStatus('Browser blocked the request (CORS). If this happens on Netlify, we can add a tiny proxy (Netlify Function) to make GIS lookups reliable.');
   }
-}
 
-document.getElementById('gisLookup')?.addEventListener('click', gisLookup);
+  document.getElementById('gisLookup')?.addEventListener('click', gisLookup);
 
 
 
@@ -993,14 +899,14 @@ document.getElementById('gisLookup')?.addEventListener('click', gisLookup);
   // GOOGLE MAPS: DRAW + PERIMETER → LF
   // ------------------------
   // Put your API key here:
-  const GOOGLE_MAPS_API_KEY = 'AIzaSyDrxPUNZW9mqzpyc3J83ocS4Rqc7DsgDv0';
+  const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY';
 
   let gmap, geocoder, drawingManager, activeShape, lastPerimeterFeet = 0;
 
   function setMapStatus(t){ const el = document.getElementById('mapStatus'); if(el) el.textContent = t; }
 
   function enableMapControls(loaded){
-    const ids = ['mapGoBtn','mapDrawPolyBtn','mapClearShapeBtn','mapUseLfBtn'];
+    const ids = ['mapClearShapeBtn','mapUseLfBtn'];
     ids.forEach(id=>{
       const el = document.getElementById(id);
       if(el) el.disabled = !loaded;
@@ -1040,11 +946,11 @@ document.getElementById('gisLookup')?.addEventListener('click', gisLookup);
   function clearActiveShape(){
     if(activeShape){ activeShape.setMap(null); activeShape = null; }
     lastPerimeterFeet = 0;
-    setMapStatus('Shape cleared.');
+    setMapStatus('');
   }
 
   async function initMap(){
-    setMapStatus('Loading map...');
+    setMapStatus('');
     await loadGoogleMapsScript();
 
     document.getElementById('mapWrap').style.display = 'block';
@@ -1056,6 +962,35 @@ document.getElementById('gisLookup')?.addEventListener('click', gisLookup);
     });
 
     geocoder = new google.maps.Geocoder();
+    
+    // Places Autocomplete for address (WAY better than raw geocoding)
+    try{
+      const addrEl = document.getElementById('custAddress');
+      if(addrEl && google.maps.places){
+        const ncBounds = new google.maps.LatLngBounds(
+          new google.maps.LatLng(33.5, -84.5),  // SW-ish (covers NC comfortably)
+          new google.maps.LatLng(37.0, -75.0)   // NE-ish
+        );
+        window.__selectedPlace = null;
+        window.__addrAutocomplete = new google.maps.places.Autocomplete(addrEl, {
+          fields: ['geometry','place_id','formatted_address','name'],
+          componentRestrictions: { country: 'us' },
+          bounds: ncBounds,
+          strictBounds: false
+        });
+        window.__addrAutocomplete.addListener('place_changed', ()=>{
+          const p = window.__addrAutocomplete.getPlace();
+          if(p && p.geometry && p.geometry.location){
+            window.__selectedPlace = p;
+            // If Google provides a nicer formatted address, keep it for your records
+            if(p.formatted_address) addrEl.value = p.formatted_address;
+          }
+        });
+      }
+    }catch(e){
+      console.warn('Autocomplete init failed', e);
+    }
+
 
     drawingManager = new google.maps.drawing.DrawingManager({
       drawingMode: null,
@@ -1094,30 +1029,52 @@ document.getElementById('gisLookup')?.addEventListener('click', gisLookup);
     });
 
     enableMapControls(true);
-    setMapStatus('Map loaded.');
+    setMapStatus('');
   }
 
   function goToAddressOnMap(){
-    if(!geocoder || !gmap) return;
-    const addr = (document.getElementById('custAddress')?.value || '').trim();
-    if(!addr){ setMapStatus('Enter an address first.'); return; }
+    if(!gmap) return;
 
-    setMapStatus('Finding address...');
-    geocoder.geocode({ address: addr }, (results, status)=>{
+    // 1) If user selected an Autocomplete suggestion, use it (best)
+    const sp = window.__selectedPlace;
+    if(sp && sp.geometry && sp.geometry.location){
+      const loc = sp.geometry.location;
+      gmap.setCenter(loc);
+      gmap.setZoom(20);
+      setMapStatus('');
+      return;
+    }
+
+    // 2) Fall back to Geocoder (still works, just pickier)
+    if(!geocoder) geocoder = new google.maps.Geocoder();
+    const addr = (document.getElementById('custAddress')?.value || '').trim();
+    if(!addr){ setMapStatus('Not found'); return; }
+
+    const ncBounds = new google.maps.LatLngBounds(
+      new google.maps.LatLng(33.5, -84.5),
+      new google.maps.LatLng(37.0, -75.0)
+    );
+
+    geocoder.geocode({
+      address: addr,
+      bounds: ncBounds,
+      region: 'us',
+      componentRestrictions: { country: 'US' }
+    }, (results, status)=>{
       if(status === 'OK' && results && results[0]){
         const loc = results[0].geometry.location;
         gmap.setCenter(loc);
         gmap.setZoom(20);
-        setMapStatus('Zoomed to address. Click Draw Perimeter.');
+        setMapStatus('');
       } else {
-        setMapStatus('Address not found. Try a simpler format.');
+        setMapStatus('Not found');
       }
     });
   }
 
   function startDrawPerimeter(){
     if(!drawingManager) return;
-    setMapStatus('Click around the home. Double-click to finish.');
+    setMapStatus('');
     drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
   }
 
@@ -1125,16 +1082,16 @@ document.getElementById('gisLookup')?.addEventListener('click', gisLookup);
     if(!(lastPerimeterFeet > 0)) return;
     const lfInput = document.getElementById('lf');
     lfInput.value = String(Math.round(lastPerimeterFeet));
-    setMapStatus('LF filled into calculator.');
+    setMapStatus('');
     calc();
   }
 
   // Wire up map buttons
-  document.getElementById('mapLoadBtn')?.addEventListener('click', async ()=>{
+  document.getElementById('mapMeasureBtn')?.addEventListener('click', async ()=>{
     try{
       await initMap();
-      document.getElementById('mapGoBtn').disabled = false;
-      document.getElementById('mapDrawPolyBtn').disabled = false;
+      // one-click: find address then start drawing
+      setTimeout(()=>{ goToAddressOnMap(); setTimeout(()=>startDrawPerimeter(), 600); }, 250);
       document.getElementById('mapClearShapeBtn').disabled = false;
       document.getElementById('mapUseLfBtn').disabled = true;
     }catch(e){
@@ -1144,10 +1101,78 @@ document.getElementById('gisLookup')?.addEventListener('click', gisLookup);
         : 'Could not load Google Maps (check key, billing, and restrictions).');
     }
   });
-  document.getElementById('mapGoBtn')?.addEventListener('click', goToAddressOnMap);
-  document.getElementById('mapDrawPolyBtn')?.addEventListener('click', startDrawPerimeter);
   document.getElementById('mapClearShapeBtn')?.addEventListener('click', clearActiveShape);
   document.getElementById('mapUseLfBtn')?.addEventListener('click', usePerimeterAsLF);
+
+
+
+  // Step highlighting
+  function setActiveStep(n){
+    ['step1Tag','step2Tag','step3Tag'].forEach((id,i)=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.classList.toggle('active', (i+1)===n);
+    });
+  }
+  ['custAddress','gisLookup','mapLoadBtn','sqft','lf','pestQuote','termQuote'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.addEventListener('focus', ()=>{
+      if(id==='custAddress') setActiveStep(1);
+      else if(['gisLookup','mapLoadBtn'].includes(id)) setActiveStep(2);
+      else setActiveStep(3);
+    });
+  });
+
+
+  // Keep Initial Service Fee starting at the QT rate unless user edits it
+  let pestInitTouched = false;
+  const pestInitEl = document.getElementById('pestInit');
+  if(pestInitEl){
+    pestInitEl.addEventListener('input', ()=>{ pestInitTouched = true; });
+  }
+
+
+  // Show/hide YIF % input only if a discount checkbox is checked
+  function syncYifUi(){
+    const show = (document.getElementById('yifPestChk')?.checked || document.getElementById('yifTermChk')?.checked);
+    const wrap = document.getElementById('yifPctWrap');
+    if(wrap) wrap.style.display = show ? 'block' : 'none';
+  }
+  document.getElementById('yifPestChk')?.addEventListener('change', ()=>{ syncYifUi(); calc(); });
+  document.getElementById('yifTermChk')?.addEventListener('change', ()=>{ syncYifUi(); calc(); });
+  syncYifUi();
+
+
+  // Termite toggle
+  let termiteEnabled = false;
+  function syncTermiteUi(){
+    const btn = document.getElementById('toggleTermiteBtn');
+    const wrap = document.getElementById('termiteSectionWrap');
+    const lfWrap = document.getElementById('termiteLfWrap');
+    const bundleWrap = document.getElementById('bundleTotalsWrap');
+    if(btn) btn.textContent = termiteEnabled ? 'Remove Termite Protection' : 'Add Termite Protection';
+    if(wrap) wrap.style.display = termiteEnabled ? 'block' : 'none';
+    if(lfWrap) lfWrap.style.display = termiteEnabled ? 'block' : 'none';
+    if(bundleWrap) bundleWrap.style.display = termiteEnabled ? 'block' : 'none';
+
+    const include = document.getElementById('includeTermite');
+    if(include) include.value = termiteEnabled ? 'Yes' : 'No';
+
+    if(!termiteEnabled){
+      const lf = document.getElementById('lf'); if(lf) lf.value='';
+      const tq = document.getElementById('termQuote'); if(tq) tq.value='';
+      const ti = document.getElementById('termInstall'); if(ti) ti.value='0';
+      const yt = document.getElementById('yifTermChk'); if(yt) yt.checked=false;
+      if(typeof syncYifUi==='function') syncYifUi();
+    }
+    calc();
+  }
+  document.getElementById('toggleTermiteBtn')?.addEventListener('click', ()=>{
+    termiteEnabled = !termiteEnabled;
+    syncTermiteUi();
+  });
+  syncTermiteUi();
 
 </script>
 </body>
