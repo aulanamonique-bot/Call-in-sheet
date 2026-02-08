@@ -35,7 +35,6 @@
       align-items:center;
       gap:12px;
     }
-    .brand img{ height: 95px; width:auto; }
     h1{ font-size: 22px; margin: 0; font-weight: 800; letter-spacing: .3px; }
     .btnRow{ display:flex; gap:12px; align-items:center; flex-wrap: wrap; }
     button{
@@ -47,7 +46,7 @@
       cursor: pointer;
     }
     .btn-clear{ background:#ff2f92; color:#fff; }
-    .btn-copy{ background:#1F4E79; color:#fff; }
+    .btn-copy{ background:#ff7bbd; color:#fff; }
 
     .grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
     .section{ border: 1px solid var(--grid); border-radius: 10px; overflow: hidden; }
@@ -137,7 +136,6 @@
   .customer-card .customer-body .field.full{ grid-column: 1 / -1; }
 }
 
-}
 .field label{
   display:block;
   font-weight: 900;
@@ -246,7 +244,11 @@
   .customer-card .customer-body .field.full{ grid-column: 1 / -1; }
 }
 
-</style>
+
+    .btn{ border:0; border-radius:10px; padding:10px 14px; font-weight:800; font-size:14px; cursor:pointer; }
+    .btn:disabled{ opacity:.5; cursor:not-allowed; }
+
+  </style>
 </head>
 <body>
   <div class="sheet">
@@ -314,7 +316,44 @@
       <div class="field full">
         <label>Service Address</label>
         <input id="custAddress" type="text" placeholder="Street, City, State, ZIP" />
-      </div>
+      
+
+<div class="field" style="grid-column: 1 / -1;">
+  <label>Auto-fill SqFt &amp; LF (GIS)</label>
+  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+    <select id="gisCounty" class="in" style="max-width:220px;">
+      <option value="wake">Wake County</option>
+      <option value="durham">Durham County</option>
+    </select>
+    <button type="button" class="btn btn-copy" id="gisLookup" style="white-space:nowrap;">Lookup from Address</button>
+    <span id="gisStatus" style="font-size:12px; opacity:.85;"></span>
+  </div>
+  <div style="font-size:12px; opacity:.7; margin-top:6px;">
+    Tip: address has to be close to what the county GIS expects. If it can’t find it, you can still type SqFt/LF manually.
+  </div>
+</div>
+
+<div class="field" style="grid-column: 1 / -1;">
+  <details>
+    <summary><strong>Measure Termite LF on Map</strong> <span style="font-size:12px; opacity:.7;">(Google Maps)</span></summary>
+    <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+      <button type="button" class="btn btn-copy" id="mapLoadBtn">Load Map</button>
+      <button type="button" class="btn btn-copy" id="mapGoBtn" disabled>Find Address</button>
+      <button type="button" class="btn btn-copy" id="mapDrawPolyBtn" disabled>Draw Perimeter</button>
+      <button type="button" class="btn btn-copy" id="mapClearShapeBtn" disabled>Clear Shape</button>
+      <button type="button" class="btn btn-copy" id="mapUseLfBtn" disabled>Use LF →</button>
+      <span id="mapStatus" style="font-size:12px; opacity:.85;"></span>
+    </div>
+    <div style="font-size:12px; opacity:.75; margin-top:8px; line-height:1.35;">
+      1) Click <b>Load Map</b> (requires a Google Maps API key) • 2) Click <b>Find Address</b> • 3) Click around the home to outline the foundation • It auto-calculates LF.
+    </div>
+    <div id="mapWrap" style="margin-top:10px; border:1px solid #f3b6d5; border-radius:12px; overflow:hidden; display:none;">
+      <div id="gmap" style="height:360px; width:100%;"></div>
+    </div>
+  </details>
+</div>
+
+</div>
 
       <div class="field quarter">
         <label>Pests / Concern</label>
@@ -630,30 +669,34 @@
   }
 
   function clearAll(){
+    // Calculator inputs
     $('sqft').value = '';
     $('lf').value = '';
     $('includeTermite').value = 'No';
     $('payInFull').value = 'None';
     $('yifDisc').value = '5';
     $('bundleDisc').value = '10';
-
     $('pestQuote').value = '';
     $('pestInit').value = '399';
-
     $('termQuote').value = '';
     $('termInstall').value = '0';
 
-    
-    // Customer info fields
-    ['custName','custPhone','custEmail','custAddress','custNotes','custQuote'].forEach(id=>{
-      const el = document.getElementById(id); if(el) el.value='';
-    });
-    ['custSource','custReason','custStatus'].forEach(id=>{
-      const el = document.getElementById(id); if(el) el.value='';
+    // Customer info (everything)
+    [
+      'custDate','custTime','custLeadSource','custName','custPhone','custEmail',
+      'custPref','custAddress','custPests','custTiming','custStatus','custAppt','custNotes'
+    ].forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      if(el.tagName === 'SELECT'){ el.value = ''; }
+      else { el.value = ''; }
     });
 
     // Checklist
-    ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS'].forEach(id=>{ const el=$(id); if(el) el.checked=false; });
+    ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS'].forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.checked = false;
+    });
 
     calc();
   }
@@ -688,38 +731,305 @@
   // Initial
   calc();
 
-  // Mirror calculator output into Customer Info "Quoted price (auto)"
-  function updateCustomerQuote(){
-    const outIds = ['yifTotal','final','grandTotal','total','quoteTotal','yif','qtTotal','finalTotal'];
-    let txt = '';
-    for(const id of outIds){
-      const el = document.getElementById(id);
-      if(el && (el.textContent||'').trim()){
-        txt = (el.textContent||'').trim();
-        break;
-      }
+
+
+  // ------------------------
+  // GIS AUTO-FILL (Wake / Durham)
+  // ------------------------
+  async function gisLookup(){
+    const status = document.getElementById('gisStatus');
+    const county = document.getElementById('gisCounty')?.value || 'wake';
+    const addr = (document.getElementById('custAddress')?.value || '').trim();
+
+    status.textContent = '';
+    if(!addr){
+      status.textContent = 'Enter an address first.';
+      return;
     }
-    const quoteEl = document.getElementById('custQuote');
-    if(quoteEl){
-      quoteEl.value = txt || quoteEl.value || '';
+
+    const setStatus = (t)=>{ status.textContent = t; };
+
+    // Normalize for LIKE queries
+    const norm = addr.replace(/[,#]/g,' ').replace(/\s+/g,' ').trim().toUpperCase();
+
+    try{
+      setStatus('Searching county GIS...');
+
+      if(county === 'wake'){
+        // Wake parcels: HEATEDAREA + SITE_ADDRESS
+        // Service: https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0  (fields include HEATEDAREA, SITE_ADDRESS)
+        const base = 'https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0/query';
+        const where = "UPPER(SITE_ADDRESS) LIKE '%" + norm.replace(/'/g,"''") + "%'";
+        const url = base + '?' + new URLSearchParams({
+          f:'json',
+          where,
+          outFields:'HEATEDAREA,SITE_ADDRESS',
+          returnGeometry:'false',
+          resultRecordCount:'1'
+        }).toString();
+
+        const r = await fetch(url);
+        const j = await r.json();
+        const feat = j?.features?.[0];
+        const sqft = feat?.attributes?.HEATEDAREA;
+
+        if(!feat){
+          setStatus('No match from Wake GIS. Type SqFt/LF manually.');
+          return;
+        }
+        if(Number.isFinite(sqft)){
+          document.getElementById('sqft').value = String(Math.round(sqft));
+          setStatus('SqFt filled from Wake GIS. (LF still manual.)');
+          calc();
+        }else{
+          setStatus('Found parcel, but SqFt missing. Type it manually.');
+        }
+        return;
+      }
+
+      if(county === 'durham'){
+        // Durham parcels: HEATED_AREA + LOCATION_ADDR; we also try to estimate LF using city building footprints layer (within city limits)
+        // Parcels layer: https://webgis.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4
+        // Buildings layer (city limits): https://webgis2.durhamnc.gov/server/rest/services/PublicWorksServices/OnlineCheckerV2/MapServer/17
+        const parcelsBase = 'https://webgis.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4/query';
+        const where = "UPPER(LOCATION_ADDR) LIKE '%" + norm.replace(/'/g,"''") + "%'";
+        const parcelUrl = parcelsBase + '?' + new URLSearchParams({
+          f:'json',
+          where,
+          outFields:'HEATED_AREA,LOCATION_ADDR',
+          returnGeometry:'true',
+          outSR:'2264', // state plane feet (matches services)
+          resultRecordCount:'1'
+        }).toString();
+
+        const pr = await fetch(parcelUrl);
+        const pj = await pr.json();
+        const pFeat = pj?.features?.[0];
+        const sqft = pFeat?.attributes?.HEATED_AREA;
+
+        if(!pFeat){
+          setStatus('No match from Durham GIS. Type SqFt/LF manually.');
+          return;
+        }
+
+        if(Number.isFinite(sqft)){
+          document.getElementById('sqft').value = String(Math.round(sqft));
+        }
+
+        // Try to estimate LF from building footprints intersecting the parcel polygon:
+        // We'll query for max SHAPE.STLength() in the building layer using outStatistics.
+        const geom = pFeat?.geometry;
+        if(!geom){
+          setStatus('SqFt filled. Could not fetch parcel geometry for LF.');
+          calc();
+          return;
+        }
+
+        setStatus('SqFt filled. Estimating LF...');
+
+        const bBase = 'https://webgis2.durhamnc.gov/server/rest/services/PublicWorksServices/OnlineCheckerV2/MapServer/17/query';
+        const outStatistics = JSON.stringify([{
+          statisticType:'max',
+          onStatisticField:'Shape.STLength()',
+          outStatisticFieldName:'max_len'
+        }]);
+
+        const bUrl = bBase + '?' + new URLSearchParams({
+          f:'json',
+          geometry: JSON.stringify(geom),
+          geometryType:'esriGeometryPolygon',
+          inSR:'2264',
+          spatialRel:'esriSpatialRelIntersects',
+          outFields:'',
+          outStatistics,
+          returnGeometry:'false'
+        }).toString();
+
+        const br = await fetch(bUrl);
+        const bj = await br.json();
+        const maxLen = bj?.features?.[0]?.attributes?.max_len;
+
+        if(Number.isFinite(maxLen) && maxLen > 0){
+          // maxLen is in feet (StatePlane feet). Round to nearest whole.
+          document.getElementById('lf').value = String(Math.round(maxLen));
+          setStatus('SqFt + LF filled from Durham GIS.');
+        }else{
+          setStatus('SqFt filled. Could not estimate LF (likely outside city footprint coverage).');
+        }
+
+        calc();
+        return;
+      }
+
+    }catch(err){
+      console.error(err);
+      setStatus('Blocked by browser/CORS. If you want this to work as a shared link, we’ll need a tiny proxy (Cloudflare/Netlify).');
     }
   }
 
-  // Hook into calc if present
-  (function(){
-    const _origCalc = window.calc;
-    if(typeof _origCalc === 'function'){
-      window.calc = function(){
-        const r = _origCalc.apply(this, arguments);
-        try{ updateCustomerQuote(); }catch(e){}
-        return r;
+  document.getElementById('gisLookup')?.addEventListener('click', gisLookup);
+
+
+
+  // ------------------------
+  // GOOGLE MAPS: DRAW + PERIMETER → LF
+  // ------------------------
+  // Put your API key here:
+  const GOOGLE_MAPS_API_KEY = 'AIzaSyDrxPUNZW9mqzpyc3J83ocS4Rqc7DsgDv0';
+
+  let gmap, geocoder, drawingManager, activeShape, lastPerimeterFeet = 0;
+
+  function setMapStatus(t){ const el = document.getElementById('mapStatus'); if(el) el.textContent = t; }
+
+  function enableMapControls(loaded){
+    const ids = ['mapGoBtn','mapDrawPolyBtn','mapClearShapeBtn','mapUseLfBtn'];
+    ids.forEach(id=>{
+      const el = document.getElementById(id);
+      if(el) el.disabled = !loaded;
+    });
+  }
+
+  function loadGoogleMapsScript(){
+    return new Promise((resolve, reject)=>{
+      if(window.google && window.google.maps){ resolve(); return; }
+      if(!GOOGLE_MAPS_API_KEY || GOOGLE_MAPS_API_KEY.includes('YOUR_')){
+        reject(new Error('Missing API key'));
+        return;
       }
-      try{ updateCustomerQuote(); }catch(e){}
-    } else {
-      // best-effort: update on input changes
-      document.addEventListener('input', ()=>{ try{updateCustomerQuote();}catch(e){} }, true);
+      const s = document.createElement('script');
+      // Load drawing + geometry + places (for autocomplete if you want later)
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=drawing,geometry,places`;
+      s.async = true;
+      s.defer = true;
+      s.onload = ()=>resolve();
+      s.onerror = ()=>reject(new Error('Failed to load Google Maps'));
+      document.head.appendChild(s);
+    });
+  }
+
+  function computePerimeterFeetFromPolygon(polygon){
+    const path = polygon.getPath();
+    if(!path || path.getLength() < 2) return 0;
+    const pts = [];
+    for(let i=0;i<path.getLength();i++) pts.push(path.getAt(i));
+    // Close the loop
+    pts.push(path.getAt(0));
+    const meters = google.maps.geometry.spherical.computeLength(pts);
+    const feet = meters * 3.280839895;
+    return feet;
+  }
+
+  function clearActiveShape(){
+    if(activeShape){ activeShape.setMap(null); activeShape = null; }
+    lastPerimeterFeet = 0;
+    setMapStatus('Shape cleared.');
+  }
+
+  async function initMap(){
+    setMapStatus('Loading map...');
+    await loadGoogleMapsScript();
+
+    document.getElementById('mapWrap').style.display = 'block';
+
+    gmap = new google.maps.Map(document.getElementById('gmap'), {
+      center: { lat: 35.7796, lng: -78.6382 }, // Raleigh-ish default
+      zoom: 12,
+      mapTypeId: 'hybrid'
+    });
+
+    geocoder = new google.maps.Geocoder();
+
+    drawingManager = new google.maps.drawing.DrawingManager({
+      drawingMode: null,
+      drawingControl: false,
+      polygonOptions: {
+        fillColor: '#ff5aa5',
+        fillOpacity: 0.22,
+        strokeColor: '#ff2f92',
+        strokeOpacity: 0.9,
+        strokeWeight: 2,
+        clickable: true,
+        editable: true,
+        zIndex: 3
+      }
+    });
+    drawingManager.setMap(gmap);
+
+    google.maps.event.addListener(drawingManager, 'overlaycomplete', function(e) {
+      // Only one shape at a time
+      clearActiveShape();
+      drawingManager.setDrawingMode(null);
+      activeShape = e.overlay;
+
+      const update = ()=>{
+        lastPerimeterFeet = computePerimeterFeetFromPolygon(activeShape);
+        setMapStatus(`Perimeter: ${Math.round(lastPerimeterFeet).toLocaleString()} ft`);
+        const useBtn = document.getElementById('mapUseLfBtn');
+        if(useBtn) useBtn.disabled = !(lastPerimeterFeet > 0);
+      };
+
+      update();
+      // update on edits
+      google.maps.event.addListener(activeShape.getPath(), 'set_at', update);
+      google.maps.event.addListener(activeShape.getPath(), 'insert_at', update);
+      google.maps.event.addListener(activeShape.getPath(), 'remove_at', update);
+    });
+
+    enableMapControls(true);
+    setMapStatus('Map loaded.');
+  }
+
+  function goToAddressOnMap(){
+    if(!geocoder || !gmap) return;
+    const addr = (document.getElementById('custAddress')?.value || '').trim();
+    if(!addr){ setMapStatus('Enter an address first.'); return; }
+
+    setMapStatus('Finding address...');
+    geocoder.geocode({ address: addr }, (results, status)=>{
+      if(status === 'OK' && results && results[0]){
+        const loc = results[0].geometry.location;
+        gmap.setCenter(loc);
+        gmap.setZoom(20);
+        setMapStatus('Zoomed to address. Click Draw Perimeter.');
+      } else {
+        setMapStatus('Address not found. Try a simpler format.');
+      }
+    });
+  }
+
+  function startDrawPerimeter(){
+    if(!drawingManager) return;
+    setMapStatus('Click around the home. Double-click to finish.');
+    drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
+  }
+
+  function usePerimeterAsLF(){
+    if(!(lastPerimeterFeet > 0)) return;
+    const lfInput = document.getElementById('lf');
+    lfInput.value = String(Math.round(lastPerimeterFeet));
+    setMapStatus('LF filled into calculator.');
+    calc();
+  }
+
+  // Wire up map buttons
+  document.getElementById('mapLoadBtn')?.addEventListener('click', async ()=>{
+    try{
+      await initMap();
+      document.getElementById('mapGoBtn').disabled = false;
+      document.getElementById('mapDrawPolyBtn').disabled = false;
+      document.getElementById('mapClearShapeBtn').disabled = false;
+      document.getElementById('mapUseLfBtn').disabled = true;
+    }catch(e){
+      console.error(e);
+      setMapStatus(e.message === 'Missing API key'
+        ? 'Add your Google Maps API key in the file (GOOGLE_MAPS_API_KEY).'
+        : 'Could not load Google Maps (check key, billing, and restrictions).');
     }
-  })();
+  });
+  document.getElementById('mapGoBtn')?.addEventListener('click', goToAddressOnMap);
+  document.getElementById('mapDrawPolyBtn')?.addEventListener('click', startDrawPerimeter);
+  document.getElementById('mapClearShapeBtn')?.addEventListener('click', clearActiveShape);
+  document.getElementById('mapUseLfBtn')?.addEventListener('click', usePerimeterAsLF);
 
 </script>
 </body>
