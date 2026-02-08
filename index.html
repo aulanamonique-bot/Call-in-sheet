@@ -746,13 +746,19 @@
     tbody.appendChild(tr);
   });
 
-  // Wire up events
+  // Wire up events (safe bind — avoids null addEventListener)
   ['sqft','lf','includeTermite','yifDisc','bundleDisc','pestQuote','pestInit','termQuote','termInstall']
-    .forEach(id=> $(id).addEventListener('input', calc));
-  $('clearBtn').addEventListener('click', clearAll);
-  $('copyBtn').addEventListener('click', copyQuote);
-
-  // Initial
+    .forEach(id=>{
+      const el = $(id);
+      if(!el) return;
+      el.addEventListener('input', calc);
+      el.addEventListener('change', calc);
+    });
+  const clearBtn = document.getElementById('clearBtn');
+  if(clearBtn) clearBtn.addEventListener('click', clearAll);
+  const copyBtn = document.getElementById('copyBtn');
+  if(copyBtn) copyBtn.addEventListener('click', copyQuote);
+// Initial
   calc();
 
 
