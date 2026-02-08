@@ -321,11 +321,18 @@
 <div class="field" style="grid-column: 1 / -1;">
   <label>Auto-fill SqFt &amp; LF (GIS)</label>
   <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-    <select id="gisCounty" class="in" style="max-width:220px;">
-      <option value="wake">Wake County</option>
-      <option value="durham">Durham County</option>
+    <select id="gisCounty" class="in" style="max-width:260px;">
+      <option value="wake">Wake</option>
+      <option value="durham">Durham</option>
+      <option value="orange">Orange</option>
+      <option value="johnston">Johnston</option>
+      <option value="harnett">Harnett</option>
+      <option value="franklin">Franklin</option>
+      <option value="chatham">Chatham</option>
+      <option value="nash">Nash</option>
+      <option value="wilson">Wilson</option>
     </select>
-    <button type="button" class="btn btn-copy" id="gisLookup" style="white-space:nowrap;">Lookup from Address</button>
+    <button type="button" class="btn btn-copy" id="gisLookup" style="white-space:nowrap;">Auto-fill from Address</button>
     <span id="gisStatus" style="font-size:12px; opacity:.85;"></span>
   </div>
   <div style="font-size:12px; opacity:.7; margin-top:6px;">
@@ -734,145 +741,256 @@
 
 
   // ------------------------
-  // GIS AUTO-FILL (Wake / Durham)
-  // ------------------------
-  async function gisLookup(){
-    const status = document.getElementById('gisStatus');
-    const county = document.getElementById('gisCounty')?.value || 'wake';
-    const addr = (document.getElementById('custAddress')?.value || '').trim();
+// GIS AUTO-FILL (multi-county)
+// - Keeps the full address exactly as typed (for your records)
+// - Uses only the street portion to search county GIS (less picky)
+// ------------------------
 
-    status.textContent = '';
-    if(!addr){
-      status.textContent = 'Enter an address first.';
+function extractStreetForGis(full){
+  // "123 Main St Apt 4B, Raleigh, NC 27609" -> "123 MAIN ST"
+  const first = (full || '').split(',')[0] || '';
+  return first
+    .replace(/\b(APT|UNIT|STE|SUITE|#)\b.*$/i,'')   // strip unit info
+    .replace(/[^\w\s\-]/g,' ')                     // kill punctuation
+    .replace(/\s+/g,' ')
+    .trim()
+    .toUpperCase();
+}
+
+function safeLike(str){
+  return (str || '').replace(/'/g, "''");
+}
+
+function perimeterFtFromPolygon(geom){
+  // expects esriGeometryPolygon with rings; units depend on the service SR (we request outSR in feet)
+  if(!geom || !Array.isArray(geom.rings)) return null;
+  let total = 0;
+  for(const ring of geom.rings){
+    if(!Array.isArray(ring) || ring.length < 2) continue;
+    for(let i=1;i<ring.length;i++){
+      const a = ring[i-1], b = ring[i];
+      const dx = (b[0]-a[0]);
+      const dy = (b[1]-a[1]);
+      total += Math.hypot(dx,dy);
+    }
+  }
+  return total > 0 ? total : null;
+}
+
+async function queryFirstMatch({base, where, outFields, outSR, returnGeometry=true, resultRecordCount=1}){
+  const url = base + '?' + new URLSearchParams({
+    f:'json',
+    where,
+    outFields,
+    returnGeometry: returnGeometry ? 'true' : 'false',
+    outSR: String(outSR || ''),
+    resultRecordCount: String(resultRecordCount || 1)
+  }).toString();
+  const r = await fetch(url);
+  const j = await r.json();
+  return j?.features?.[0] || null;
+}
+
+async function gisLookup(){
+  const status = document.getElementById('gisStatus');
+  const county = document.getElementById('gisCounty')?.value || 'wake';
+  const fullAddr = (document.getElementById('custAddress')?.value || '').trim();
+
+  status.textContent = '';
+  if(!fullAddr){
+    status.textContent = 'Enter an address first.';
+    return;
+  }
+
+  const street = extractStreetForGis(fullAddr);
+  if(!street){
+    status.textContent = 'Enter a street address (e.g., 123 Main St).';
+    return;
+  }
+
+  const setStatus = (t)=>{ status.textContent = t; };
+  const whereLike = (field)=> `UPPER(${field}) LIKE '%${safeLike(street)}%'`;
+
+  try{
+    setStatus(`Searching ${county.toUpperCase()} GIS for: ${street}`);
+
+    // --- Wake ---
+    if(county === 'wake'){
+      const feat = await queryFirstMatch({
+        base: 'https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0/query',
+        where: whereLike('SITE_ADDRESS'),
+        outFields: 'HEATEDAREA,SITE_ADDRESS',
+        returnGeometry: false,
+        outSR: 2264
+      });
+
+      const sqft = feat?.attributes?.HEATEDAREA;
+      if(!feat){ setStatus('No match from Wake GIS. Type SqFt/LF manually.'); return; }
+      if(Number.isFinite(sqft)){
+        document.getElementById('sqft').value = String(Math.round(sqft));
+        setStatus('SqFt filled from Wake GIS. (LF still manual.)');
+        calc();
+      }else{
+        setStatus('Found parcel, but SqFt missing. Type it manually.');
+      }
       return;
     }
 
-    const setStatus = (t)=>{ status.textContent = t; };
+    // --- Durham ---
+    if(county === 'durham'){
+      const pFeat = await queryFirstMatch({
+        base: 'https://webgis.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4/query',
+        where: whereLike('LOCATION_ADDR'),
+        outFields: 'HEATED_AREA,LOCATION_ADDR',
+        returnGeometry: true,
+        outSR: 2264
+      });
 
-    // Normalize for LIKE queries
-    const norm = addr.replace(/[,#]/g,' ').replace(/\s+/g,' ').trim().toUpperCase();
-
-    try{
-      setStatus('Searching county GIS...');
-
-      if(county === 'wake'){
-        // Wake parcels: HEATEDAREA + SITE_ADDRESS
-        // Service: https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0  (fields include HEATEDAREA, SITE_ADDRESS)
-        const base = 'https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0/query';
-        const where = "UPPER(SITE_ADDRESS) LIKE '%" + norm.replace(/'/g,"''") + "%'";
-        const url = base + '?' + new URLSearchParams({
-          f:'json',
-          where,
-          outFields:'HEATEDAREA,SITE_ADDRESS',
-          returnGeometry:'false',
-          resultRecordCount:'1'
-        }).toString();
-
-        const r = await fetch(url);
-        const j = await r.json();
-        const feat = j?.features?.[0];
-        const sqft = feat?.attributes?.HEATEDAREA;
-
-        if(!feat){
-          setStatus('No match from Wake GIS. Type SqFt/LF manually.');
-          return;
-        }
-        if(Number.isFinite(sqft)){
-          document.getElementById('sqft').value = String(Math.round(sqft));
-          setStatus('SqFt filled from Wake GIS. (LF still manual.)');
-          calc();
-        }else{
-          setStatus('Found parcel, but SqFt missing. Type it manually.');
-        }
-        return;
+      const sqft = pFeat?.attributes?.HEATED_AREA;
+      if(!pFeat){ setStatus('No match from Durham GIS. Type SqFt/LF manually.'); return; }
+      if(Number.isFinite(sqft)){
+        document.getElementById('sqft').value = String(Math.round(sqft));
       }
 
-      if(county === 'durham'){
-        // Durham parcels: HEATED_AREA + LOCATION_ADDR; we also try to estimate LF using city building footprints layer (within city limits)
-        // Parcels layer: https://webgis.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4
-        // Buildings layer (city limits): https://webgis2.durhamnc.gov/server/rest/services/PublicWorksServices/OnlineCheckerV2/MapServer/17
-        const parcelsBase = 'https://webgis.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4/query';
-        const where = "UPPER(LOCATION_ADDR) LIKE '%" + norm.replace(/'/g,"''") + "%'";
-        const parcelUrl = parcelsBase + '?' + new URLSearchParams({
-          f:'json',
-          where,
-          outFields:'HEATED_AREA,LOCATION_ADDR',
-          returnGeometry:'true',
-          outSR:'2264', // state plane feet (matches services)
-          resultRecordCount:'1'
-        }).toString();
-
-        const pr = await fetch(parcelUrl);
-        const pj = await pr.json();
-        const pFeat = pj?.features?.[0];
-        const sqft = pFeat?.attributes?.HEATED_AREA;
-
-        if(!pFeat){
-          setStatus('No match from Durham GIS. Type SqFt/LF manually.');
-          return;
-        }
-
-        if(Number.isFinite(sqft)){
-          document.getElementById('sqft').value = String(Math.round(sqft));
-        }
-
-        // Try to estimate LF from building footprints intersecting the parcel polygon:
-        // We'll query for max SHAPE.STLength() in the building layer using outStatistics.
-        const geom = pFeat?.geometry;
-        if(!geom){
-          setStatus('SqFt filled. Could not fetch parcel geometry for LF.');
-          calc();
-          return;
-        }
-
-        setStatus('SqFt filled. Estimating LF...');
-
-        const bBase = 'https://webgis2.durhamnc.gov/server/rest/services/PublicWorksServices/OnlineCheckerV2/MapServer/17/query';
-        const outStatistics = JSON.stringify([{
-          statisticType:'max',
-          onStatisticField:'Shape.STLength()',
-          outStatisticFieldName:'max_len'
-        }]);
-
-        const bUrl = bBase + '?' + new URLSearchParams({
-          f:'json',
-          geometry: JSON.stringify(geom),
-          geometryType:'esriGeometryPolygon',
-          inSR:'2264',
-          spatialRel:'esriSpatialRelIntersects',
-          outFields:'',
-          outStatistics,
-          returnGeometry:'false'
-        }).toString();
-
-        const br = await fetch(bUrl);
-        const bj = await br.json();
-        const maxLen = bj?.features?.[0]?.attributes?.max_len;
-
-        if(Number.isFinite(maxLen) && maxLen > 0){
-          // maxLen is in feet (StatePlane feet). Round to nearest whole.
-          document.getElementById('lf').value = String(Math.round(maxLen));
-          setStatus('SqFt + LF filled from Durham GIS.');
-        }else{
-          setStatus('SqFt filled. Could not estimate LF (likely outside city footprint coverage).');
-        }
-
-        calc();
-        return;
+      const geom = pFeat?.geometry;
+      if(!geom){
+        setStatus('SqFt filled. Could not fetch parcel geometry for LF.');
+        calc(); return;
       }
 
-    }catch(err){
-      console.error(err);
-      setStatus('Blocked by browser/CORS. If you want this to work as a shared link, we’ll need a tiny proxy (Cloudflare/Netlify).');
+      setStatus('SqFt filled. Estimating LF...');
+
+      const bBase = 'https://webgis2.durhamnc.gov/server/rest/services/PublicWorksServices/OnlineCheckerV2/MapServer/17/query';
+      const outStatistics = JSON.stringify([{
+        statisticType:'max',
+        onStatisticField:'Shape.STLength()',
+        outStatisticFieldName:'max_len'
+      }]);
+
+      const bUrl = bBase + '?' + new URLSearchParams({
+        f:'json',
+        geometry: JSON.stringify(geom),
+        geometryType:'esriGeometryPolygon',
+        inSR:'2264',
+        spatialRel:'esriSpatialRelIntersects',
+        outFields:'',
+        outStatistics,
+        returnGeometry:'false'
+      }).toString();
+
+      const br = await fetch(bUrl);
+      const bj = await br.json();
+      const maxLen = bj?.features?.[0]?.attributes?.max_len;
+
+      if(Number.isFinite(maxLen) && maxLen > 0){
+        document.getElementById('lf').value = String(Math.round(maxLen));
+        setStatus('SqFt + LF filled from Durham GIS.');
+      }else{
+        setStatus('SqFt filled. Could not estimate LF (likely outside footprint coverage).');
+      }
+      calc();
+      return;
     }
-  }
 
-  document.getElementById('gisLookup')?.addEventListener('click', gisLookup);
+    // --- Orange (ArcGIS Online parcels) ---
+    if(county === 'orange'){
+      const feat = await queryFirstMatch({
+        base: 'https://services2.arcgis.com/N4cKzJ9dzXmsPNRs/ArcGIS/rest/services/orange_county_parcels/FeatureServer/0/query',
+        where: whereLike('SITUS'),
+        outFields: 'LIVING_AREA,SITUS',
+        returnGeometry: true,
+        outSR: 2236
+      });
+
+      if(!feat){ setStatus('No match from Orange GIS. Type SqFt/LF manually.'); return; }
+
+      const sqft = feat?.attributes?.LIVING_AREA;
+      if(Number.isFinite(sqft)){
+        document.getElementById('sqft').value = String(Math.round(sqft));
+      }
+
+      const per = perimeterFtFromPolygon(feat?.geometry);
+      if(Number.isFinite(per)){
+        document.getElementById('lf').value = String(Math.round(per));
+        setStatus('SqFt filled. LF estimated from parcel boundary.');
+      }else{
+        setStatus('SqFt filled. Could not estimate LF from parcel geometry.');
+      }
+      calc();
+      return;
+    }
+
+    // --- Nash (Parcel Records) ---
+    if(county === 'nash'){
+      const feat = await queryFirstMatch({
+        base: 'https://gis.nashcountync.gov/nashmaps/rest/services/OpenGov/GIS_Flags/MapServer/5/query',
+        where: whereLike('PHYS_ADDR'),
+        outFields: 'R_SQFT,PHYS_ADDR',
+        returnGeometry: true,
+        outSR: 2264
+      });
+
+      if(!feat){ setStatus('No match from Nash GIS. Type SqFt/LF manually.'); return; }
+
+      const sqft = feat?.attributes?.R_SQFT;
+      if(Number.isFinite(sqft)){
+        document.getElementById('sqft').value = String(Math.round(sqft));
+      }
+
+      const per = perimeterFtFromPolygon(feat?.geometry);
+      if(Number.isFinite(per)){
+        document.getElementById('lf').value = String(Math.round(per));
+        setStatus('SqFt filled. LF estimated from parcel boundary.');
+      }else{
+        setStatus('SqFt filled (if available). Could not estimate LF.');
+      }
+      calc();
+      return;
+    }
+
+    // --- Wilson (Parcels) ---
+    if(county === 'wilson'){
+      const feat = await queryFirstMatch({
+        base: 'https://gis.wilsonnc.org/services/rest/services/publiclayers/Parcels/MapServer/0/query',
+        where: whereLike('PhysicalStreetAddress'),
+        outFields: 'FinishedArea1Imp,PhysicalStreetAddress',
+        returnGeometry: true,
+        outSR: 2264
+      });
+
+      if(!feat){ setStatus('No match from Wilson GIS. Type SqFt/LF manually.'); return; }
+
+      const sqft = feat?.attributes?.FinishedArea1Imp;
+      if(Number.isFinite(sqft)){
+        document.getElementById('sqft').value = String(Math.round(sqft));
+      }
+
+      const per = perimeterFtFromPolygon(feat?.geometry);
+      if(Number.isFinite(per)){
+        document.getElementById('lf').value = String(Math.round(per));
+        setStatus('SqFt filled. LF estimated from parcel boundary.');
+      }else{
+        setStatus('SqFt filled (if available). Could not estimate LF.');
+      }
+      calc();
+      return;
+    }
+
+    // --- Chatham / Johnston / Harnett / Franklin ---
+    setStatus('That county is in the dropdown, but GIS auto-fill is not wired yet. (Manual SqFt/LF still works.)');
+
+  }catch(err){
+    console.error(err);
+    setStatus('Browser blocked the request (CORS). If this happens on Netlify, we can add a tiny proxy (Netlify Function) to make GIS lookups reliable.');
+  }
+}
+
+document.getElementById('gisLookup')?.addEventListener('click', gisLookup);
 
 
 
   // ------------------------
-  //  MAPS: DRAW + PERIMETER → LF
+  // GOOGLE MAPS: DRAW + PERIMETER → LF
   // ------------------------
   // Put your API key here:
   const GOOGLE_MAPS_API_KEY = 'AIzaSyDrxPUNZW9mqzpyc3J83ocS4Rqc7DsgDv0';
