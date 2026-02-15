@@ -1,583 +1,735 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Quote Calculator</title>
   <style>
-    :root{      --green:#ff5aa5;
-      --grid:#d0d7de;
-      --soft-yellow:#ffe0f0;
-      --soft-blue:#ffd1e6;
-      --soft-blue-2:#ffe4f1;
-      --soft-green:#ffe0ef;
-      --bg:#ffffff;
-      --text:#111;
+    :root{
+      --p:#ff2f92;
+      --p2:#ff7bbd;
+      --bg:#fff0f7;
+      --card:#ffffff;
+      --ink:#141414;
+      --muted:#6b6b6b;
+      --border:rgba(255,47,146,.18);
+      --line:rgba(0,0,0,.08);
+      --shadow:0 10px 30px rgba(0,0,0,.06);
+      --radius:18px;
+
+      /* Back-compat names */
+      --pink:var(--p);
+      --pink2:var(--p2);
+      --appBg:var(--bg);
+      --cardBg:var(--card);
     }
+*{ box-sizing:border-box; }
     body{
-      font-family: Arial, Helvetica, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 18px;
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, sans-serif;
+      color:var(--ink);
+      background:var(--bg);
     }
-    .sheet{ max-width: 1100px; margin: 0 auto; }
+    .wrap{ max-width:1280px; margin:0 auto; padding:18px 16px 36px; }
     .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:16px;
-      margin-bottom: 10px;
-      flex-wrap: wrap;
+      display:flex; align-items:center; justify-content:space-between; gap:14px;
+      position:sticky; top:0; z-index:50;
+      padding:14px 12px;
+      background:rgba(255,255,255,.78);
+      backdrop-filter: blur(8px);
+      border-bottom:1px solid var(--line);
     }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap:12px;
+    .title{
+      display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
     }
-    h1{ font-size: 22px; margin: 0; font-weight: 800; letter-spacing: .3px; }
-    .btnRow{ display:flex; gap:12px; align-items:center; flex-wrap: wrap; }
+    .title h1{
+      margin:0;
+      font-size:22px;
+      letter-spacing:.3px;
+      font-weight:950;
+    }
+    .title .sub{
+      color:var(--muted);
+      font-weight:800;
+      font-size:12px;
+    }
+    .actions{ display:flex; align-items:end; gap:10px; flex-wrap:wrap; }
+    .dt{
+      display:flex; gap:10px; align-items:end;
+    }
+    .dt .f{
+      display:flex; flex-direction:column; gap:6px;
+      font-weight:900; font-size:12px; color:var(--muted);
+    }
+    input[type="date"], input[type="time"]{
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px 12px;
+      font-weight:800;
+      background:#fff;
+      min-width:150px;
+    }
+
     button{
-      border: 0;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-weight: 800;
-      font-size: 14px;
-      cursor: pointer;
+      border:0;
+      border-radius:14px;
+      padding:11px 14px;
+      font-weight:950;
+      letter-spacing:.2px;
+      cursor:pointer;
+      white-space:nowrap;
     }
-    .btn-clear{ background:#ff2f92; color:#fff; }
-    .btn-copy{ background:#ff7bbd; color:#fff; }
-
-    .grid{ display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
-    .section{ border: 1px solid var(--grid); border-radius: 10px; overflow: hidden; }
-    .section .header{ background: var(--green); color: #fff; font-weight: 800; padding: 10px 12px; font-size: 15px; }
-    .rows{ display: grid; grid-template-columns: 1.2fr 1fr; gap: 0; }
-    .row{ display: contents; }
-    .label{ padding: 10px 12px; border-top: 1px solid var(--grid); font-weight: 700; font-size: 14px; }
-    .cell{ padding: 8px 10px; border-top: 1px solid var(--grid); border-left: 1px solid var(--grid); display:flex; align-items:center; }
-
-    input[type="number"], input[type="text"], select{
-      width: 100%;
-      padding: 9px 10px;
-      border: 1px solid var(--grid);
-      border-radius: 8px;
-      font-size: 14px;
-      outline: none;
-      background: white;
+    .btn-primary{ background:var(--pink); color:#fff; box-shadow:var(--shadow); }
+    .btn-secondary{ background:var(--p2); color:#fff; }
+    .btn-ghost{
+      background:transparent;
+      border:1px solid rgba(255,79,163,.35);
+      color:var(--ink);
+      font-weight:950;
     }
+    .btn-chip{
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,79,163,.35);
+      background:#fff;
+      color:var(--ink);
+      font-weight:950;
+    }
+    .btn-chip.on{
+      background:var(--pink);
+      color:#fff;
+      border-color:transparent;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 360px 1fr 420px;
+      gap:16px;
+      align-items:start;
+      margin-top:16px;
+    }
+
+    .panel{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .panel .head{
+      padding:12px 14px;
+      background:linear-gradient(180deg, rgba(255,79,163,.92), rgba(255,79,163,.86));
+      color:#fff;
+      font-weight:950;
+      letter-spacing:.2px;
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+    }
+    .panel .body{ padding:14px; }
+
+    .sticky-left{
+      position: sticky;
+      top: 76px; /* below topbar */
+      max-height: calc(100vh - 92px);
+      overflow:auto;
+    }
+    .sticky-left::-webkit-scrollbar{ width:10px; }
+    .sticky-left::-webkit-scrollbar-thumb{ background:rgba(255,79,163,.30); border-radius:999px; }
+
+    .field{ display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
+    .field label{
+      font-size:12px; color:var(--muted); font-weight:950; letter-spacing:.2px;
+    }
+    .field input[type="text"], .field input[type="number"], .field textarea, .field select{
+      width:100%;
+      border:1px solid rgba(255,79,163,.26);
+      background:rgba(255,255,255,.9);
+      border-radius:14px;
+      padding:12px 12px;
+      font-weight:850;
+      font-size:14px;
+      outline:none;
+    }
+    .field textarea{ min-height:110px; resize:vertical; }
 
     /* remove number spinners */
     input[type=number]::-webkit-outer-spin-button,
     input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     input[type=number] { -moz-appearance: textfield; }
 
-    .in-yellow input{ background: var(--soft-yellow); }
-    .in-blue input, .in-blue select{ background: var(--soft-blue); }
-    .in-blue2 input, .in-blue2 select{ background: var(--soft-blue-2); }
+    .miniRow{ display:flex; gap:10px; }
+    .miniRow > *{ flex:1; }
 
-    .out-green{
-      background: var(--soft-green);
-      border-radius: 8px;
-      padding: 9px 10px;
-      width: 100%;
-      border: 1px solid var(--grid);
-      font-weight: 800;
-      font-size: 16px;
+    .checkGrid{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:10px;
+      margin-top:8px;
     }
-    .out-green.small{ font-size: 15px; }
+    .chk{
+      display:flex; align-items:center; gap:10px;
+      padding:12px 12px;
+      border-radius:999px;
+      border:1px dashed rgba(255,79,163,.35);
+      background:rgba(255,225,240,.42);
+      font-weight:950;
+      user-select:none;
+    }
+    .chk input{ width:18px; height:18px; accent-color:var(--pink); }
 
-    .full{ grid-column: 1 / -1; }
-    .bundleTotals{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+    /* Middle column */
+    .card{
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      background:rgba(255,255,255,.92);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      margin-bottom:14px;
+    }
+    .card .head{
+      background:linear-gradient(180deg, rgba(255,79,163,.16), rgba(255,255,255,0));
+      padding:12px 14px;
+      font-weight:950;
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .card .body{ padding:14px; }
 
-    details{ margin-top: 10px; border-top: 1px dashed var(--grid); padding-top: 10px; }
-    details summary{ cursor:pointer; font-weight:800; }
-    table{ width:100%; border-collapse: collapse; margin-top: 8px; font-size: 13px; }
-    th, td{ border:1px solid var(--grid); padding:8px 10px; text-align:left; }
-    th{ background:#f2f2f2; font-weight:800; }
-    .right{ text-align:right; }
-    .tierTag{ display:inline-block; padding: 3px 8px; border-radius: 999px; font-weight:800; font-size:12px; }
+    .row2{ display:grid; grid-template-columns: 1.4fr 0.6fr; gap:12px; }
+    .row3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; }
+
+    .statusTiny{
+      font-size:12px; color:var(--muted); font-weight:900;
+      padding-left:2px;
+      min-height:16px;
+    }
+    .statusTiny.bad{ color:#a11447; }
+    .statusTiny.ok{ color:#157a3b; }
+
+    details{
+      margin-top:10px;
+      border-top:1px dashed rgba(255,79,163,.25);
+      padding-top:10px;
+    }
+    summary{ cursor:pointer; font-weight:950; }
+    #mapWrap{ margin-top:10px; border:1px solid rgba(255,79,163,.25); border-radius:14px; overflow:hidden; display:none; }
+    #gmap{ height:360px; width:100%; }
+
+    /* Right column - numbers dashboard */
+    .dash{
+      position: sticky;
+      top: 76px;
+    }
+    .tiles{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-bottom:12px;
+    }
+    .tile{
+      border:1px solid rgba(255,79,163,.25);
+      border-radius:18px;
+      background:rgba(255,225,240,.35);
+      padding:12px 12px;
+    }
+    .tile .k{ font-size:12px; color:var(--muted); font-weight:950; }
+    .tile .v{ font-size:28px; font-weight:1000; letter-spacing:-.4px; margin-top:4px; }
+    .tile .sub{ font-size:12px; color:var(--muted); font-weight:950; margin-top:4px; }
+    .tile .sub b{ color:var(--ink); }
+
+    .quoteEdit{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top:12px;
+    }
+    .quoteEdit .box{
+      border:1px solid rgba(0,0,0,.10);
+      border-radius:18px;
+      padding:12px;
+      background:#fff;
+    }
+    .box .topline{
+      display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+    }
+    .box .topline .lbl{ font-weight:1000; }
+    .box .topline .suggest{ font-size:12px; color:var(--muted); font-weight:950; }
+    .box .grid2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:10px;
+    }
+    .box .grid2 .field{ margin:0; }
+    .readonlyOut{
+      border:1px solid rgba(255,79,163,.22);
+      background:rgba(255,240,247,.85);
+      border-radius:14px;
+      padding:12px;
+      font-weight:1000;
+    }
+
+    .toggles{
+      display:flex; flex-wrap:wrap; gap:10px;
+      margin-top:12px;
+      padding-top:12px;
+      border-top:1px dashed rgba(255,79,163,.25);
+    }
+
+    .totals{
+      margin-top:12px;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    .totalCard{
+      border:1px solid rgba(255,79,163,.25);
+      background:rgba(255,225,240,.35);
+      border-radius:18px;
+      padding:12px;
+    }
+    .totalCard .k{ font-size:12px; color:var(--muted); font-weight:950; }
+    .totalCard .v{ font-size:22px; font-weight:1000; margin-top:6px; }
+    .totalCard .sub{ font-size:12px; color:var(--muted); font-weight:950; margin-top:4px; }
+
+    .bundleBox{
+      margin-top:12px;
+      border:1px solid rgba(255,79,163,.25);
+      background:rgba(255,240,247,.85);
+      border-radius:18px;
+      padding:12px;
+    }
+    .bundleBox .row{
+      display:flex; justify-content:space-between; gap:10px; align-items:baseline;
+      font-weight:950;
+      margin-top:8px;
+    }
+    .bundleBox .row .k{ color:var(--muted); font-size:12px; }
+    .bundleBox .row .v{ font-size:16px; font-weight:1000; }
+
+    .smallNote{ font-size:12px; color:var(--muted); font-weight:900; margin-top:10px; }
+    .divider{ height:10px; }
+
+    /* Responsive */
+    @media (max-width: 1180px){
+      .grid{ grid-template-columns: 340px 1fr; }
+      .dash{ position:relative; top:auto; }
+    }
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+      .sticky-left{ position:relative; top:auto; max-height:none; }
+      .dash{ position:relative; top:auto; }
+      .row2{ grid-template-columns: 1fr; }
+      .tiles{ grid-template-columns: 1fr; }
+      .quoteEdit{ grid-template-columns: 1fr; }
+      .totals{ grid-template-columns: 1fr; }
+    }
+
+    /* Collapsible customer info (Quote Mode vs Save Mode) */
+    .collapseBtn{
+      display:inline-flex; align-items:center; gap:8px;
+      border-radius:999px;
+      padding:8px 10px;
+      background:rgba(255,255,255,.20);
+      color:#fff;
+      font-weight:950;
+      border:1px solid rgba(255,255,255,.35);
+      cursor:pointer;
+    }
+    .collapsed .body{ display:none; }
+    .collapsed .head{ border-bottom:none; }
   
-/* Customer Info (top) */
-.customer-card{
-  grid-column: 1 / -1;
-  background: linear-gradient(180deg, rgba(255, 105, 180, .14), rgba(255,255,255,1));
-  border: 1px solid rgba(255, 105, 180, .28);
-  border-radius: 18px;
-  overflow: hidden;
-}
-.customer-card .customer-head{
-  padding: 18px 18px 6px;
-}
-.customer-card .customer-head h2{
-  margin:0;
-  font-size: 20px;
-  font-weight: 900;
-  letter-spacing: .2px;
-}
-.customer-card .customer-head p{
-  margin: 6px 0 0;
-  color: rgba(0,0,0,.62);
-  font-weight: 700;
-}
 
-.customer-card .customer-body{
-  padding: 14px 18px 18px;
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 14px 14px;
+/* ---- Visual polish v35 ---- */
+:root{
+  --primary:#ff2f92;
+  --primary2:#ff69b4;
+  --bg:#fff2f8;
+  --card:#ffffff;
+  --border:rgba(255,47,146,.22);
+  --border2:rgba(0,0,0,.08);
+  --muted:rgba(0,0,0,.60);
+  --shadow: 0 10px 28px rgba(255,47,146,.10);
 }
-.customer-card .customer-body .field{ grid-column: span 6; }
-.customer-card .customer-body .field.small{ grid-column: span 3; }
-.customer-card .customer-body .field.full{ grid-column: 1 / -1; }
-@media (max-width: 720px){
-  .customer-card .customer-body{ grid-template-columns: 1fr; }
-  .customer-card .customer-body .field,
-  .customer-card .customer-body .field.small,
-  .customer-card .customer-body .field.full{ grid-column: 1 / -1; }
+body{ background: var(--bg); }
+.topbar{ background:rgba(255,255,255,.78); backdrop-filter: blur(6px); border:1px solid var(--border); box-shadow: var(--shadow); }
+.card,.panel{ background:var(--card); box-shadow: var(--shadow); border:1px solid var(--border); }
+.head{ background: linear-gradient(180deg, rgba(255,47,146,.95), rgba(255,105,180,.92)); }
+label{ letter-spacing:.2px; }
+.field label{ font-size:12px; color:var(--muted); }
+.field input, .field select, .field textarea{
+  background:#fff;
+  border:1px solid var(--border2);
 }
+.field input:focus, .field select:focus, .field textarea:focus{
+  border-color: rgba(255,47,146,.55);
+  box-shadow: 0 0 0 4px rgba(255,47,146,.10);
+}
+.btn{ background: var(--primary); }
+.btn:active{ transform: translateY(1px); }
+.btn-ghost{ background:#fff; border:1px solid rgba(255,47,146,.35); }
+.btn-chip{ background:#fff; border:1px solid rgba(255,47,146,.35); }
+.btn-chip.on{ background: var(--primary); border-color: var(--primary); }
+.statusTiny{ color: rgba(196,0,70,.90); font-weight:1000; }
+.smallNote{ display:none !important; }
+.divider{ display:none; }
 
-.field label{
-  display:block;
-  font-weight: 900;
-  margin-bottom: 8px;
-}
-.field input,.field select,.field textarea{
-  width:100%;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 105, 180, .32);
-  padding: 14px 14px;
-  font-size: 16px;
-  outline: none;
-  background: rgba(255,255,255,.78);
-}
-.field textarea{
-  min-height: 110px;
-  resize: vertical;
-}
-.field.full{grid-column: 1 / -1;}
-.field input[readonly]{
-  background: rgba(255,255,255,.55);
-}
+/* Details */
+.details{ margin-top:12px; border:1px dashed rgba(255,47,146,.22); border-radius:18px; padding:10px 12px; background: rgba(255,240,247,.55); }
+.details[open]{ background: rgba(255,240,247,.72); }
+.detailsSummary{ cursor:pointer; font-weight:1000; color: rgba(0,0,0,.75); }
+.detailsSummary::-webkit-details-marker{ display:none; }
+.detailsSummary:before{ content:'▸ '; display:inline-block; transform: translateY(-1px); }
+details[open] .detailsSummary:before{ content:'▾ '; }
 
+/* Make the right column feel like a single dashboard */
+.dash .body{ padding:14px; }
+.tiles .tile, .totalCard{ background: rgba(255,240,247,.70); border:1px solid rgba(255,47,146,.18);} 
 
-/* Compact sizing pass */
-.customer-card .customer-head{padding:14px 14px 6px}
-.customer-card .customer-head h2{font-size:18px}
-.customer-card .customer-body{padding:12px 14px 14px; gap:12px}
-.field label{margin-bottom:6px; font-size:12px}
-.field input,.field select,.field textarea{
-  padding:11px 12px;
-  font-size:14px;
-  border-radius:16px;
-}
-.field textarea{min-height:92px}
+/* Checklist buttons slightly calmer */
+.chkTile{ background: rgba(255,240,247,.65); border-color: rgba(255,47,146,.22);} 
 
+/* Measurements card tighter */
+.row2{ gap:12px; }
 
-/* Horizontal Checklist */
-.checklist-wrap{
-  grid-column: 1 / -1;
-  border: 1px dashed rgba(255, 105, 180, .38);
-  background: rgba(255, 224, 240, .55);
-  border-radius: 18px;
-  padding: 12px 14px;
+    /* Visual flow polish */
+    body{background:var(--appBg);}
+    .topbar{border:1px solid var(--line);}
+    .section{border:1px solid var(--line);}
+    .section h3{letter-spacing:.2px;}
+    .lbl{font-size:11px; letter-spacing:.35px; text-transform:uppercase; color:rgba(20,20,20,.65);}
+    .input, input[type="text"], input[type="number"], input[type="date"], input[type="time"], textarea, select{
+      background:#fff;
+      border:1px solid rgba(255,47,146,.25);
+    }
+    input:focus, textarea:focus, select:focus{outline:3px solid rgba(255,47,146,.18);}
+    .chip{border:1px solid rgba(255,47,146,.35);}
+    .chip.on{box-shadow:0 10px 22px rgba(255,47,146,.18);}
+    .statusPill{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:rgba(255,47,146,.08); border:1px solid rgba(255,47,146,.18); font-weight:800; font-size:12px; color:rgba(20,20,20,.75);}
+    .quoteTile{border:1px solid rgba(255,47,146,.18);}
+    .money{letter-spacing:-.02em;}
+
+    .actionRow{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
+    .actionRow button{flex:1; min-width:160px;}
+    .measureControls{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; align-items:center;}
+    .measureControls .statusTiny{min-width:220px;}
+    .hidden{display:none !important;}
+
+    /* Remove cluttery helper text */
+    .debugTiny{display:none !important;}
+
+/* Visual fixes */
+.head.subhead{
+  background: rgba(255,255,255,.72);
+  color: #111;
+  border-bottom: 1px solid rgba(255, 90, 165, .22);
 }
-.checklist-title{
-  font-weight: 900;
-  margin: 0 0 10px 0;
-  letter-spacing: .2px;
+.btnSecondary{
+  background: #fff;
+  color: #ff2f92;
+  border: 2px solid rgba(255, 47, 146, .35);
 }
-.checklist-row{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  align-items:center;
+.btnSecondary:hover{ filter: brightness(0.98); }
+input, select, textarea{
+  font-size: 14px !important;
 }
-.chk{
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:10px 12px;
-  border:1px solid rgba(255, 105, 180, .32);
-  border-radius:999px;
-  background: rgba(255,255,255,.78);
-  font-weight:900;
-  user-select:none;
-}
-.chk input{
-  width:18px;
-  height:18px;
-  accent-color:#ff2f92;
-  cursor:pointer;
+.field input, .field select, .field textarea{
+  padding: 10px 12px !important;
+  line-height: 1.2 !important;
 }
 
 
-/* Customer info layout (no overlap) */
-.customer-card .customer-body{
-  padding: 14px 18px 18px;
-  display:grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 18px 18px;
-}
-.customer-card .customer-body .field{ grid-column: span 6; min-width:0; }
-.customer-card .customer-body .field.quarter{ grid-column: span 3; min-width:0; }
-.customer-card .customer-body .field.full{ grid-column: 1 / -1; min-width:0; }
-.field label{
-  display:block;
-  font-weight: 900;
-  margin-bottom: 10px;
-}
-.field input,.field select,.field textarea{
-  width:100%;
-  box-sizing:border-box;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 105, 180, .32);
-  padding: 14px 14px;
-  font-size: 16px;
-  outline: none;
-  background: rgba(255,255,255,.78);
-}
-.field textarea{ min-height: 120px; resize: vertical; }
-@media (max-width: 900px){
-  .customer-card .customer-body{ grid-template-columns: 1fr; }
-  .customer-card .customer-body .field,
-  .customer-card .customer-body .field.quarter,
-  .customer-card .customer-body .field.full{ grid-column: 1 / -1; }
-}
+.label, label{ white-space:nowrap; }
 
-
-    .btn{ border:0; border-radius:10px; padding:10px 14px; font-weight:800; font-size:14px; cursor:pointer; }
-    .btn:disabled{ opacity:.5; cursor:not-allowed; }
-
-  
-    .steps{ display:flex; gap:10px; flex-wrap:wrap; margin: 10px 0 14px; }
-    .step{ display:flex; align-items:center; gap:8px; padding:8px 12px; border:1px solid #f3b6d5; border-radius:999px; background:#fff; font-weight:800; font-size:13px; opacity:.85; }
-    .step .num{ width:22px; height:22px; border-radius:999px; background:#ff2f92; color:#fff; display:inline-flex; align-items:center; justify-content:center; font-size:12px; }
-    .step.active{ box-shadow: 0 0 0 3px rgba(255,47,146,.18); opacity:1; }
-    .card{ border:1px solid #f3b6d5; border-radius:14px; background:#fff; padding:14px; }
-    .cardTitle{ font-weight:900; font-size:14px; margin:0 0 10px 0; }
-    .btn:disabled{ opacity:.5; cursor:not-allowed; }
-
-
-    .suggestedBox{ font-size:13px !important; font-weight:700 !important; opacity:.75; }
-    .dominantInput input{ font-size:18px !important; font-weight:900 !important; padding:12px 12px !important; }
+    /* Address row sizing */
+    .addrRow{ grid-template-columns: 1fr 200px !important; }
+    .addrRow .countySelect{ max-width:200px; }
 
 </style>
 </head>
 <body>
-  <div class="sheet">
+<div class="wrap">
 
-<div class="steps">
-  <div class="step active" id="step1Tag"><span class="num">1</span> Address</div>
-  <div class="step" id="step2Tag"><span class="num">2</span> Auto-fill / Measure</div>
-  <div class="step" id="step3Tag"><span class="num">3</span> Quote</div>
-</div>
+  <div class="topbar">
+    <div class="title">
+      <h1>QUOTE CALCULATOR</h1>
+      </div>
 
-    <div class="topbar">
-      <div class="brand">
-        <h1>QUOTE CALCULATOR</h1>
+    <div class="actions">
+      <div class="dt">
+        <div class="f">
+          <div>Date</div>
+          <input id="topDate" type="date"/>
+        </div>
+        <div class="f">
+          <div>Time</div>
+          <input id="topTime" type="time"/>
+        </div>
       </div>
-      <div class="btnRow">
-        <button class="btn-clear" type="button" id="clearBtn">NEW LEAD (Clear)</button>
-        <button class="btn-copy" type="button" id="copyBtn">Copy Quote Line</button>
-      </div>
+
+      <button class="btn-primary" id="clearBtn" type="button">NEW LEAD (Clear)</button>
+      <button class="btn-secondary" id="copyBtn" type="button">Copy Quote Line</button>
     </div>
-
-    <div class="card" id="step3Card"><div class="cardTitle">Step 3 — Quote</div><div class="grid">
-      
-  
-  
-  <!-- Customer Info -->
-  <section class="customer-card" id="customerInfo">
-    <div class="customer-head">
-      <h2>Customer info</h2>
-    </div>
-
-    <div class="customer-body">
-      <div class="field quarter">
-        <label>Date</label>
-        <input id="custDate" type="date" placeholder="mm/dd/yyyy" />
-      </div>
-
-      <div class="field quarter">
-        <label>Time</label>
-        <input id="custTime" type="time" />
-      </div>
-
-      <div class="field" style="grid-column: span 6;">
-        <label>Lead Source</label>
-        <input id="custLeadSource" type="text" placeholder="Call / Web / Referral / Other" />
-      </div>
-
-      <div class="field">
-        <label>Customer Name</label>
-        <input id="custName" type="text" placeholder="First + Last" />
-      </div>
-
-      <div class="field">
-        <label>Phone</label>
-        <input id="custPhone" type="text" placeholder="(###) ###-####" />
-      </div>
-
-      <div class="field">
-        <label>Email</label>
-        <input id="custEmail" type="text" placeholder="name@email.com" />
-      </div>
-
-      <div class="field">
-        <label>Preferred Contact</label>
-        <select id="custPref">
-          <option value="" selected></option>
-          <option>Call</option>
-          <option>Text</option>
-          <option>Email</option>
-        </select>
-      </div>
-
-      <div class="field full">
-        <label>Service Address</label>
-        <input id="custAddress" type="text" placeholder="Street, City, State, ZIP" />
-      
-
-</div></div><div class="card" id="step2Card"><div class="cardTitle">Step 2 — Auto-fill / Measure</div><div class="field" style="grid-column: 1 / -1;">
-  <label>Auto-fill SqFt &amp; LF (GIS)</label>
-  <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-    <select id="gisCounty" class="in" style="max-width:220px;">
-      <option value="wake">Wake</option>
-      <option value="durham">Durham</option>
-    </select>
-    <button type="button" class="btn btn-copy" id="gisLookup" style="white-space:nowrap;">Lookup from Address</button>
-    <span id="gisStatus" style="font-size:12px; opacity:.85;"></span>
-  </div>
   </div>
 
-<div class="field" style="grid-column: 1 / -1;">
-  <details>
-    <summary><strong>Measure</strong></summary>
-    
-    <div style="margin-top:10px; display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-      <button type="button" class="btn btn-copy" id="mapMeasureBtn">Measure</button>
-      <button type="button" class="btn btn-copy" id="mapClearShapeBtn" disabled>Clear</button>
-      <button type="button" class="btn btn-copy" id="mapUseLfBtn" disabled>Submit LF</button>
-      <span id="mapStatus" style="font-size:12px; opacity:.85;"></span>
-    </div>
-    
-    <div id="mapWrap" style="margin-top:10px; border:1px solid #f3b6d5; border-radius:12px; overflow:hidden; display:none;">
-      <div id="gmap" style="height:360px; width:100%;"></div>
-    </div>
-  </details>
-</div></div>
+  <div class="grid">
 
-</div>
-
-      <div class="field quarter">
-        <label>Pests / Concern</label>
-        <input id="custPests" type="text" placeholder="Ants, roaches, mice, etc." />
+    <!-- LEFT: Customer info (sticky, can collapse) -->
+    <section class="panel sticky-left" id="customerPanel">
+      <div class="head">
+        <div>Customer info</div>
+        <button class="collapseBtn" id="toggleCustomer" type="button">Collapse</button>
       </div>
+      <div class="body">
+        <div class="field">
+          <label>Customer Name</label>
+          <input id="custName" type="text" placeholder="First + Last"/>
+        </div>
 
-      <div class="field quarter">
-        <label>Timing</label>
-        <input id="custTiming" type="text" placeholder="ASAP / This week / Next month" />
-      </div>
+        <div class="field">
+          <label>Lead Source</label>
+          <input id="custLeadSource" type="text" placeholder="Call / Web / Referral / Other"/>
+        </div>
 
-      <div class="field quarter">
-        <label>Status</label>
-        <select id="custStatus">
-          <option value="" selected></option>
-          <option>Booked</option>
-          <option>Pending</option>
-          <option>Declined</option>
-          <option>Sold QT</option>
-          <option>Sold Bundle</option>
-          <option>Sold Other</option>
-        </select>
-      </div>
+        <div class="miniRow">
+          <div class="field">
+            <label>Phone</label>
+            <input id="custPhone" type="text" placeholder="(###) ###-####"/>
+          </div>
+          <div class="field">
+            <label>Email</label>
+            <input id="custEmail" type="text" placeholder="name@email.com"/>
+          </div>
+        </div>
 
-      <div class="field quarter">
-        <label>Appt Date/Time</label>
-        <input id="custAppt" type="text" placeholder="MM/DD @ 2pm" />
-      </div>
+        <div class="field">
+          <label>Notes</label>
+          <textarea id="custNotes" placeholder="Objections, pests, timing, gate code, special instructions..."></textarea>
+        </div>
 
-      <div class="field full">
-        <label>Notes</label>
-        <textarea id="custNotes" placeholder="Objections, pets, gate code, special instructions..."></textarea>
-      </div>
-
-      <!-- Keep quoted price for calculator to write into -->
-      <input id="custQuote" type="hidden" value="" />
-      <input id="custSource" type="hidden" value="" />
-      <input id="custReason" type="hidden" value="" />
-    </div>
-  </section>
-
-
-
-
-  <!-- Checklist -->
-  <section class="checklist-wrap" id="checklist">
-    <div class="checklist-title">Checklist</div>
-    <div class="checklist-row" aria-label="Horizontal checklist">
-      <label class="chk"><input id="chkINT" type="checkbox" /> INT</label>
-      <label class="chk"><input id="chkPS" type="checkbox" /> PS</label>
-      <label class="chk"><input id="chkWD" type="checkbox" /> WD</label>
-      <label class="chk"><input id="chkGR" type="checkbox" /> GR</label>
-      <label class="chk"><input id="chkLB" type="checkbox" /> LB</label>
-      <label class="chk"><input id="chkRS" type="checkbox" /> RS</label>
-    </div>
-  </section>
-
-
-<!-- QT Square Footage -->
-      <div class="section">
-        <div class="header">QT Square Footage</div>
-        <div class="rows">
-          <div class="row">
-            <div class="label">SqFt</div>
-            <div class="cell in-blue2">
-              <input id="sqft" type="number" min="0" step="1" placeholder="" />
+        <div class="panel" style="box-shadow:none; border-radius:var(--radius); border:1px dashed rgba(255,79,163,.35); background:rgba(255,225,240,.28);">
+          <div class="head" style="background:transparent; color:var(--ink); padding:12px 14px; border-bottom:1px dashed rgba(255,79,163,.25);">
+            Checklist
+          </div>
+          <div class="body" style="padding:12px 14px;">
+            <div class="checkGrid">
+              <label class="chk"><input id="chkINT" type="checkbox"/> INT</label>
+              <label class="chk"><input id="chkPS" type="checkbox"/> PS</label>
+              <label class="chk"><input id="chkWD" type="checkbox"/> WD</label>
+              <label class="chk"><input id="chkGR" type="checkbox"/> GR</label>
+              <label class="chk"><input id="chkLB" type="checkbox"/> LB</label>
+              <label class="chk"><input id="chkRS" type="checkbox"/> RS</label>
             </div>
           </div>
         </div>
 
-        <details>
-          <summary>Show pricing tiers</summary>
-          <table>
-            <thead>
-              <tr><th>SqFt Range</th><th class="right">QT</th></tr>
-            </thead>
-            <tbody id="tiersTable"></tbody>
-          </table>
-        </details>
+        
       </div>
+    </section>
 
-      <!-- Termite Linear Feet --><div id="termiteLfWrap" style="display:none;">
-      <div class="section">
-        <div class="header">Termite Linear Feet</div>
-        <div class="rows">
-          <div class="row">
-            <div class="label">Linear ft</div>
-            <div class="cell in-blue2">
-              <input id="lf" type="number" min="0" step="1" placeholder="" />
+    <!-- MIDDLE: Address + measure -->
+    <section>
+      <div class="card">
+        <div class="head">
+          <div>Address</div>
+          <div class="statusTiny" id="gisStatus"></div>
+        </div>
+        <div class="body">
+          <div class="row2 addrRow">
+            <div class="field" style="margin:0;">
+              <label>Service Address</label>
+              <input id="custAddress" type="text" placeholder="Street, City, State, ZIP"/>
+            </div>
+            <div class="field" style="margin:0;">
+              <label>County (GIS)</label>
+              <select id="gisCounty" class="countySelect">
+                <option value="wake">Wake</option>
+                <option value="durham">Durham</option>
+              </select>
             </div>
           </div>
+
+          <div class="actionRow">
+            <button class="btn-primary" id="gisLookup" type="button">Auto-fill SqFt</button>
+            <button class="btn-secondary" id="measureBtn" type="button">Measure LF</button>
+          </div>
+
+          <details>
+            <summary>Measure</summary>
+            <div class="measureControls">
+              <button class="btn-ghost" id="mapClearBtn" type="button" disabled>Clear</button>
+              <button class="btn-primary" id="mapSubmitBtn" type="button" disabled>Submit LF</button>
+              <div class="statusTiny" id="mapStatus"></div>
+
+              <!-- Hidden helpers (kept for power users / fallback) -->
+              <button class="btn-ghost hidden" id="mapLoadBtn" type="button">Load Map</button>
+              <button class="btn-ghost hidden" id="mapGoBtn" type="button" disabled>Find Address</button>
+              <button class="btn-ghost hidden" id="mapDrawBtn" type="button" disabled>Draw</button>
+            </div>
+            <div id="mapWrap">
+              <div id="gmap"></div>
+            </div>
+            
+          </details>
         </div>
       </div>
 
-      </div>
-
-      <!-- Bundle + Discounts -->
-      <div class="section full">
-        <div class="header">Bundle + Discounts</div>
-        <div class="rows">
-          <div class="row">
-            <div class="label">Termite Protection</div>
-            <div class="cell in-blue2">
-              <button type="button" class="btn btn-copy" id="toggleTermiteBtn" style="width:100%;">Add Termite Protection</button>
-            </div>
+      <div class="card">
+        <div class="head">Services + Discounts</div>
+        <div class="body">
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn-chip on" id="svcPest" type="button">Pest</button>
+            <button class="btn-chip" id="svcTermite" type="button">Termite (SM)</button>
+            <button class="btn-chip" id="toggleYIF" type="button">YIF</button>
+            <button class="btn-chip" id="toggleBundle" type="button">Bundle</button>
           </div>
-          <input type="hidden" id="includeTermite" value="No" />
+
+          <div class="divider"></div>
+
+          <div class="row3" id="svcFields">
+            <div class="field" style="margin:0;" id="yifFieldWrap">
+              <label>YIF Discount (%)</label>
+              <input id="yifDisc" type="number" min="0" step="0.1" value="5"/>
+            </div>
+</div>
+
           
-          <div class="row">
-            <div class="label">YIF Discount</div>
-            <div class="cell in-blue2" style="gap:10px;">
-              <label style="display:flex; gap:8px; align-items:center; font-weight:800; font-size:13px;">
-                <input type="checkbox" id="yifPestChk" /> Pest
-              </label>
-              <label style="display:flex; gap:8px; align-items:center; font-weight:800; font-size:13px;">
-                <input type="checkbox" id="yifTermChk" /> Termite
-              </label>
-              <div id="yifPctWrap" style="display:none; flex:1; min-width:160px;">
-                <input id="yifDisc" type="text" value="5" aria-label="YIF discount percent" />
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Measurements + Quote dashboard -->
+    <section class="panel dash">
+      <div class="head">Measurements + Quote</div>
+      <div class="body">
+
+        <div class="card" style="box-shadow:none; margin:0 0 12px;">
+          <div class="head subhead">Measurements</div>
+          <div class="body">
+            <div class="row2">
+              <div class="field" style="margin:0;">
+                <label>SqFt</label>
+                <input id="sqft" type="number" min="0" step="1" placeholder=""/>
+              </div>
+              <div class="field" style="margin:0;">
+                <label>Linear ft (LF)</label>
+                <input id="lf" type="number" min="0" step="1" placeholder=""/>
+              </div>
+            </div>
+
+            <details>
+              <summary>Show pricing tiers</summary>
+              <div style="margin-top:10px; border:1px solid rgba(255,79,163,.18); border-radius:14px; overflow:hidden;">
+                <table style="width:100%; border-collapse:collapse; font-weight:900;">
+                  <thead>
+                    <tr style="background:rgba(255,79,163,.10);">
+                      <th style="text-align:left; padding:10px 12px; border-bottom:1px solid rgba(0,0,0,.06);">SqFt</th>
+                      <th style="text-align:right; padding:10px 12px; border-bottom:1px solid rgba(0,0,0,.06);">QT</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tiersTable"></tbody>
+                </table>
+              </div>
+            </details>
+          </div>
+        </div>
+
+        <div class="tiles">
+          <div class="tile">
+            <div class="k">QT Rate</div>
+            <div class="v" id="tileQt">$0.00</div>
+            </div>
+          <div class="tile">
+            <div class="k">SM Rate</div>
+            <div class="v" id="tileSm">$0.00</div>
+            </div>
+        </div>
+        </details>
+
+        <div class="totals">
+          <div class="totalCard">
+            <div class="k">Total (Pest + SM)</div>
+            <div class="v" id="totalMonthly">$0 / mo</div>
+            </div>
+          <div class="totalCard">
+            <div class="k">Bundle Total</div>
+            <div class="v" id="bundleMonthly">$0 / mo</div>
+            </div>
+        </div>
+
+        <details class="details" id="editDetails" open>
+          <summary class="detailsSummary">Adjust rates (only if needed)</summary>
+          <div class="quoteEdit">
+          <div class="box" id="pestEditBox">
+            <div class="topline">
+              <div class="lbl">Pest (QT)</div>
+              <div class="suggest">Suggested: <span id="pestSuggested">$0.00</span></div>
+            </div>
+            <div class="grid2">
+              <div class="field">
+                <label>QT Quote</label>
+                <input id="pestQuote" type="number" min="0" step="0.01" placeholder="Negotiable"/>
+              </div>
+              <div class="field">
+                <label>Initial Fee</label>
+                <input id="pestInit" type="number" min="0" step="0.01" placeholder="Auto"/>
+              </div>
+              <div class="field">
+                <label>QT Monthly</label>
+                <div class="readonlyOut" id="pestMonthly">$0</div>
+              </div>
+              <div class="field">
+                <label>Pest YIF</label>
+                <div class="readonlyOut" id="pestYif">$0.00</div>
               </div>
             </div>
           </div>
-    
-      </div>
 
-      <!-- QT Rate -->
-      <div class="section">
-        <div class="header">QT Rate</div>
-        <div class="rows">
-          <div class="row">
-            <div class="label">Suggested QT rate</div>
-            <div class="cell in-yellow"><div class="out-green small suggestedBox" id="pestSuggested">$0.00</div></div>
-          </div>
-          <div class="row">
-            <div class="label">Your quote QT Rate</div>
-            <div class="cell in-blue dominantInput">
-              <input id="pestQuote" type="number" min="0" step="0.01" placeholder="Negotiable" />
+          <div class="box" id="termEditBox">
+            <div class="topline">
+              <div class="lbl">Termite (SM)</div>
+              <div class="suggest">Suggested: <span id="termSuggested">$0.00</span></div>
             </div>
-          </div>
-          <div class="row">
-            <div class="label">Initial service fee</div>
-            <div class="cell in-blue">
-              <input id="pestInit" type="number" min="0" step="0.01" value="399" />
+            <div class="grid2">
+              <div class="field">
+                <label>SM Quote</label>
+                <input id="termQuote" type="number" min="0" step="0.01" placeholder="Negotiable"/>
+                <div class="field" style="margin-top:10px;">
+                  <label>SM Install Fee</label>
+                  <input id="termInstall" type="number" min="0" step="0.01" value="0" />
+                </div>
+              </div>
+              <div class="field">
+                <label>SM Monthly</label>
+                <div class="readonlyOut" id="termMonthly">$0</div>
+              </div>
+              <div class="field" style="grid-column:1/-1;">
+                <label>Termite YIF</label>
+                <div class="readonlyOut" id="termYif">$0.00</div>
+              </div>
             </div>
-          </div>
-          <div class="row">
-            <div class="label">Pest Monthly</div>
-            <div class="cell"><div class="out-green" id="pestMonthly">$0</div></div>
-          </div>
-          <div class="row">
-            <div class="label">Pest YIF</div>
-            <div class="cell"><div class="out-green" id="pestYIF">$0.00</div></div>
           </div>
         </div>
-      </div>
 
-      <!-- Termite Yearly Rate --><div id="termiteSectionWrap" style="display:none;">
-      <div class="section">
-        <div class="header">Termite Yearly Rate</div>
-        <div class="rows">
+        <div class="bundleBox">
+          <div style="font-weight:1000;">Bundle + Discounts (at a glance)</div>
           <div class="row">
-            <div class="label">Suggested SM Rate</div>
-            <div class="cell in-yellow"><div class="out-green small suggestedBox" id="termSuggested">$0.00</div></div>
+            <div class="k">Bundle QT (pest after -$)</div>
+            <div class="v" id="bundleQtRate">$0.00</div>
           </div>
           <div class="row">
-            <div class="label">Your quote SM Rate</div>
-            <div class="cell in-blue dominantInput">
-              <input id="termQuote" type="number" min="0" step="0.01" placeholder="Negotiable" />
-            </div>
-          </div>
-          <div class="row">
-            <div class="label">Termite install fee</div>
-            <div class="cell in-blue">
-              <input id="termInstall" type="number" min="0" step="0.01" value="0" />
-            </div>
-          </div>
-          <div class="row">
-            <div class="label">SM Monthly</div>
-            <div class="cell"><div class="out-green" id="termMonthly">$0</div></div>
-          </div>
-          <div class="row">
-            <div class="label">Termite YIF</div>
-            <div class="cell"><div class="out-green" id="termYIF">$0.00</div></div>
+            <div class="k">Bundle Total YIF (pest + SM)</div>
+            <div class="v" id="bundleYifBig">$0.00</div>
           </div>
         </div>
-      </div>
 
+        <div class="smallNote" id="debugTiny"></div>
       </div>
+    </section>
 
-      <div id="bundleTotalsWrap" style="display:none;">
-      <!-- Bundle Totals -->
-      <div class="section full">
-        <div class="header">Bundle Totals</div>
-        <div class="bundleTotals" style="padding:12px;">
-          <div>
-            <div class="label" style="border:0; padding:0 0 8px 0;">Bundle QT Rate</div>
-            <div class="out-green" id="bundleQT">$0.00</div>
-          </div>
-          <div>
-            <div class="label" style="border:0; padding:0 0 8px 0;">Bundle YIF (Pest + Termite)</div>
-            <div class="out-green" id="bundleYIF">$0.00</div>
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
-</div>
 </div>
 
 <script>
+  // ---------- Pricing ----------
   const tiers = [
     {min:1000, max:1499, qt:139},
     {min:1500, max:2499, qt:159},
@@ -587,599 +739,497 @@
     {min:4500, max:5000, qt:219},
   ];
 
-  const qtColors = {"219": "#ffb3d1", "209": "#ffc2dc", "199": "#ffd1e6", "179": "#ffe0f0", "169": "#ffd6ea", "159": "#ffcade", "149": "#ffbed4", "139": "#ffb3d1", "129": "#ffa3c8"};
+  const tierPalette = [
+    "#ffd1e6","#ffe0f0","#ffd6ea","#ffcade","#ffbed4","#ffb3d1"
+  ];
 
-  const $ = (id) => document.getElementById(id);
+  const $ = (id)=>document.getElementById(id);
 
   function money(n){
     const x = Number.isFinite(n) ? n : 0;
-    return x.toLocaleString(undefined, {style:'currency', currency:'USD'});
+    return x.toLocaleString(undefined,{style:"currency",currency:"USD"});
   }
   function money0(n){
     const x = Number.isFinite(n) ? n : 0;
-    return x.toLocaleString(undefined, {style:'currency', currency:'USD', maximumFractionDigits:0});
+    return x.toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0});
   }
   function ceil(n){ return Math.ceil(n); }
 
   function suggestedPestQT(sqft){
     if(!Number.isFinite(sqft) || sqft<=0) return 0;
     let best = 0;
-    for(const t of tiers){ if(sqft >= t.min) best = t.qt; }
+    for(const t of tiers){
+      if(sqft >= t.min) best = t.qt;
+    }
     return best;
   }
 
-  function yifDiscount(){
-    const raw = String($('yifDisc').value || '').replace('%','').trim();
-    const pct = parseFloat(raw);
-    return Number.isFinite(pct) ? (pct/100) : 0;
-  }
-  function bundleDiscount(){
-    const raw = String($('bundleDisc').value || '').replace('$','').trim();
-    const n = parseFloat(raw);
-    return Number.isFinite(n) ? n : 0;
-  }
-  
-  function yifApplyPest(){ return document.getElementById('yifPestChk')?.checked === true; }
-  function yifApplyTermite(){ return document.getElementById('yifTermChk')?.checked === true; }
+  // ---------- State ----------
+  const state = {
+    pestOn: true,
+    termiteOn: false,
+    yifOn: false,
+    bundleOn: false,
+    userTouchedInit: false
+  };
 
+  function syncToggleUI(){
+    $('svcPest').classList.toggle('on', state.pestOn);
+    $('svcTermite').classList.toggle('on', state.termiteOn);
+    $('toggleYIF').classList.toggle('on', state.yifOn);
+    $('toggleBundle').classList.toggle('on', state.bundleOn);
 
+    // Reduce what you have to read: only show option fields when relevant
+    const y = document.getElementById('yifFieldWrap');
+    const b = document.getElementById('bundleFieldWrap');
+    const i = document.getElementById('installFieldWrap');
+    if(y) y.style.display = state.yifOn ? '' : 'none';
+    if(b) b.style.display = state.bundleOn ? '' : 'none';
+    if(i) i.style.display = state.termiteOn ? '' : 'none';
+
+    const pestBox = document.getElementById('pestEditBox');
+    const termBox = document.getElementById('termEditBox');
+    if(pestBox) pestBox.style.display = state.pestOn ? '' : 'none';
+    if(termBox) termBox.style.display = state.termiteOn ? '' : 'none';
+  }
+
+  // ---------- Calculations ----------
   function calc(){
     const sqft = parseFloat($('sqft').value);
     const lf = parseFloat($('lf').value);
-    const include = $('includeTermite').value === 'Yes';
 
-    const yifDisc = yifDiscount(); // 0.05 default
-    const bundleDisc = bundleDiscount(); // 10 default
-    const mode = payInFullMode(); // None/Pest/Termite/Both
+    const yifPct = 0.05; // fixed 5% YIF discount
+    const bundleDisc = Math.max(0, parseFloat($('bundleDisc').value) || 0);
+    const termInstall = Math.max(0, parseFloat($('termInstall').value) || 0);
 
-    // Pest
+    // Suggested
     const pestSuggested = suggestedPestQT(sqft);
     $('pestSuggested').textContent = money(pestSuggested);
 
-    const pestQuote = parseFloat($('pestQuote').value);
-    const pestInit = parseFloat($('pestInit').value);
-    const pestFinal = Number.isFinite(pestQuote) ? pestQuote : pestSuggested;
-    const pestAfterBundle = include ? Math.max(0, pestFinal - bundleDisc) : pestFinal;
-
-    // Default initial fee to match QT rate unless manually changed
-    if(!pestInitTouched && pestAfterBundle>0){
-      const pi = document.getElementById('pestInit');
-      if(pi) pi.value = String(pestAfterBundle.toFixed(2));
-    }
-
-
-    const pestMonthly = (pestAfterBundle>0) ? ceil(pestAfterBundle/3) : 0;
-
-    const pestYearBase = pestAfterBundle * 4;
-    const pestInitSafe = (Number.isFinite(pestInit)?pestInit:0);
-    const pestTotalBase = pestYearBase + pestInitSafe;
-    const pestYIF = (pestAfterBundle>0)
-      ? (yifApplyPest() ? (pestTotalBase * (1 - yifDisc)) : pestTotalBase)
-      : 0;
-
-    $('pestMonthly').textContent = money0(pestMonthly);
-    $('pestYIF').textContent = money(pestYIF);
-
-    // Termite (yearly = lf * 1.5 unless quote override)
-    const termSuggested = (Number.isFinite(lf) && lf>0) ? (lf * 1.5) : 0;
+    const termSuggested = (Number.isFinite(lf) && lf>0) ? (lf * 1.5) : 0; // yearly
     $('termSuggested').textContent = money(termSuggested);
 
-    const termQuote = parseFloat($('termQuote').value);
-    const termInstall = parseFloat($('termInstall').value);
-    const termFinal = Number.isFinite(termQuote) ? termQuote : termSuggested;
+    // Determine chosen QT and Initial
+    const pestQuoteRaw = parseFloat($('pestQuote').value);
+    let pestQT = Number.isFinite(pestQuoteRaw) ? pestQuoteRaw : pestSuggested;
 
-    const termMonthly = (termFinal>0) ? ceil(termFinal/12) : 0;
-    const termInstallSafe = (Number.isFinite(termInstall)?termInstall:0);
-    const termTotalBase = termFinal + termInstallSafe;
-    const termYIF = (termFinal>0)
-      ? (yifApplyTermite() ? (termTotalBase * (1 - yifDisc)) : termTotalBase)
-      : 0;
+    // Auto-set initial fee to match QT unless user edits it
+    if(!state.userTouchedInit){
+      $('pestInit').value = String((pestQT || 0).toFixed(2));
+    }
+    const pestInit = Math.max(0, parseFloat($('pestInit').value) || 0);
 
-    $('termMonthly').textContent = money0(termMonthly);
-    $('termYIF').textContent = money(termYIF);
+    // Termite chosen yearly
+    const termQuoteRaw = parseFloat($('termQuote').value);
+    let termYR = Number.isFinite(termQuoteRaw) ? termQuoteRaw : termSuggested;
 
-    // Bundle totals
-    $('bundleQT').textContent = money(pestAfterBundle);
-    $('bundleYIF').textContent = money(include ? (pestYIF + termYIF) : pestYIF);
+    // Apply service toggles
+    if(!state.pestOn) pestQT = 0;
+    if(!state.termiteOn) termYR = 0;
+
+    // Bundle applies only if both services are on AND bundle is on
+    const bundleApplies = state.bundleOn && state.pestOn && state.termiteOn;
+    const pestAfterBundle = bundleApplies ? Math.max(0, pestQT - bundleDisc) : pestQT;
+
+    // Monthly displays (QT monthly = ceil(qt/3), SM monthly = ceil(yr/12))
+    const pestMo = (pestAfterBundle>0) ? ceil(pestAfterBundle/3) : 0;
+    const smMo = (termYR>0) ? ceil(termYR/12) : 0;
+
+    // YIF totals:
+    // Pest base year = qt*4 + initial fee, discount applied AFTER fees.
+    const pestBase = (pestAfterBundle>0) ? (pestAfterBundle * 4 + pestInit) : 0;
+    const pestYif = (pestBase>0) ? (state.yifOn ? pestBase * (1 - yifPct) : pestBase) : 0;
+
+    // Termite base year = yr + install, discount applied AFTER fees.
+    const termBase = (termYR>0) ? (termYR + termInstall) : 0;
+    const termYif = (termBase>0) ? (state.yifOn ? termBase * (1 - yifPct) : termBase) : 0;
+
+    // Totals
+    const totalMo = pestMo + smMo;
+    const totalYif = pestYif + termYif;
+
+    // Bundle "totals" are just totals with bundle applied (already in pestAfterBundle), but show separately for clarity
+    const bundleMo = (bundleApplies ? totalMo : totalMo); // monthly already uses pestAfterBundle
+    const bundleYif = (bundleApplies ? totalYif : totalYif);
+
+    // Dashboard tiles
+    $('tileQt').textContent = money(pestAfterBundle);
+    $('tileQtMo').textContent = money0(pestMo);
+    $('tileSm').textContent = money(termYR);
+    $('tileSmMo').textContent = money0(smMo);
+
+    // Editable boxes outputs
+    $('pestMonthly').textContent = money0(pestMo);
+    $('pestYif').textContent = money(pestYif);
+    $('termMonthly').textContent = money0(smMo);
+    $('termYif').textContent = money(termYif);
+
+    // Totals cards
+    $('totalMonthly').textContent = `${money0(totalMo)} / mo`;
+    $('totalYif').textContent = money(totalYif);
+
+    $('bundleMonthly').textContent = `${money0(bundleMo)} / mo`;
+    $('bundleYif').textContent = money(bundleYif);
+
+    $('bundleQtRate').textContent = money(pestAfterBundle);
+    $('bundleYifBig').textContent = money(bundleYif);
 
     // Copy line
-    const quoteLine = include
-      ? `Pest QT ${money(pestAfterBundle)} (Monthly ${money0(pestMonthly)}), Termite YR ${money(termFinal)} (Monthly ${money0(termMonthly)}), Bundle YIF ${money(pestYIF + termYIF)}`
-      : `Pest QT ${money(pestAfterBundle)} (Monthly ${money0(pestMonthly)}), Pest YIF ${money(pestYIF)}`;
-    $('copyBtn').dataset.quote = quoteLine;
+    const line = [
+      state.pestOn ? `QT ${money(pestAfterBundle)} (Mo ${money0(pestMo)})` : null,
+      state.termiteOn ? `SM ${money(termYR)} (Mo ${money0(smMo)})` : null,
+      `Total ${money0(totalMo)}/mo`,
+      state.yifOn ? `YIF ${money(totalYif)}` : null,
+      bundleApplies ? `Bundle (-$${bundleDisc}/QT)` : null
+    ].filter(Boolean).join(" | ");
+    $('copyBtn').dataset.quote = line;
+
+    // Show/hide SM editor box if termite off? Keep visible but dim a bit.
+    const smBox = $('termQuote').closest('.box');
+    smBox.style.opacity = state.termiteOn ? '1' : '0.55';
   }
 
+  // ---------- Clear ----------
   function clearAll(){
-    // Calculator inputs
+    // Customer
+    ['custName','custLeadSource','custPhone','custEmail','custNotes','custAddress'].forEach(id=> $(id).value = '');
+    ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS'].forEach(id=> $(id).checked = false);
+
+    // Measurements
     $('sqft').value = '';
     $('lf').value = '';
-    $('includeTermite').value = 'No';
-    
-    $('yifDisc').value = '5';
-    const yp=document.getElementById('yifPestChk'); if(yp) yp.checked=false;
-    const yt=document.getElementById('yifTermChk'); if(yt) yt.checked=false;
-    if(typeof syncYifUi==='function') syncYifUi();
-    $('bundleDisc').value = '10';
+
+    // Services state defaults
+    state.pestOn = true;
+    state.termiteOn = false;
+    state.yifOn = false;
+    state.bundleOn = false;
+    state.userTouchedInit = false;
+
+    // Pricing inputs
     $('pestQuote').value = '';
-    $('pestInit').value = '399';
+    $('pestInit').value = '';
     $('termQuote').value = '';
     $('termInstall').value = '0';
+    $('bundleDisc').value = '10';
 
-    // Customer info (everything)
-    [
-      'custDate','custTime','custLeadSource','custName','custPhone','custEmail',
-      'custPref','custAddress','custPests','custTiming','custStatus','custAppt','custNotes'
-    ].forEach(id=>{
-      const el = document.getElementById(id);
-      if(!el) return;
-      if(el.tagName === 'SELECT'){ el.value = ''; }
-      else { el.value = ''; }
-    });
+    // Status
+    $('gisStatus').textContent = '';
+    $('gisStatus').className = 'statusTiny';
 
-    // Checklist
-    ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS'].forEach(id=>{
-      const el = document.getElementById(id);
-      if(el) el.checked = false;
-    });
-
+    syncToggleUI();
     calc();
   }
 
+  // ---------- Copy ----------
   function copyQuote(){
     const text = $('copyBtn').dataset.quote || '';
     if(!text) return;
     navigator.clipboard.writeText(text).then(()=>{
-      const btn = $('copyBtn');
-      const old = btn.textContent;
-      btn.textContent = 'Copied';
-      setTimeout(()=>btn.textContent = old, 900);
-    }).catch(()=>{ alert('Copy failed. You can select and copy manually.'); });
+      const old = $('copyBtn').textContent;
+      $('copyBtn').textContent = 'Copied';
+      setTimeout(()=> $('copyBtn').textContent = old, 900);
+    }).catch(()=> alert('Copy failed. Select + copy manually.'));
   }
 
-  // Populate tiers table with palette colors
-  const tbody = document.getElementById('tiersTable');
-  tiers.forEach(t=>{
-    const tr = document.createElement('tr');
-    const bg = qtColors[t.qt] || '#ffffff';
-    tr.innerHTML = `<td><span class="tierTag" style="background:${bg}">${t.min.toLocaleString()}–${t.max.toLocaleString()}</span></td>
-                    <td class="right" style="background:${bg}; font-weight:800;">${money(t.qt)}</td>`;
-    tbody.appendChild(tr);
+  // ---------- Pricing tiers table ----------
+  (function buildTiers(){
+    const tbody = $('tiersTable');
+    tbody.innerHTML = '';
+    tiers.forEach((t,i)=>{
+      const bg = tierPalette[i % tierPalette.length];
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="padding:10px 12px; border-bottom:1px solid rgba(0,0,0,.06); background:${bg};">
+          ${t.min.toLocaleString()}–${t.max.toLocaleString()}
+        </td>
+        <td style="padding:10px 12px; border-bottom:1px solid rgba(0,0,0,.06); text-align:right; background:${bg}; font-weight:1000;">
+          ${money(t.qt)}
+        </td>`;
+      tbody.appendChild(tr);
+    });
+  })();
+
+  // ---------- Customer panel collapse ----------
+  $('toggleCustomer').addEventListener('click', ()=>{
+    const p = $('customerPanel');
+    p.classList.toggle('collapsed');
+    $('toggleCustomer').textContent = p.classList.contains('collapsed') ? 'Expand' : 'Collapse';
   });
 
-  // Wire up events (safe bind — avoids null addEventListener)
-  ['sqft','lf','includeTermite','yifDisc','bundleDisc','pestQuote','pestInit','termQuote','termInstall']
-    .forEach(id=>{
-      const el = $(id);
-      if(!el) return;
-      el.addEventListener('input', calc);
-      el.addEventListener('change', calc);
-    });
-  const clearBtn = document.getElementById('clearBtn');
-  if(clearBtn) clearBtn.addEventListener('click', clearAll);
-  const copyBtn = document.getElementById('copyBtn');
-  if(copyBtn) copyBtn.addEventListener('click', copyQuote);
-// Initial
-  calc();
+  // ---------- Toggle buttons ----------
+  $('svcPest').addEventListener('click', ()=>{ state.pestOn = !state.pestOn; syncToggleUI(); calc(); });
+  $('svcTermite').addEventListener('click', ()=>{ state.termiteOn = !state.termiteOn; syncToggleUI(); calc(); });
+  $('toggleYIF').addEventListener('click', ()=>{ state.yifOn = !state.yifOn; syncToggleUI(); calc(); });
+  $('toggleBundle').addEventListener('click', ()=>{ state.bundleOn = !state.bundleOn; syncToggleUI(); calc(); });
 
+  // Mark initial fee as user-touched if they type in it
+  $('pestInit').addEventListener('input', ()=>{ state.userTouchedInit = true; calc(); });
 
+  // Other inputs that affect calc
+  ['sqft','lf','pestQuote','termQuote','termInstall','bundleDisc']
+    .forEach(id=> $(id).addEventListener('input', calc));
 
-  // ------------------------
-  // GIS AUTO-FILL (Wake / Durham)
-  // ------------------------
+  // Actions
+  $('clearBtn').addEventListener('click', clearAll);
+  $('copyBtn').addEventListener('click', copyQuote);
+
+  // ---------- Auto-fill SQFT (layout-first, but usable) ----------
+  // Minimal behavior: attempt GIS; if fails, show "Not found" only (as requested earlier).
+  function extractStreetForGis(full){
+    const first = (full || '').split(',')[0] || '';
+    return first
+      .replace(/\b(APT|UNIT|STE|SUITE|#)\b.*$/i,'')
+      .replace(/[^\w\s\-]/g,' ')
+      .replace(/\s+/g,' ')
+      .trim()
+      .toUpperCase();
+  }
+  function safeLike(str){ return (str || '').replace(/'/g, "''"); }
+  async function queryFirstMatch({base, where, outFields, returnGeometry=false, outSR=2264}){
+    const url = base + '?' + new URLSearchParams({
+      f:'json',
+      where,
+      outFields,
+      returnGeometry: returnGeometry ? 'true' : 'false',
+      outSR: String(outSR),
+      resultRecordCount: '1'
+    }).toString();
+    const r = await fetch(url);
+    const j = await r.json();
+    return j?.features?.[0] || null;
+  }
   async function gisLookup(){
-    const status = document.getElementById('gisStatus');
-    const county = document.getElementById('gisCounty')?.value || 'wake';
-    const addr = (document.getElementById('custAddress')?.value || '').trim();
-
+    const status = $('gisStatus');
+    const county = $('gisCounty').value;
+    const fullAddr = ($('custAddress').value || '').trim();
+    status.className = 'statusTiny';
     status.textContent = '';
-    if(!addr){
-      status.textContent = 'Enter an address first.';
+
+    if(!fullAddr){
+      status.textContent = 'Not found';
+      status.classList.add('bad');
+      return;
+    }
+    const street = extractStreetForGis(fullAddr);
+    if(!street){
+      status.textContent = 'Not found';
+      status.classList.add('bad');
       return;
     }
 
-    const setStatus = (t)=>{ status.textContent = t; };
-
-    // Normalize for LIKE queries
-    const norm = addr.replace(/[,#]/g,' ').replace(/\s+/g,' ').trim().toUpperCase();
+    const whereLike = (field)=> `UPPER(${field}) LIKE '%${safeLike(street)}%'`;
 
     try{
-      setStatus('');
-
+      // Wake
       if(county === 'wake'){
-        // Wake parcels: HEATEDAREA + SITE_ADDRESS
-        // Service: https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0  (fields include HEATEDAREA, SITE_ADDRESS)
-        const base = 'https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0/query';
-        const where = "UPPER(SITE_ADDRESS) LIKE '%" + norm.replace(/'/g,"''") + "%'";
-        const url = base + '?' + new URLSearchParams({
-          f:'json',
-          where,
-          outFields:'HEATEDAREA,SITE_ADDRESS',
-          returnGeometry:'false',
-          resultRecordCount:'1'
-        }).toString();
-
-        const r = await fetch(url);
-        const j = await r.json();
-        const feat = j?.features?.[0];
+        const feat = await queryFirstMatch({
+          base: 'https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0/query',
+          where: whereLike('SITE_ADDRESS'),
+          outFields: 'HEATEDAREA'
+        });
         const sqft = feat?.attributes?.HEATEDAREA;
-
-        if(!feat){
-          setStatus('Not found');
+        if(Number.isFinite(sqft)){
+          $('sqft').value = String(Math.round(sqft));
+          status.textContent = '';
+          calc();
           return;
         }
-        if(Number.isFinite(sqft)){
-          document.getElementById('sqft').value = String(Math.round(sqft));
-          setStatus('');
-          calc();
-        }else{
-          setStatus('Not found');
-        }
-        return;
       }
 
+      // Durham
       if(county === 'durham'){
-        // Durham parcels: HEATED_AREA + LOCATION_ADDR; we also try to estimate LF using city building footprints layer (within city limits)
-        // Parcels layer: https://webgis.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4
-        // Buildings layer (city limits): https://webgis2.durhamnc.gov/server/rest/services/PublicWorksServices/OnlineCheckerV2/MapServer/17
-        const parcelsBase = 'https://webgis.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4/query';
-        const where = "UPPER(LOCATION_ADDR) LIKE '%" + norm.replace(/'/g,"''") + "%'";
-        const parcelUrl = parcelsBase + '?' + new URLSearchParams({
-          f:'json',
-          where,
-          outFields:'HEATED_AREA,LOCATION_ADDR',
-          returnGeometry:'true',
-          outSR:'2264', // state plane feet (matches services)
-          resultRecordCount:'1'
-        }).toString();
-
-        const pr = await fetch(parcelUrl);
-        const pj = await pr.json();
-        const pFeat = pj?.features?.[0];
-        const sqft = pFeat?.attributes?.HEATED_AREA;
-
-        if(!pFeat){
-          setStatus('Not found');
-          return;
-        }
-
+        const feat = await queryFirstMatch({
+          base: 'https://webgis.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4/query',
+          where: whereLike('LOCATION_ADDR'),
+          outFields: 'HEATED_AREA'
+        });
+        const sqft = feat?.attributes?.HEATED_AREA;
         if(Number.isFinite(sqft)){
-          document.getElementById('sqft').value = String(Math.round(sqft));
-        }
-
-        // Try to estimate LF from building footprints intersecting the parcel polygon:
-        // We'll query for max SHAPE.STLength() in the building layer using outStatistics.
-        const geom = pFeat?.geometry;
-        if(!geom){
-          setStatus('');
+          $('sqft').value = String(Math.round(sqft));
+          status.textContent = '';
           calc();
           return;
         }
-
-        setStatus('');
-
-        const bBase = 'https://webgis2.durhamnc.gov/server/rest/services/PublicWorksServices/OnlineCheckerV2/MapServer/17/query';
-        const outStatistics = JSON.stringify([{
-          statisticType:'max',
-          onStatisticField:'Shape.STLength()',
-          outStatisticFieldName:'max_len'
-        }]);
-
-        const bUrl = bBase + '?' + new URLSearchParams({
-          f:'json',
-          geometry: JSON.stringify(geom),
-          geometryType:'esriGeometryPolygon',
-          inSR:'2264',
-          spatialRel:'esriSpatialRelIntersects',
-          outFields:'',
-          outStatistics,
-          returnGeometry:'false'
-        }).toString();
-
-        const br = await fetch(bUrl);
-        const bj = await br.json();
-        const maxLen = bj?.features?.[0]?.attributes?.max_len;
-
-        if(Number.isFinite(maxLen) && maxLen > 0){
-          // maxLen is in feet (StatePlane feet). Round to nearest whole.
-          document.getElementById('lf').value = String(Math.round(maxLen));
-          setStatus('');
-        }else{
-          setStatus('');
-        }
-
-        calc();
-        return;
       }
 
-    }catch(err){
-      console.error(err);
-      setStatus('Blocked by browser/CORS. If you want this to work as a shared link, we’ll need a tiny proxy (Cloudflare/Netlify).');
+      status.textContent = 'Not found';
+      status.classList.add('bad');
+    }catch(e){
+      console.error(e);
+      status.textContent = 'Not found';
+      status.classList.add('bad');
     }
   }
+  $('gisLookup').addEventListener('click', gisLookup);
 
-  document.getElementById('gisLookup')?.addEventListener('click', gisLookup);
+  // "Use Address for Measure" just opens the Measure section and focuses address
+      if(det) det.open = true;
+    $('custAddress').focus();
+  });
 
+  // ---------- Map measure (optional) ----------
+  const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'; // <- replace
+  let gmap, geocoder, drawingManager, activeShape, lastFeet = 0;
 
-
-  // ------------------------
-  // GOOGLE MAPS: DRAW + PERIMETER → LF
-  // ------------------------
-  // Put your API key here:
-  const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY';
-
-  let gmap, geocoder, drawingManager, activeShape, lastPerimeterFeet = 0;
-
-  function setMapStatus(t){ const el = document.getElementById('mapStatus'); if(el) el.textContent = t; }
-
-  function enableMapControls(loaded){
-    const ids = ['mapClearShapeBtn','mapUseLfBtn'];
-    ids.forEach(id=>{
-      const el = document.getElementById(id);
-      if(el) el.disabled = !loaded;
+  function setMapStatus(t){
+    const el = $('mapStatus');
+    el.textContent = t || '';
+  }
+  function enableMapBtns(on){
+    ['mapGoBtn','mapDrawBtn','mapClearBtn','mapSubmitBtn'].forEach(id=>{
+      $(id).disabled = !on;
     });
   }
 
   function loadGoogleMapsScript(){
-    return new Promise((resolve, reject)=>{
+    return new Promise((resolve,reject)=>{
       if(window.google && window.google.maps){ resolve(); return; }
       if(!GOOGLE_MAPS_API_KEY || GOOGLE_MAPS_API_KEY.includes('YOUR_')){
         reject(new Error('Missing API key'));
         return;
       }
       const s = document.createElement('script');
-      // Load drawing + geometry + places (for autocomplete if you want later)
-      s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=drawing,geometry,places`;
-      s.async = true;
-      s.defer = true;
+      s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=drawing,geometry,places&loading=async`;
+      s.async = true; s.defer = true;
       s.onload = ()=>resolve();
       s.onerror = ()=>reject(new Error('Failed to load Google Maps'));
       document.head.appendChild(s);
     });
   }
 
-  function computePerimeterFeetFromPolygon(polygon){
-    const path = polygon.getPath();
-    if(!path || path.getLength() < 2) return 0;
-    const pts = [];
+  function computePerimeterFeet(poly){
+    const path = poly.getPath();
+    if(!path || path.getLength()<2) return 0;
+    const pts=[];
     for(let i=0;i<path.getLength();i++) pts.push(path.getAt(i));
-    // Close the loop
     pts.push(path.getAt(0));
     const meters = google.maps.geometry.spherical.computeLength(pts);
-    const feet = meters * 3.280839895;
-    return feet;
+    return meters * 3.280839895;
   }
 
-  function clearActiveShape(){
-    if(activeShape){ activeShape.setMap(null); activeShape = null; }
-    lastPerimeterFeet = 0;
+  function clearShape(){
+    if(activeShape){ activeShape.setMap(null); activeShape=null; }
+    lastFeet = 0;
     setMapStatus('');
+    $('mapSubmitBtn').disabled = true;
   }
 
   async function initMap(){
-    setMapStatus('');
+    setMapStatus('Loading…');
     await loadGoogleMapsScript();
+    $('mapWrap').style.display = 'block';
 
-    document.getElementById('mapWrap').style.display = 'block';
-
-    gmap = new google.maps.Map(document.getElementById('gmap'), {
-      center: { lat: 35.7796, lng: -78.6382 }, // Raleigh-ish default
-      zoom: 12,
-      mapTypeId: 'hybrid'
+    gmap = new google.maps.Map($('gmap'), {
+      center:{lat:35.7796, lng:-78.6382},
+      zoom:12,
+      mapTypeId:'hybrid'
     });
-
     geocoder = new google.maps.Geocoder();
-    
-    // Places Autocomplete for address (WAY better than raw geocoding)
-    try{
-      const addrEl = document.getElementById('custAddress');
-      if(addrEl && google.maps.places){
-        const ncBounds = new google.maps.LatLngBounds(
-          new google.maps.LatLng(33.5, -84.5),  // SW-ish (covers NC comfortably)
-          new google.maps.LatLng(37.0, -75.0)   // NE-ish
-        );
-        window.__selectedPlace = null;
-        window.__addrAutocomplete = new google.maps.places.Autocomplete(addrEl, {
-          fields: ['geometry','place_id','formatted_address','name'],
-          componentRestrictions: { country: 'us' },
-          bounds: ncBounds,
-          strictBounds: false
-        });
-        window.__addrAutocomplete.addListener('place_changed', ()=>{
-          const p = window.__addrAutocomplete.getPlace();
-          if(p && p.geometry && p.geometry.location){
-            window.__selectedPlace = p;
-            // If Google provides a nicer formatted address, keep it for your records
-            if(p.formatted_address) addrEl.value = p.formatted_address;
-          }
-        });
-      }
-    }catch(e){
-      console.warn('Autocomplete init failed', e);
-    }
-
 
     drawingManager = new google.maps.drawing.DrawingManager({
-      drawingMode: null,
-      drawingControl: false,
-      polygonOptions: {
-        fillColor: '#ff5aa5',
-        fillOpacity: 0.22,
-        strokeColor: '#ff2f92',
-        strokeOpacity: 0.9,
-        strokeWeight: 2,
-        clickable: true,
-        editable: true,
-        zIndex: 3
+      drawingMode:null,
+      drawingControl:false,
+      polygonOptions:{
+        fillColor:'#ff4fa3',
+        fillOpacity:0.22,
+        strokeColor:'#ff2f92',
+        strokeOpacity:0.9,
+        strokeWeight:2,
+        editable:true
       }
     });
     drawingManager.setMap(gmap);
 
-    google.maps.event.addListener(drawingManager, 'overlaycomplete', function(e) {
-      // Only one shape at a time
-      clearActiveShape();
+    google.maps.event.addListener(drawingManager,'overlaycomplete',(e)=>{
+      clearShape();
       drawingManager.setDrawingMode(null);
       activeShape = e.overlay;
 
       const update = ()=>{
-        lastPerimeterFeet = computePerimeterFeetFromPolygon(activeShape);
-        setMapStatus(`Perimeter: ${Math.round(lastPerimeterFeet).toLocaleString()} ft`);
-        const useBtn = document.getElementById('mapUseLfBtn');
-        if(useBtn) useBtn.disabled = !(lastPerimeterFeet > 0);
+        lastFeet = computePerimeterFeet(activeShape);
+        setMapStatus(`Perimeter: ${Math.round(lastFeet).toLocaleString()} ft`);
+        $('mapSubmitBtn').disabled = !(lastFeet>0);
       };
-
       update();
-      // update on edits
-      google.maps.event.addListener(activeShape.getPath(), 'set_at', update);
-      google.maps.event.addListener(activeShape.getPath(), 'insert_at', update);
-      google.maps.event.addListener(activeShape.getPath(), 'remove_at', update);
+      google.maps.event.addListener(activeShape.getPath(),'set_at',update);
+      google.maps.event.addListener(activeShape.getPath(),'insert_at',update);
+      google.maps.event.addListener(activeShape.getPath(),'remove_at',update);
     });
 
-    enableMapControls(true);
+    enableMapBtns(true);
     setMapStatus('');
   }
 
-  function goToAddressOnMap(){
-    if(!gmap) return;
-
-    // 1) If user selected an Autocomplete suggestion, use it (best)
-    const sp = window.__selectedPlace;
-    if(sp && sp.geometry && sp.geometry.location){
-      const loc = sp.geometry.location;
-      gmap.setCenter(loc);
-      gmap.setZoom(20);
-      setMapStatus('');
-      return;
-    }
-
-    // 2) Fall back to Geocoder (still works, just pickier)
-    if(!geocoder) geocoder = new google.maps.Geocoder();
-    const addr = (document.getElementById('custAddress')?.value || '').trim();
-    if(!addr){ setMapStatus('Not found'); return; }
-
-    const ncBounds = new google.maps.LatLngBounds(
-      new google.maps.LatLng(33.5, -84.5),
-      new google.maps.LatLng(37.0, -75.0)
-    );
-
-    geocoder.geocode({
-      address: addr,
-      bounds: ncBounds,
-      region: 'us',
-      componentRestrictions: { country: 'US' }
-    }, (results, status)=>{
-      if(status === 'OK' && results && results[0]){
+  function findAddress(){
+    const addr = ($('custAddress').value||'').trim();
+    if(!addr){ setMapStatus('Enter address.'); return; }
+    setMapStatus('Finding…');
+    geocoder.geocode({address:addr},(results,status)=>{
+      if(status==='OK' && results && results[0]){
         const loc = results[0].geometry.location;
         gmap.setCenter(loc);
         gmap.setZoom(20);
         setMapStatus('');
-      } else {
-        setMapStatus('Not found');
+      }else{
+        setMapStatus('Not found.');
       }
     });
   }
 
-  function startDrawPerimeter(){
+  function draw(){
     if(!drawingManager) return;
-    setMapStatus('');
+    setMapStatus('Draw around the house. Double-click to finish.');
     drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
   }
 
-  function usePerimeterAsLF(){
-    if(!(lastPerimeterFeet > 0)) return;
-    const lfInput = document.getElementById('lf');
-    lfInput.value = String(Math.round(lastPerimeterFeet));
-    setMapStatus('');
+  function submitLf(){
+    if(!(lastFeet>0)) return;
+    $('lf').value = String(Math.round(lastFeet));
+    setMapStatus('LF saved.');
     calc();
   }
 
-  // Wire up map buttons
-  document.getElementById('mapMeasureBtn')?.addEventListener('click', async ()=>{
+  $('mapLoadBtn').addEventListener('click', async ()=>{
     try{
       await initMap();
-      // one-click: find address then start drawing
-      setTimeout(()=>{ goToAddressOnMap(); setTimeout(()=>startDrawPerimeter(), 600); }, 250);
-      document.getElementById('mapClearShapeBtn').disabled = false;
-      document.getElementById('mapUseLfBtn').disabled = true;
     }catch(e){
       console.error(e);
-      setMapStatus(e.message === 'Missing API key'
-        ? 'Add your Google Maps API key in the file (GOOGLE_MAPS_API_KEY).'
-        : 'Could not load Google Maps (check key, billing, and restrictions).');
+      setMapStatus(e.message==='Missing API key' ? 'Add Google API key.' : 'Map failed to load.');
     }
   });
-  document.getElementById('mapClearShapeBtn')?.addEventListener('click', clearActiveShape);
-  document.getElementById('mapUseLfBtn')?.addEventListener('click', usePerimeterAsLF);
+  $('mapGoBtn').addEventListener('click', findAddress);
+  $('mapDrawBtn').addEventListener('click', draw);
+  $('mapClearBtn').addEventListener('click', clearShape);
+  $('mapSubmitBtn').addEventListener('click', submitLf);
 
+  // One-click measure: opens Measure, loads map, finds address, and starts drawing
+  $('measureBtn')?.addEventListener('click', async ()=>{
+    const det = document.querySelector('details');
+    if(det) det.open = true;
 
-
-  // Step highlighting
-  function setActiveStep(n){
-    ['step1Tag','step2Tag','step3Tag'].forEach((id,i)=>{
-      const el = document.getElementById(id);
-      if(!el) return;
-      el.classList.toggle('active', (i+1)===n);
-    });
-  }
-  ['custAddress','gisLookup','mapLoadBtn','sqft','lf','pestQuote','termQuote'].forEach(id=>{
-    const el = document.getElementById(id);
-    if(!el) return;
-    el.addEventListener('focus', ()=>{
-      if(id==='custAddress') setActiveStep(1);
-      else if(['gisLookup','mapLoadBtn'].includes(id)) setActiveStep(2);
-      else setActiveStep(3);
-    });
-  });
-
-
-  // Keep Initial Service Fee starting at the QT rate unless user edits it
-  let pestInitTouched = false;
-  const pestInitEl = document.getElementById('pestInit');
-  if(pestInitEl){
-    pestInitEl.addEventListener('input', ()=>{ pestInitTouched = true; });
-  }
-
-
-  // Show/hide YIF % input only if a discount checkbox is checked
-  function syncYifUi(){
-    const show = (document.getElementById('yifPestChk')?.checked || document.getElementById('yifTermChk')?.checked);
-    const wrap = document.getElementById('yifPctWrap');
-    if(wrap) wrap.style.display = show ? 'block' : 'none';
-  }
-  document.getElementById('yifPestChk')?.addEventListener('change', ()=>{ syncYifUi(); calc(); });
-  document.getElementById('yifTermChk')?.addEventListener('change', ()=>{ syncYifUi(); calc(); });
-  syncYifUi();
-
-
-  // Termite toggle
-  let termiteEnabled = false;
-  function syncTermiteUi(){
-    const btn = document.getElementById('toggleTermiteBtn');
-    const wrap = document.getElementById('termiteSectionWrap');
-    const lfWrap = document.getElementById('termiteLfWrap');
-    const bundleWrap = document.getElementById('bundleTotalsWrap');
-    if(btn) btn.textContent = termiteEnabled ? 'Remove Termite Protection' : 'Add Termite Protection';
-    if(wrap) wrap.style.display = termiteEnabled ? 'block' : 'none';
-    if(lfWrap) lfWrap.style.display = termiteEnabled ? 'block' : 'none';
-    if(bundleWrap) bundleWrap.style.display = termiteEnabled ? 'block' : 'none';
-
-    const include = document.getElementById('includeTermite');
-    if(include) include.value = termiteEnabled ? 'Yes' : 'No';
-
-    if(!termiteEnabled){
-      const lf = document.getElementById('lf'); if(lf) lf.value='';
-      const tq = document.getElementById('termQuote'); if(tq) tq.value='';
-      const ti = document.getElementById('termInstall'); if(ti) ti.value='0';
-      const yt = document.getElementById('yifTermChk'); if(yt) yt.checked=false;
-      if(typeof syncYifUi==='function') syncYifUi();
+    try{
+      if(!mapReady){ await initMap(); }
+      goToAddressOnMap();
+      startDrawPerimeter();
+    }catch(e){
+      console.error(e);
+      setMapStatus('Map not ready (check API key / billing / domain restriction).');
     }
-    calc();
-  }
-  document.getElementById('toggleTermiteBtn')?.addEventListener('click', ()=>{
-    termiteEnabled = !termiteEnabled;
-    syncTermiteUi();
   });
-  syncTermiteUi();
 
+
+  // ---------- Auto-fill date/time ----------
+  function pad2(n){ return String(n).padStart(2,'0'); }
+  (function initDateTime(){
+    const now = new Date();
+    $('topDate').value = `${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;
+    $('topTime').value = `${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
+  })();
+
+  // ---------- Init ----------
+  syncToggleUI();
+  calc();
 </script>
 </body>
 </html>
