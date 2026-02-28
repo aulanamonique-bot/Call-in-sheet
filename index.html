@@ -2,502 +2,275 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Quote Calculator</title>
   <style>
     :root{
-      --p:#ff2f92;
-      --p2:#ff7bbd;
-      --bg:#fff0f7;
-      --card:#ffffff;
-      --ink:#141414;
-      --muted:#6b6b6b;
-      --border:rgba(255,47,146,.18);
-      --line:rgba(0,0,0,.08);
-      --shadow:0 10px 30px rgba(0,0,0,.06);
-      --radius:18px;
-
-      /* Back-compat names */
-      --pink:var(--p);
-      --pink2:var(--p2);
-      --appBg:var(--bg);
-      --cardBg:var(--card);
+      --bg:#f7edf3;
+      --panel:#ffffff;
+      --ink:#161616;
+      --muted:#6b6b73;
+      --line:#f0c1d9;
+      --line2:#eadde5;
+      --pink:#f43f95;
+      --pink2:#ec5da8;
+      --pinkSoft:#fff4fa;
+      --chip:#fff;
+      --shadow:0 10px 26px rgba(0,0,0,.06);
+      --r:18px;
+      --r2:14px;
     }
-*{ box-sizing:border-box; }
+    *{box-sizing:border-box}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", Helvetica, sans-serif;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--ink);
       background:var(--bg);
     }
-    .wrap{ max-width:1280px; margin:0 auto; padding:18px 16px 36px; }
+    .wrap{max-width:1360px;margin:14px auto;padding:0 12px 26px}
+    /* Top bar */
     .topbar{
-      display:flex; align-items:center; justify-content:space-between; gap:14px;
-      position:sticky; top:0; z-index:50;
-      padding:14px 12px;
-      background:rgba(255,255,255,.78);
-      backdrop-filter: blur(8px);
-      border-bottom:1px solid var(--line);
-    }
-    .title{
-      display:flex; align-items:baseline; gap:10px; flex-wrap:wrap;
-    }
-    .title h1{
-      margin:0;
-      font-size:22px;
-      letter-spacing:.3px;
-      font-weight:950;
-    }
-    .title .sub{
-      color:var(--muted);
-      font-weight:800;
-      font-size:12px;
-    }
-    .actions{ display:flex; align-items:end; gap:10px; flex-wrap:wrap; }
-    .dt{
-      display:flex; gap:10px; align-items:end;
-    }
-    .dt .f{
-      display:flex; flex-direction:column; gap:6px;
-      font-weight:900; font-size:12px; color:var(--muted);
-    }
-    input[type="date"], input[type="time"]{
-      border:1px solid var(--line);
-      border-radius:12px;
-      padding:10px 12px;
-      font-weight:800;
-      background:#fff;
-      min-width:150px;
-    }
-
-    button{
-      border:0;
-      border-radius:14px;
-      padding:11px 14px;
-      font-weight:950;
-      letter-spacing:.2px;
-      cursor:pointer;
-      white-space:nowrap;
-    }
-    .btn-primary{ background:var(--pink); color:#fff; box-shadow:var(--shadow); }
-    .btn-secondary{ background:var(--p2); color:#fff; }
-    .btn-ghost{
-      background:transparent;
-      border:1px solid rgba(255,79,163,.35);
-      color:var(--ink);
-      font-weight:950;
-    }
-    .btn-chip{
-      padding:10px 14px;
-      border-radius:999px;
-      border:1px solid rgba(255,79,163,.35);
-      background:#fff;
-      color:var(--ink);
-      font-weight:950;
-    }
-    .btn-chip.on{
-      background:var(--pink);
-      color:#fff;
-      border-color:transparent;
-    }
-
-    .grid{
-      display:grid;
-      grid-template-columns: 360px 1fr 420px;
-      gap:16px;
-      align-items:start;
-      margin-top:16px;
-    }
-
-    .panel{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-    }
-    .panel .head{
-      padding:12px 14px;
-      background:linear-gradient(180deg, rgba(255,79,163,.92), rgba(255,79,163,.86));
-      color:#fff;
-      font-weight:950;
-      letter-spacing:.2px;
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-    }
-    .panel .body{ padding:14px; }
-
-    .sticky-left{
-      position: sticky;
-      top: 76px; /* below topbar */
-      max-height: calc(100vh - 92px);
-      overflow:auto;
-    }
-    .sticky-left::-webkit-scrollbar{ width:10px; }
-    .sticky-left::-webkit-scrollbar-thumb{ background:rgba(255,79,163,.30); border-radius:999px; }
-
-    .field{ display:flex; flex-direction:column; gap:6px; margin-bottom:12px; }
-    .field label{
-      font-size:12px; color:var(--muted); font-weight:950; letter-spacing:.2px;
-    }
-    .field input[type="text"], .field input[type="number"], .field textarea, .field select{
-      width:100%;
-      border:1px solid rgba(255,79,163,.26);
       background:rgba(255,255,255,.9);
+      border:1px solid var(--line2);
       border-radius:14px;
-      padding:12px 12px;
-      font-weight:850;
-      font-size:14px;
-      outline:none;
-    }
-    .field textarea{ min-height:110px; resize:vertical; }
-
-    /* remove number spinners */
-    input[type=number]::-webkit-outer-spin-button,
-    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-    input[type=number] { -moz-appearance: textfield; }
-
-    .miniRow{ display:flex; gap:10px; }
-    .miniRow > *{ flex:1; }
-
-    .checkGrid{
+      box-shadow:var(--shadow);
+      padding:12px;
       display:grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: 1.2fr auto auto auto auto;
       gap:10px;
-      margin-top:8px;
-    }
-    .chk{
-      display:flex; align-items:center; gap:10px;
-      padding:12px 12px;
-      border-radius:999px;
-      border:1px dashed rgba(255,79,163,.35);
-      background:rgba(255,225,240,.42);
-      font-weight:950;
-      user-select:none;
-    }
-    .chk input{ width:18px; height:18px; accent-color:var(--pink); }
-
-    /* Middle column */
-    .card{
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      background:rgba(255,255,255,.92);
-      box-shadow: var(--shadow);
-      overflow:hidden;
+      align-items:end;
       margin-bottom:14px;
     }
-    .card .head{
-      background:linear-gradient(180deg, rgba(255,79,163,.16), rgba(255,255,255,0));
-      padding:12px 14px;
-      font-weight:950;
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .card .body{ padding:14px; }
-
-    .row2{ display:grid; grid-template-columns: 1.4fr 0.6fr; gap:12px; }
-    .row3{ display:grid; grid-template-columns: 1fr 1fr 1fr; gap:12px; }
-
-    .statusTiny{
-      font-size:12px; color:var(--muted); font-weight:900;
-      padding-left:2px;
-      min-height:16px;
-    }
-    .statusTiny.bad{ color:#a11447; }
-    .statusTiny.ok{ color:#157a3b; }
-
-    details{
-      margin-top:10px;
-      border-top:1px dashed rgba(255,79,163,.25);
-      padding-top:10px;
-    }
-    summary{ cursor:pointer; font-weight:950; }
-    #mapWrap{ margin-top:10px; border:1px solid rgba(255,79,163,.25); border-radius:14px; overflow:hidden; display:none; }
-    #gmap{ height:360px; width:100%; }
-
-    /* Right column - numbers dashboard */
-    .dash{
-      position: sticky;
-      top: 76px;
-    }
-    .tiles{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-      margin-bottom:12px;
-    }
-    .tile{
-      border:1px solid rgba(255,79,163,.25);
-      border-radius:18px;
-      background:rgba(255,225,240,.35);
-      padding:12px 12px;
-    }
-    .tile .k{ font-size:12px; color:var(--muted); font-weight:950; }
-    .tile .v{ font-size:28px; font-weight:1000; letter-spacing:-.4px; margin-top:4px; }
-    .tile .sub{ font-size:12px; color:var(--muted); font-weight:950; margin-top:4px; }
-    .tile .sub b{ color:var(--ink); }
-
-    .quoteEdit{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-      margin-top:12px;
-    }
-    .quoteEdit .box{
-      border:1px solid rgba(0,0,0,.10);
-      border-radius:18px;
-      padding:12px;
+    .brand h1{margin:0;font-size:20px;font-weight:950;letter-spacing:.35px}
+    .brand p{margin:3px 0 0;color:var(--muted);font-size:12px;font-weight:650}
+    .miniField{display:grid;gap:4px}
+    .miniField label{font-size:12px;font-weight:850;color:#3f3f46}
+    .miniField input{
+      height:38px; padding:8px 10px;
+      border:1px solid var(--line);
+      border-radius:12px;
       background:#fff;
+      font-weight:800;
+      min-width:140px;
     }
-    .box .topline{
-      display:flex; align-items:baseline; justify-content:space-between; gap:10px;
+    .btn{
+      height:38px;
+      border-radius:12px;
+      padding:0 14px;
+      font-weight:900;
+      font-size:14px;
+      cursor:pointer;
+      border:1px solid transparent;
+      white-space:nowrap;
     }
-    .box .topline .lbl{ font-weight:1000; }
-    .box .topline .suggest{ font-size:12px; color:var(--muted); font-weight:950; }
-    .box .grid2{
+    .btn-primary{background:var(--pink);color:#fff}
+    .btn-soft{background:#ffecf5;color:#b10b5f;border-color:#ffc8e2}
+    .btn-ghost{background:#fff;color:#222;border-color:var(--line)}
+    .btn:active{transform:translateY(1px)}
+    /* Layout */
+    .main{
       display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-      margin-top:10px;
+      grid-template-columns: 360px 1fr 460px;
+      gap:14px;
+      align-items:start;
     }
-    .box .grid2 .field{ margin:0; }
-    .readonlyOut{
-      border:1px solid rgba(255,79,163,.22);
-      background:rgba(255,240,247,.85);
-      border-radius:14px;
-      padding:12px;
-      font-weight:1000;
+    .card{
+      background:var(--panel);
+      border:1px solid var(--line2);
+      border-radius:var(--r);
+      box-shadow:var(--shadow);
+      overflow:hidden;
     }
-
-    .toggles{
-      display:flex; flex-wrap:wrap; gap:10px;
-      margin-top:12px;
-      padding-top:12px;
-      border-top:1px dashed rgba(255,79,163,.25);
-    }
-
-    .totals{
-      margin-top:12px;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-    }
-    .totalCard{
-      border:1px solid rgba(255,79,163,.25);
-      background:rgba(255,225,240,.35);
-      border-radius:18px;
-      padding:12px;
-    }
-    .totalCard .k{ font-size:12px; color:var(--muted); font-weight:950; }
-    .totalCard .v{ font-size:22px; font-weight:1000; margin-top:6px; }
-    .totalCard .sub{ font-size:12px; color:var(--muted); font-weight:950; margin-top:4px; }
-
-    .bundleBox{
-      margin-top:12px;
-      border:1px solid rgba(255,79,163,.25);
-      background:rgba(255,240,247,.85);
-      border-radius:18px;
-      padding:12px;
-    }
-    .bundleBox .row{
-      display:flex; justify-content:space-between; gap:10px; align-items:baseline;
-      font-weight:950;
-      margin-top:8px;
-    }
-    .bundleBox .row .k{ color:var(--muted); font-size:12px; }
-    .bundleBox .row .v{ font-size:16px; font-weight:1000; }
-
-    .smallNote{ font-size:12px; color:var(--muted); font-weight:900; margin-top:10px; }
-    .divider{ height:10px; }
-
-    /* Responsive */
-    @media (max-width: 1180px){
-      .grid{ grid-template-columns: 340px 1fr; }
-      .dash{ position:relative; top:auto; }
-    }
-    @media (max-width: 900px){
-      .grid{ grid-template-columns: 1fr; }
-      .sticky-left{ position:relative; top:auto; max-height:none; }
-      .dash{ position:relative; top:auto; }
-      .row2{ grid-template-columns: 1fr; }
-      .tiles{ grid-template-columns: 1fr; }
-      .quoteEdit{ grid-template-columns: 1fr; }
-      .totals{ grid-template-columns: 1fr; }
-    }
-
-    /* Collapsible customer info (Quote Mode vs Save Mode) */
-    .collapseBtn{
-      display:inline-flex; align-items:center; gap:8px;
-      border-radius:999px;
-      padding:8px 10px;
-      background:rgba(255,255,255,.20);
+    .head{
+      background:linear-gradient(180deg,var(--pink2),var(--pink));
       color:#fff;
+      padding:10px 14px;
       font-weight:950;
-      border:1px solid rgba(255,255,255,.35);
+      font-size:15px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .body{padding:12px}
+    .stack{display:grid;gap:10px}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+    .field{display:grid;gap:4px}
+    .field label{font-size:12px;font-weight:850;color:#4a4a52;line-height:1.2}
+    .field input,.field textarea{
+      width:100%; min-width:0;
+      height:40px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      padding:8px 10px;
+      font-size:14px;
+      font-weight:750;
+      color:#1c1c22;
+      outline:none;
+    }
+    .field textarea{height:86px;resize:vertical;line-height:1.25;padding-top:10px}
+    .field.compact input{height:36px}
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0;}
+    input[type=number]{ -moz-appearance:textfield; }
+    .sticky{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+    /* Checklist chips */
+    .chipGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+    .chip{
+      border:1px solid var(--line);
+      border-radius:999px;
+      background:var(--chip);
+      height:38px;
+      display:flex;align-items:center;justify-content:center;gap:8px;
+      font-weight:900;cursor:pointer;user-select:none;
+    }
+    .chip input{margin:0;width:16px;height:16px;accent-color:var(--pink)}
+    .chip.on{background:#fff0f7;border-color:#ff9dcb}
+    /* Center: quote read */
+    .quoteGrid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+    .metric{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff7fb;
+      padding:10px;
+    }
+    .metric .k{font-size:11px;font-weight:900;color:#50505a}
+    .metric .v{font-size:20px;font-weight:1000;margin:5px 0 2px;line-height:1.05}
+    .metric .sub{font-size:11px;color:#50505a;font-weight:800}
+    .metric.big .v{font-size:22px}
+    .divider{border-top:1px dashed var(--line);margin:10px 0}
+    /* Toggles */
+    .toggles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+    .toggle{
+      height:40px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-weight:950;
       cursor:pointer;
     }
-    .collapsed .body{ display:none; }
-    .collapsed .head{ border-bottom:none; }
-  
-
-/* ---- Visual polish v35 ---- */
-:root{
-  --primary:#ff2f92;
-  --primary2:#ff69b4;
-  --bg:#fff2f8;
-  --card:#ffffff;
-  --border:rgba(255,47,146,.22);
-  --border2:rgba(0,0,0,.08);
-  --muted:rgba(0,0,0,.60);
-  --shadow: 0 10px 28px rgba(255,47,146,.10);
-}
-body{ background: var(--bg); }
-.topbar{ background:rgba(255,255,255,.78); backdrop-filter: blur(6px); border:1px solid var(--border); box-shadow: var(--shadow); }
-.card,.panel{ background:var(--card); box-shadow: var(--shadow); border:1px solid var(--border); }
-.head{ background: linear-gradient(180deg, rgba(255,47,146,.95), rgba(255,105,180,.92)); }
-label{ letter-spacing:.2px; }
-.field label{ font-size:12px; color:var(--muted); }
-.field input, .field select, .field textarea{
-  background:#fff;
-  border:1px solid var(--border2);
-}
-.field input:focus, .field select:focus, .field textarea:focus{
-  border-color: rgba(255,47,146,.55);
-  box-shadow: 0 0 0 4px rgba(255,47,146,.10);
-}
-.btn{ background: var(--primary); }
-.btn:active{ transform: translateY(1px); }
-.btn-ghost{ background:#fff; border:1px solid rgba(255,47,146,.35); }
-.btn-chip{ background:#fff; border:1px solid rgba(255,47,146,.35); }
-.btn-chip.on{ background: var(--primary); border-color: var(--primary); }
-.statusTiny{ color: rgba(196,0,70,.90); font-weight:1000; }
-.smallNote{ display:none !important; }
-.divider{ display:none; }
-
-/* Details */
-.details{ margin-top:12px; border:1px dashed rgba(255,47,146,.22); border-radius:18px; padding:10px 12px; background: rgba(255,240,247,.55); }
-.details[open]{ background: rgba(255,240,247,.72); }
-.detailsSummary{ cursor:pointer; font-weight:1000; color: rgba(0,0,0,.75); }
-.detailsSummary::-webkit-details-marker{ display:none; }
-.detailsSummary:before{ content:'▸ '; display:inline-block; transform: translateY(-1px); }
-details[open] .detailsSummary:before{ content:'▾ '; }
-
-/* Make the right column feel like a single dashboard */
-.dash .body{ padding:14px; }
-.tiles .tile, .totalCard{ background: rgba(255,240,247,.70); border:1px solid rgba(255,47,146,.18);} 
-
-/* Checklist buttons slightly calmer */
-.chkTile{ background: rgba(255,240,247,.65); border-color: rgba(255,47,146,.22);} 
-
-/* Measurements card tighter */
-.row2{ gap:12px; }
-
-    /* Visual flow polish */
-    body{background:var(--appBg);}
-    .topbar{border:1px solid var(--line);}
-    .section{border:1px solid var(--line);}
-    .section h3{letter-spacing:.2px;}
-    .lbl{font-size:11px; letter-spacing:.35px; text-transform:uppercase; color:rgba(20,20,20,.65);}
-    .input, input[type="text"], input[type="number"], input[type="date"], input[type="time"], textarea, select{
-      background:#fff;
-      border:1px solid rgba(255,47,146,.25);
+    .toggle.on{
+      background:var(--pink);
+      border-color:var(--pink);
+      color:#fff;
     }
-    input:focus, textarea:focus, select:focus{outline:3px solid rgba(255,47,146,.18);}
-    .chip{border:1px solid rgba(255,47,146,.35);}
-    .chip.on{box-shadow:0 10px 22px rgba(255,47,146,.18);}
-    .statusPill{display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background:rgba(255,47,146,.08); border:1px solid rgba(255,47,146,.18); font-weight:800; font-size:12px; color:rgba(20,20,20,.75);}
-    .quoteTile{border:1px solid rgba(255,47,146,.18);}
-    .money{letter-spacing:-.02em;}
-
-    .actionRow{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
-    .actionRow button{flex:1; min-width:160px;}
-    .measureControls{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px; align-items:center;}
-    .measureControls .statusTiny{min-width:220px;}
-    .hidden{display:none !important;}
-
-    /* Remove cluttery helper text */
-    .debugTiny{display:none !important;}
-
-/* Visual fixes */
-.head.subhead{
-  background: rgba(255,255,255,.72);
-  color: #111;
-  border-bottom: 1px solid rgba(255, 90, 165, .22);
-}
-.btnSecondary{
-  background: #fff;
-  color: #ff2f92;
-  border: 2px solid rgba(255, 47, 146, .35);
-}
-.btnSecondary:hover{ filter: brightness(0.98); }
-input, select, textarea{
-  font-size: 14px !important;
-}
-.field input, .field select, .field textarea{
-  padding: 10px 12px !important;
-  line-height: 1.2 !important;
-}
-
-
-.label, label{ white-space:nowrap; }
-
-    /* Address row sizing */
-    .addrRow{ grid-template-columns: 1fr 200px !important; }
-    .addrRow .countySelect{ max-width:200px; }
-
-</style>
+    .hint{font-size:12px;color:var(--muted);font-weight:700}
+    /* Right: measurements + adjust */
+    .miniPanel{
+      border:1px solid var(--line2);
+      border-radius:14px;
+      background:var(--pinkSoft);
+      padding:10px;
+    }
+    .miniPanel h4{margin:0 0 8px;font-size:13px;font-weight:950}
+    details summary{cursor:pointer;font-weight:900}
+    table{width:100%;border-collapse:collapse;font-size:12px}
+    th,td{border:1px solid var(--line);padding:6px}
+    th{text-align:left;background:#fff}
+    td.right{text-align:right;font-weight:900}
+    .adjustGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .adjustBox{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      padding:10px;
+    }
+    .adjustBox h5{
+      margin:0 0 8px;
+      font-size:12px;
+      font-weight:1000;
+      color:#4d4d56;
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+    }
+    .smallGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .field.mini label{font-size:11px}
+    .readonly{background:#fff7fb;font-weight:900}
+    .totalsList{display:grid;gap:8px}
+    .totalsRow{
+      display:flex;justify-content:space-between;gap:10px;
+      padding:8px 10px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      font-weight:900;
+    }
+    .totalsRow .lab{font-size:12px;color:#4a4a52}
+    .totalsRow .amt{font-size:14px}
+    @media (max-width: 1180px){
+      .main{grid-template-columns:1fr}
+      .sticky{position:static;max-height:none}
+      .topbar{grid-template-columns:1fr 1fr 1fr;align-items:end}
+      .brand{grid-column:1/-1}
+    }
+    @media (max-width: 760px){
+      .row2,.row3,.toggle,.toggles,.quoteGrid,.adjustGrid,.smallGrid,.chipGrid{grid-template-columns:1fr}
+      .topbar{grid-template-columns:1fr}
+      .miniField input{min-width:0}
+    }
+  </style>
 </head>
 <body>
 <div class="wrap">
 
   <div class="topbar">
-    <div class="title">
+    <div class="brand">
       <h1>QUOTE CALCULATOR</h1>
-      </div>
-
-    <div class="actions">
-      <div class="dt">
-        <div class="f">
-          <div>Date</div>
-          <input id="topDate" type="date"/>
-        </div>
-        <div class="f">
-          <div>Time</div>
-          <input id="topTime" type="time"/>
-        </div>
-      </div>
-
-      <button class="btn-primary" id="clearBtn" type="button">NEW LEAD (Clear)</button>
-      <button class="btn-secondary" id="copyBtn" type="button">Copy Quote Line</button>
     </div>
+
+    <div class="miniField">
+      <label>Date</label>
+      <input id="topDate" type="date">
+    </div>
+    <div class="miniField">
+      <label>Time</label>
+      <input id="topTime" type="time">
+    </div>
+
+    <button class="btn btn-primary" id="clearBtn" type="button">NEW LEAD (Clear)</button>
+    <button class="btn btn-soft" id="copyBtn" type="button">Copy Quote Line</button>
   </div>
 
-  <div class="grid">
+  <div class="main">
 
-    <!-- LEFT: Customer info (sticky, can collapse) -->
-    <section class="panel sticky-left" id="customerPanel">
+    <!-- LEFT: CUSTOMER INFO -->
+    <section class="card sticky">
       <div class="head">
-        <div>Customer info</div>
-        <button class="collapseBtn" id="toggleCustomer" type="button">Collapse</button>
+        <span>Customer info</span>
+        <button class="btn btn-soft" id="collapseCustomer" type="button" style="height:30px;padding:0 10px;font-size:12px;">Collapse</button>
       </div>
-      <div class="body">
+      <div class="body stack" id="customerBody">
         <div class="field">
           <label>Customer Name</label>
-          <input id="custName" type="text" placeholder="First + Last"/>
+          <input id="custName" type="text" placeholder="First + Last">
         </div>
 
         <div class="field">
           <label>Lead Source</label>
-          <input id="custLeadSource" type="text" placeholder="Call / Web / Referral / Other"/>
+          <input id="custLeadSource" type="text" placeholder="Call / Web / Referral / Other">
         </div>
 
-        <div class="miniRow">
+        <div class="row2">
           <div class="field">
             <label>Phone</label>
-            <input id="custPhone" type="text" placeholder="(###) ###-####"/>
+            <input id="custPhone" type="text" placeholder="(###) ###-####">
           </div>
           <div class="field">
             <label>Email</label>
-            <input id="custEmail" type="text" placeholder="name@email.com"/>
+            <input id="custEmail" type="email" placeholder="name@email.com">
           </div>
+        </div>
+
+        <div class="field">
+          <label>Address</label>
+          <input id="custAddress" type="text" placeholder="Street, City, State, ZIP">
         </div>
 
         <div class="field">
@@ -505,125 +278,100 @@ input, select, textarea{
           <textarea id="custNotes" placeholder="Objections, pests, timing, gate code, special instructions..."></textarea>
         </div>
 
-        <div class="panel" style="box-shadow:none; border-radius:var(--radius); border:1px dashed rgba(255,79,163,.35); background:rgba(255,225,240,.28);">
-          <div class="head" style="background:transparent; color:var(--ink); padding:12px 14px; border-bottom:1px dashed rgba(255,79,163,.25);">
-            Checklist
+        <div class="miniPanel" style="background:#fff7fb;border-style:dashed;">
+          <h4>Checklist</h4>
+          <div class="chipGrid">
+            <label class="chip"><input type="checkbox" id="chkINT"> INT</label>
+            <label class="chip"><input type="checkbox" id="chkPS"> PS</label>
+            <label class="chip"><input type="checkbox" id="chkWD"> WD</label>
+            <label class="chip"><input type="checkbox" id="chkGR"> GR</label>
+            <label class="chip"><input type="checkbox" id="chkLB"> LB</label>
+            <label class="chip"><input type="checkbox" id="chkRS"> RS</label>
           </div>
-          <div class="body" style="padding:12px 14px;">
-            <div class="checkGrid">
-              <label class="chk"><input id="chkINT" type="checkbox"/> INT</label>
-              <label class="chk"><input id="chkPS" type="checkbox"/> PS</label>
-              <label class="chk"><input id="chkWD" type="checkbox"/> WD</label>
-              <label class="chk"><input id="chkGR" type="checkbox"/> GR</label>
-              <label class="chk"><input id="chkLB" type="checkbox"/> LB</label>
-              <label class="chk"><input id="chkRS" type="checkbox"/> RS</label>
-            </div>
-          </div>
-        </div>
-
-        
-      </div>
-    </section>
-
-    <!-- MIDDLE: Address + measure -->
-    <section>
-      <div class="card">
-        <div class="head">
-          <div>Address</div>
-          <div class="statusTiny" id="gisStatus"></div>
-        </div>
-        <div class="body">
-          <div class="row2 addrRow">
-            <div class="field" style="margin:0;">
-              <label>Service Address</label>
-              <input id="custAddress" type="text" placeholder="Street, City, State, ZIP"/>
-            </div>
-            <div class="field" style="margin:0;">
-              <label>County (GIS)</label>
-              <select id="gisCounty" class="countySelect">
-                <option value="wake">Wake</option>
-                <option value="durham">Durham</option>
-              </select>
-            </div>
-          </div>
-
-          <div class="actionRow">
-            <button class="btn-primary" id="gisLookup" type="button">Auto-fill SqFt</button>
-            <button class="btn-secondary" id="measureBtn" type="button">Measure LF</button>
-          </div>
-
-          <details>
-            <summary>Measure</summary>
-            <div class="measureControls">
-              <button class="btn-ghost" id="mapClearBtn" type="button" disabled>Clear</button>
-              <button class="btn-primary" id="mapSubmitBtn" type="button" disabled>Submit LF</button>
-              <div class="statusTiny" id="mapStatus"></div>
-
-              <!-- Hidden helpers (kept for power users / fallback) -->
-              <button class="btn-ghost hidden" id="mapLoadBtn" type="button">Load Map</button>
-              <button class="btn-ghost hidden" id="mapGoBtn" type="button" disabled>Find Address</button>
-              <button class="btn-ghost hidden" id="mapDrawBtn" type="button" disabled>Draw</button>
-            </div>
-            <div id="mapWrap">
-              <div id="gmap"></div>
-            </div>
-            
-          </details>
-        </div>
-      </div>
-
-      <div class="card">
-        <div class="head">Services + Discounts</div>
-        <div class="body">
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <button class="btn-chip on" id="svcPest" type="button">Pest</button>
-            <button class="btn-chip" id="svcTermite" type="button">Termite (SM)</button>
-            <button class="btn-chip" id="toggleYIF" type="button">YIF</button>
-            <button class="btn-chip" id="toggleBundle" type="button">Bundle</button>
-          </div>
-
-          <div class="divider"></div>
-
-          <div class="row3" id="svcFields">
-            <div class="field" style="margin:0;" id="yifFieldWrap">
-              <label>YIF Discount (%)</label>
-              <input id="yifDisc" type="number" min="0" step="0.1" value="5"/>
-            </div>
-</div>
-
-          
         </div>
       </div>
     </section>
 
-    <!-- RIGHT: Measurements + Quote dashboard -->
-    <section class="panel dash">
-      <div class="head">Measurements + Quote</div>
-      <div class="body">
+    <!-- CENTER: TOTALS + TOGGLES -->
+    <div class="stack">
+      <section class="card">
+        <div class="head">Quote (read this)</div>
+        <div class="body stack">
 
-        <div class="card" style="box-shadow:none; margin:0 0 12px;">
-          <div class="head subhead">Measurements</div>
-          <div class="body">
+          <div class="quoteGrid">
+            <div class="metric">
+              <div class="k">QT Rate</div>
+              <div class="v" id="qtRateDisplay">$0.00</div>
+              <div class="sub">Monthly: <span id="qtMonthlyDisplay">$0</span></div>
+            </div>
+            <div class="metric">
+              <div class="k">SM Rate</div>
+              <div class="v" id="smRateDisplay">$0.00</div>
+              <div class="sub">Monthly: <span id="smMonthlyDisplay">$0</span></div>
+            </div>
+            <div class="metric big">
+              <div class="k">Total monthly</div>
+              <div class="v" id="totalMonthlyDisplay">$0 / mo</div>
+              <div class="sub">YIF Total: <span id="totalYifDisplay">$0.00</span></div>
+            </div>
+            <div class="metric big">
+              <div class="k">Bundle total monthly</div>
+              <div class="v" id="bundleMonthlyDisplay">$0 / mo</div>
+              <div class="sub">Bundle YIF: <span id="bundleYifDisplay">$0.00</span></div>
+            </div>
+          </div>
+
+          <div class="miniPanel" style="background:#fff7fb;border:1px solid var(--line);">
+            <h4>Totals</h4>
+            <div class="totalsList">
+              <div class="totalsRow"><span class="lab">Bundle QT (pest after -$10)</span><span class="amt" id="bundleQtRow">$0.00</span></div>
+              <div class="totalsRow"><span class="lab">Plain total monthly (selected services)</span><span class="amt" id="plainMonthlyRow">$0 / mo</span></div>
+              <div class="totalsRow"><span class="lab">Bundle total monthly</span><span class="amt" id="bundleMonthlyRow">$0 / mo</span></div>
+              <div class="totalsRow"><span class="lab">Plain YIF total</span><span class="amt" id="plainYifRow">$0.00</span></div>
+              <div class="totalsRow"><span class="lab">Bundle YIF total</span><span class="amt" id="bundleYifRow">$0.00</span></div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="head">Services</div>
+        <div class="body stack">
+          <div class="toggles">
+            <button class="toggle on" id="btnPest" type="button">Pest</button>
+            <button class="toggle" id="btnTermite" type="button">Termite (SM)</button>
+            <button class="toggle" id="btnYIF" type="button">YIF</button>
+            <button class="toggle" id="btnBundle" type="button">Bundle</button>
+          </div>
+          </div>
+      </section>
+    </div>
+
+    <!-- RIGHT: MEASUREMENTS + ADJUST -->
+    <div class="stack">
+      <section class="card">
+        <div class="head">Measurements</div>
+        <div class="body stack">
+          <div class="miniPanel">
+            <h4>Measurements</h4>
             <div class="row2">
-              <div class="field" style="margin:0;">
+              <div class="field compact">
                 <label>SqFt</label>
-                <input id="sqft" type="number" min="0" step="1" placeholder=""/>
+                <input id="sqft" type="number" min="0" step="1" placeholder="">
               </div>
-              <div class="field" style="margin:0;">
+              <div class="field compact">
                 <label>Linear ft (LF)</label>
-                <input id="lf" type="number" min="0" step="1" placeholder=""/>
+                <input id="lf" type="number" min="0" step="1" placeholder="">
               </div>
             </div>
 
-            <details>
+            <details style="margin-top:8px">
               <summary>Show pricing tiers</summary>
-              <div style="margin-top:10px; border:1px solid rgba(255,79,163,.18); border-radius:14px; overflow:hidden;">
-                <table style="width:100%; border-collapse:collapse; font-weight:900;">
+              <div style="margin-top:8px;overflow:auto">
+                <table>
                   <thead>
-                    <tr style="background:rgba(255,79,163,.10);">
-                      <th style="text-align:left; padding:10px 12px; border-bottom:1px solid rgba(0,0,0,.06);">SqFt</th>
-                      <th style="text-align:right; padding:10px 12px; border-bottom:1px solid rgba(0,0,0,.06);">QT</th>
-                    </tr>
+                    <tr><th>SqFt Range</th><th class="right">QT Rate</th></tr>
                   </thead>
                   <tbody id="tiersTable"></tbody>
                 </table>
@@ -631,605 +379,285 @@ input, select, textarea{
             </details>
           </div>
         </div>
+      </section>
 
-        <div class="tiles">
-          <div class="tile">
-            <div class="k">QT Rate</div>
-            <div class="v" id="tileQt">$0.00</div>
-            </div>
-          <div class="tile">
-            <div class="k">SM Rate</div>
-            <div class="v" id="tileSm">$0.00</div>
-            </div>
-        </div>
-        </details>
+      <section class="card">
+        <div class="head">Adjust rates (only if needed)</div>
+        <div class="body stack">
+          <div class="adjustGrid">
 
-        <div class="totals">
-          <div class="totalCard">
-            <div class="k">Total (Pest + SM)</div>
-            <div class="v" id="totalMonthly">$0 / mo</div>
-            </div>
-          <div class="totalCard">
-            <div class="k">Bundle Total</div>
-            <div class="v" id="bundleMonthly">$0 / mo</div>
-            </div>
-        </div>
-
-        <details class="details" id="editDetails" open>
-          <summary class="detailsSummary">Adjust rates (only if needed)</summary>
-          <div class="quoteEdit">
-          <div class="box" id="pestEditBox">
-            <div class="topline">
-              <div class="lbl">Pest (QT)</div>
-              <div class="suggest">Suggested: <span id="pestSuggested">$0.00</span></div>
-            </div>
-            <div class="grid2">
-              <div class="field">
-                <label>QT Quote</label>
-                <input id="pestQuote" type="number" min="0" step="0.01" placeholder="Negotiable"/>
-              </div>
-              <div class="field">
-                <label>Initial Fee</label>
-                <input id="pestInit" type="number" min="0" step="0.01" placeholder="Auto"/>
-              </div>
-              <div class="field">
-                <label>QT Monthly</label>
-                <div class="readonlyOut" id="pestMonthly">$0</div>
-              </div>
-              <div class="field">
-                <label>Pest YIF</label>
-                <div class="readonlyOut" id="pestYif">$0.00</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="box" id="termEditBox">
-            <div class="topline">
-              <div class="lbl">Termite (SM)</div>
-              <div class="suggest">Suggested: <span id="termSuggested">$0.00</span></div>
-            </div>
-            <div class="grid2">
-              <div class="field">
-                <label>SM Quote</label>
-                <input id="termQuote" type="number" min="0" step="0.01" placeholder="Negotiable"/>
-                <div class="field" style="margin-top:10px;">
-                  <label>SM Install Fee</label>
-                  <input id="termInstall" type="number" min="0" step="0.01" value="0" />
+            <div class="adjustBox">
+              <h5><span>PEST (QT)</span><span>Suggested: <span id="qtSuggestedLabel">$0.00</span></span></h5>
+              <div class="smallGrid">
+                <div class="field mini">
+                  <label>QT Quote</label>
+                  <input id="pestQuote" type="number" step="0.01" placeholder="Auto">
+                </div>
+                <div class="field mini">
+                  <label>Initial Fee</label>
+                  <input id="pestInit" type="number" step="1" value="399">
+                </div>
+                <div class="field mini">
+                  <label>QT Monthly</label>
+                  <input id="pestMonthlyRead" class="readonly" type="text" readonly>
+                </div>
+                <div class="field mini">
+                  <label>Pest YIF</label>
+                  <input id="pestYifRead" class="readonly" type="text" readonly>
                 </div>
               </div>
-              <div class="field">
-                <label>SM Monthly</label>
-                <div class="readonlyOut" id="termMonthly">$0</div>
-              </div>
-              <div class="field" style="grid-column:1/-1;">
-                <label>Termite YIF</label>
-                <div class="readonlyOut" id="termYif">$0.00</div>
+            </div>
+
+            <div class="adjustBox">
+              <h5><span>TERMITE (SM)</span><span>Suggested: <span id="smSuggestedLabel">$0.00</span></span></h5>
+              <div class="smallGrid">
+                <div class="field mini">
+                  <label>SM Quote</label>
+                  <input id="termQuote" type="number" step="0.01" placeholder="Auto">
+                </div>
+                <div class="field mini">
+                  <label>SM Install Fee</label>
+                  <input id="termInstall" type="number" step="1" value="0">
+                </div>
+                <div class="field mini">
+                  <label>SM Monthly</label>
+                  <input id="smMonthlyRead" class="readonly" type="text" readonly>
+                </div>
+                <div class="field mini">
+                  <label>Termite YIF</label>
+                  <input id="termYifRead" class="readonly" type="text" readonly>
+                </div>
               </div>
             </div>
+
           </div>
         </div>
-
-        <div class="bundleBox">
-          <div style="font-weight:1000;">Bundle + Discounts (at a glance)</div>
-          <div class="row">
-            <div class="k">Bundle QT (pest after -$)</div>
-            <div class="v" id="bundleQtRate">$0.00</div>
-          </div>
-          <div class="row">
-            <div class="k">Bundle Total YIF (pest + SM)</div>
-            <div class="v" id="bundleYifBig">$0.00</div>
-          </div>
-        </div>
-
-        <div class="smallNote" id="debugTiny"></div>
-      </div>
-    </section>
+      </section>
+    </div>
 
   </div>
 </div>
 
 <script>
-  // ---------- Pricing ----------
-  const tiers = [
-    {min:1000, max:1499, qt:139},
-    {min:1500, max:2499, qt:159},
-    {min:2500, max:3499, qt:179},
-    {min:3500, max:3999, qt:199},
-    {min:4000, max:4499, qt:209},
-    {min:4500, max:5000, qt:219},
-  ];
+(function(){
+  const YIF_DISCOUNT = 0.05;        // fixed 5%
+  const TERMITE_RATE_PER_LF = 1.5;  // yearly
+  const BUNDLE_DISC = 10;           // fixed $10 off QT
 
-  const tierPalette = [
-    "#ffd1e6","#ffe0f0","#ffd6ea","#ffcade","#ffbed4","#ffb3d1"
+  const tiers = [
+    {min:1000,max:1499,qt:139},
+    {min:1500,max:2499,qt:159},
+    {min:2500,max:3499,qt:179},
+    {min:3500,max:3999,qt:199},
+    {min:4000,max:4499,qt:209},
+    {min:4500,max:999999,qt:219},
   ];
 
   const $ = (id)=>document.getElementById(id);
+  const state = { pestOn:true, termiteOn:false, yifOn:false, bundleOn:false };
 
-  function money(n){
-    const x = Number.isFinite(n) ? n : 0;
-    return x.toLocaleString(undefined,{style:"currency",currency:"USD"});
-  }
-  function money0(n){
-    const x = Number.isFinite(n) ? n : 0;
-    return x.toLocaleString(undefined,{style:"currency",currency:"USD",maximumFractionDigits:0});
-  }
-  function ceil(n){ return Math.ceil(n); }
+  function money(n){ return (Number(n)||0).toLocaleString(undefined,{style:'currency',currency:'USD'}); }
+  function money0(n){ return (Number(n)||0).toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}); }
+  function ceil(n){ return Math.ceil(Number(n)||0); }
 
-  function suggestedPestQT(sqft){
-    if(!Number.isFinite(sqft) || sqft<=0) return 0;
-    let best = 0;
+  function suggestQt(sqft){
+    const s = Number(sqft);
+    if(!Number.isFinite(s) || s<=0) return 0;
     for(const t of tiers){
-      if(sqft >= t.min) best = t.qt;
+      if(s>=t.min && s<=t.max) return t.qt;
     }
-    return best;
+    return 0;
   }
 
-  // ---------- State ----------
-  const state = {
-    pestOn: true,
-    termiteOn: false,
-    yifOn: false,
-    bundleOn: false,
-    userTouchedInit: false
-  };
-
-  function syncToggleUI(){
-    $('svcPest').classList.toggle('on', state.pestOn);
-    $('svcTermite').classList.toggle('on', state.termiteOn);
-    $('toggleYIF').classList.toggle('on', state.yifOn);
-    $('toggleBundle').classList.toggle('on', state.bundleOn);
-
-    // Reduce what you have to read: only show option fields when relevant
-    const y = document.getElementById('yifFieldWrap');
-    const b = document.getElementById('bundleFieldWrap');
-    const i = document.getElementById('installFieldWrap');
-    if(y) y.style.display = state.yifOn ? '' : 'none';
-    if(b) b.style.display = state.bundleOn ? '' : 'none';
-    if(i) i.style.display = state.termiteOn ? '' : 'none';
-
-    const pestBox = document.getElementById('pestEditBox');
-    const termBox = document.getElementById('termEditBox');
-    if(pestBox) pestBox.style.display = state.pestOn ? '' : 'none';
-    if(termBox) termBox.style.display = state.termiteOn ? '' : 'none';
+  function setNow(){
+    const d = new Date();
+    $('topDate').value = d.toISOString().slice(0,10);
+    $('topTime').value = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
   }
 
-  // ---------- Calculations ----------
+  function initTiers(){
+    const tb = $('tiersTable');
+    tb.innerHTML = '';
+    tiers.forEach(t=>{
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${t.min.toLocaleString()} - ${t.max===999999 ? 'up' : t.max.toLocaleString()}</td>
+        <td class="right">${money(t.qt)}</td>
+      `;
+      tb.appendChild(tr);
+    });
+  }
+
+  function updateChecklistChips(){
+    document.querySelectorAll('.chip').forEach(c=>{
+      const i = c.querySelector('input');
+      c.classList.toggle('on', !!i?.checked);
+    });
+  }
+
+  function updateTogglesUI(){
+    const map = [
+      ['btnPest', state.pestOn],
+      ['btnTermite', state.termiteOn],
+      ['btnYIF', state.yifOn],
+      ['btnBundle', state.bundleOn],
+    ];
+    map.forEach(([id,on])=>{
+      const b = $(id);
+      b.classList.toggle('on', !!on);
+    });
+  }
+
   function calc(){
     const sqft = parseFloat($('sqft').value);
     const lf = parseFloat($('lf').value);
 
-    const yifPct = 0.05; // fixed 5% YIF discount
-    const bundleDisc = Math.max(0, parseFloat($('bundleDisc').value) || 0);
-    const termInstall = Math.max(0, parseFloat($('termInstall').value) || 0);
+    const qtSuggested = suggestQt(sqft);
+    const smSuggested = (Number.isFinite(lf) && lf>0) ? (lf * TERMITE_RATE_PER_LF) : 0;
 
-    // Suggested
-    const pestSuggested = suggestedPestQT(sqft);
-    $('pestSuggested').textContent = money(pestSuggested);
+    $('qtSuggestedLabel').textContent = money(qtSuggested);
+    $('smSuggestedLabel').textContent = money(smSuggested);
 
-    const termSuggested = (Number.isFinite(lf) && lf>0) ? (lf * 1.5) : 0; // yearly
-    $('termSuggested').textContent = money(termSuggested);
+    const pestQuoteIn = parseFloat($('pestQuote').value);
+    const termQuoteIn = parseFloat($('termQuote').value);
 
-    // Determine chosen QT and Initial
-    const pestQuoteRaw = parseFloat($('pestQuote').value);
-    let pestQT = Number.isFinite(pestQuoteRaw) ? pestQuoteRaw : pestSuggested;
+    const pestQtBase = Number.isFinite(pestQuoteIn) ? pestQuoteIn : qtSuggested;
+    const termSmBase = Number.isFinite(termQuoteIn) ? termQuoteIn : smSuggested;
 
-    // Auto-set initial fee to match QT unless user edits it
-    if(!state.userTouchedInit){
-      $('pestInit').value = String((pestQT || 0).toFixed(2));
-    }
-    const pestInit = Math.max(0, parseFloat($('pestInit').value) || 0);
+    const pestInit = parseFloat($('pestInit').value) || 0;
+    const termInstall = parseFloat($('termInstall').value) || 0;
 
-    // Termite chosen yearly
-    const termQuoteRaw = parseFloat($('termQuote').value);
-    let termYR = Number.isFinite(termQuoteRaw) ? termQuoteRaw : termSuggested;
-
-    // Apply service toggles
-    if(!state.pestOn) pestQT = 0;
-    if(!state.termiteOn) termYR = 0;
-
-    // Bundle applies only if both services are on AND bundle is on
     const bundleApplies = state.bundleOn && state.pestOn && state.termiteOn;
-    const pestAfterBundle = bundleApplies ? Math.max(0, pestQT - bundleDisc) : pestQT;
+    const pestQtBundled = bundleApplies ? Math.max(0, pestQtBase - BUNDLE_DISC) : pestQtBase;
 
-    // Monthly displays (QT monthly = ceil(qt/3), SM monthly = ceil(yr/12))
-    const pestMo = (pestAfterBundle>0) ? ceil(pestAfterBundle/3) : 0;
-    const smMo = (termYR>0) ? ceil(termYR/12) : 0;
+    const pestMonthlyPlain = state.pestOn ? ceil(pestQtBase/3) : 0;
+    const pestMonthlyBundle = state.pestOn ? ceil(pestQtBundled/3) : 0;
+    const smMonthly = state.termiteOn ? ceil(termSmBase/12) : 0;
 
-    // YIF totals:
-    // Pest base year = qt*4 + initial fee, discount applied AFTER fees.
-    const pestBase = (pestAfterBundle>0) ? (pestAfterBundle * 4 + pestInit) : 0;
-    const pestYif = (pestBase>0) ? (state.yifOn ? pestBase * (1 - yifPct) : pestBase) : 0;
+    // YIF after fees
+    let pestYifPlain = 0, pestYifBundle = 0;
+    if(state.pestOn){
+      const basePlain = (pestQtBase*4) + pestInit;
+      const baseBundle = (pestQtBundled*4) + pestInit;
+      pestYifPlain = state.yifOn ? basePlain * (1 - YIF_DISCOUNT) : basePlain;
+      pestYifBundle = state.yifOn ? baseBundle * (1 - YIF_DISCOUNT) : baseBundle;
+    }
 
-    // Termite base year = yr + install, discount applied AFTER fees.
-    const termBase = (termYR>0) ? (termYR + termInstall) : 0;
-    const termYif = (termBase>0) ? (state.yifOn ? termBase * (1 - yifPct) : termBase) : 0;
+    let smYif = 0;
+    if(state.termiteOn){
+      const base = termSmBase + termInstall;
+      smYif = state.yifOn ? base * (1 - YIF_DISCOUNT) : base;
+    }
 
-    // Totals
-    const totalMo = pestMo + smMo;
-    const totalYif = pestYif + termYif;
+    const plainMonthlyTotal = (state.pestOn ? pestMonthlyPlain : 0) + (state.termiteOn ? smMonthly : 0);
+    const bundleMonthlyTotal = (state.pestOn ? pestMonthlyBundle : 0) + (state.termiteOn ? smMonthly : 0);
 
-    // Bundle "totals" are just totals with bundle applied (already in pestAfterBundle), but show separately for clarity
-    const bundleMo = (bundleApplies ? totalMo : totalMo); // monthly already uses pestAfterBundle
-    const bundleYif = (bundleApplies ? totalYif : totalYif);
+    const plainYifTotal = pestYifPlain + smYif;
+    const bundleYifTotal = pestYifBundle + smYif;
 
-    // Dashboard tiles
-    $('tileQt').textContent = money(pestAfterBundle);
-    $('tileQtMo').textContent = money0(pestMo);
-    $('tileSm').textContent = money(termYR);
-    $('tileSmMo').textContent = money0(smMo);
+    // Center big readouts (respect current bundle toggle, but only applies when valid)
+    const shownQt = state.pestOn ? (bundleApplies ? pestQtBundled : pestQtBase) : 0;
+    const shownQtMo = state.pestOn ? (bundleApplies ? pestMonthlyBundle : pestMonthlyPlain) : 0;
 
-    // Editable boxes outputs
-    $('pestMonthly').textContent = money0(pestMo);
-    $('pestYif').textContent = money(pestYif);
-    $('termMonthly').textContent = money0(smMo);
-    $('termYif').textContent = money(termYif);
+    $('qtRateDisplay').textContent = money(shownQt);
+    $('qtMonthlyDisplay').textContent = money0(shownQtMo);
 
-    // Totals cards
-    $('totalMonthly').textContent = `${money0(totalMo)} / mo`;
-    $('totalYif').textContent = money(totalYif);
+    $('smRateDisplay').textContent = money(state.termiteOn ? termSmBase : 0);
+    $('smMonthlyDisplay').textContent = money0(smMonthly);
 
-    $('bundleMonthly').textContent = `${money0(bundleMo)} / mo`;
-    $('bundleYif').textContent = money(bundleYif);
+    $('totalMonthlyDisplay').textContent = `${money0(plainMonthlyTotal)} / mo`;
+    $('totalYifDisplay').textContent = money(plainYifTotal);
 
-    $('bundleQtRate').textContent = money(pestAfterBundle);
-    $('bundleYifBig').textContent = money(bundleYif);
+    $('bundleMonthlyDisplay').textContent = `${money0(bundleMonthlyTotal)} / mo`;
+    $('bundleYifDisplay').textContent = money(bundleYifTotal);
 
-    // Copy line
-    const line = [
-      state.pestOn ? `QT ${money(pestAfterBundle)} (Mo ${money0(pestMo)})` : null,
-      state.termiteOn ? `SM ${money(termYR)} (Mo ${money0(smMo)})` : null,
-      `Total ${money0(totalMo)}/mo`,
-      state.yifOn ? `YIF ${money(totalYif)}` : null,
-      bundleApplies ? `Bundle (-$${bundleDisc}/QT)` : null
-    ].filter(Boolean).join(" | ");
-    $('copyBtn').dataset.quote = line;
+    // Totals panel
+    $('bundleQtRow').textContent = money(state.pestOn ? pestQtBundled : 0);
+    $('plainMonthlyRow').textContent = `${money0(plainMonthlyTotal)} / mo`;
+    $('bundleMonthlyRow').textContent = `${money0(bundleMonthlyTotal)} / mo`;
+    $('plainYifRow').textContent = money(plainYifTotal);
+    $('bundleYifRow').textContent = money(bundleYifTotal);
 
-    // Show/hide SM editor box if termite off? Keep visible but dim a bit.
-    const smBox = $('termQuote').closest('.box');
-    smBox.style.opacity = state.termiteOn ? '1' : '0.55';
+    // Right read-only fields
+    $('pestMonthlyRead').value = money0(pestMonthlyPlain);
+    $('pestYifRead').value = money(pestYifPlain);
+
+    $('smMonthlyRead').value = money0(smMonthly);
+    $('termYifRead').value = money(smYif);
+
+    // Copy line (uses current view + totals)
+    const parts = [];
+    if(state.pestOn) parts.push(`QT ${money(shownQt)} (${money0(shownQtMo)}/mo)`);
+    if(state.termiteOn) parts.push(`SM ${money(termSmBase)} (${money0(smMonthly)}/mo)`);
+    if(state.yifOn) parts.push(`YIF ${money(bundleApplies ? bundleYifTotal : plainYifTotal)}`);
+    if(bundleApplies) parts.push(`Bundle (-$10/QT)`);
+    $('copyBtn').dataset.quote = parts.join(' | ');
   }
 
-  // ---------- Clear ----------
   function clearAll(){
-    // Customer
-    ['custName','custLeadSource','custPhone','custEmail','custNotes','custAddress'].forEach(id=> $(id).value = '');
-    ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS'].forEach(id=> $(id).checked = false);
+    setNow();
+    ['custName','custLeadSource','custPhone','custEmail','custAddress','custNotes'].forEach(id=>$(id).value='');
+    ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS'].forEach(id=>$(id).checked=false);
+    updateChecklistChips();
 
-    // Measurements
     $('sqft').value = '';
     $('lf').value = '';
+    $('pestQuote').value = '';
+    $('termQuote').value = '';
+    $('pestInit').value = '399';
+    $('termInstall').value = '0';
 
-    // Services state defaults
     state.pestOn = true;
     state.termiteOn = false;
     state.yifOn = false;
     state.bundleOn = false;
-    state.userTouchedInit = false;
+    updateTogglesUI();
 
-    // Pricing inputs
-    $('pestQuote').value = '';
-    $('pestInit').value = '';
-    $('termQuote').value = '';
-    $('termInstall').value = '0';
-    $('bundleDisc').value = '10';
-
-    // Status
-    $('gisStatus').textContent = '';
-    $('gisStatus').className = 'statusTiny';
-
-    syncToggleUI();
     calc();
   }
 
-  // ---------- Copy ----------
   function copyQuote(){
-    const text = $('copyBtn').dataset.quote || '';
-    if(!text) return;
-    navigator.clipboard.writeText(text).then(()=>{
+    const txt = $('copyBtn').dataset.quote || '';
+    if(!txt) return;
+    navigator.clipboard.writeText(txt).then(()=>{
       const old = $('copyBtn').textContent;
       $('copyBtn').textContent = 'Copied';
       setTimeout(()=> $('copyBtn').textContent = old, 900);
-    }).catch(()=> alert('Copy failed. Select + copy manually.'));
+    }).catch(()=> alert('Copy failed. Copy manually.'));
   }
 
-  // ---------- Pricing tiers table ----------
-  (function buildTiers(){
-    const tbody = $('tiersTable');
-    tbody.innerHTML = '';
-    tiers.forEach((t,i)=>{
-      const bg = tierPalette[i % tierPalette.length];
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td style="padding:10px 12px; border-bottom:1px solid rgba(0,0,0,.06); background:${bg};">
-          ${t.min.toLocaleString()}–${t.max.toLocaleString()}
-        </td>
-        <td style="padding:10px 12px; border-bottom:1px solid rgba(0,0,0,.06); text-align:right; background:${bg}; font-weight:1000;">
-          ${money(t.qt)}
-        </td>`;
-      tbody.appendChild(tr);
-    });
-  })();
-
-  // ---------- Customer panel collapse ----------
-  $('toggleCustomer').addEventListener('click', ()=>{
-    const p = $('customerPanel');
-    p.classList.toggle('collapsed');
-    $('toggleCustomer').textContent = p.classList.contains('collapsed') ? 'Expand' : 'Collapse';
+  // Wire
+  $('collapseCustomer').addEventListener('click', ()=>{
+    $('customerBody').classList.toggle('hide');
+    $('collapseCustomer').textContent = $('customerBody').classList.contains('hide') ? 'Expand' : 'Collapse';
   });
 
-  // ---------- Toggle buttons ----------
-  $('svcPest').addEventListener('click', ()=>{ state.pestOn = !state.pestOn; syncToggleUI(); calc(); });
-  $('svcTermite').addEventListener('click', ()=>{ state.termiteOn = !state.termiteOn; syncToggleUI(); calc(); });
-  $('toggleYIF').addEventListener('click', ()=>{ state.yifOn = !state.yifOn; syncToggleUI(); calc(); });
-  $('toggleBundle').addEventListener('click', ()=>{ state.bundleOn = !state.bundleOn; syncToggleUI(); calc(); });
+  ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS'].forEach(id=>{
+    $(id).addEventListener('change', updateChecklistChips);
+  });
 
-  // Mark initial fee as user-touched if they type in it
-  $('pestInit').addEventListener('input', ()=>{ state.userTouchedInit = true; calc(); });
+  [['btnPest','pestOn'],['btnTermite','termiteOn'],['btnYIF','yifOn'],['btnBundle','bundleOn']]
+    .forEach(([id,key])=>{
+      $(id).addEventListener('click', ()=>{
+        state[key] = !state[key];
+        updateTogglesUI();
+        calc();
+      });
+    });
 
-  // Other inputs that affect calc
-  ['sqft','lf','pestQuote','termQuote','termInstall','bundleDisc']
-    .forEach(id=> $(id).addEventListener('input', calc));
+  ['sqft','lf','pestQuote','pestInit','termQuote','termInstall'].forEach(id=>{
+    $(id).addEventListener('input', calc);
+  });
 
-  // Actions
   $('clearBtn').addEventListener('click', clearAll);
   $('copyBtn').addEventListener('click', copyQuote);
 
-  // ---------- Auto-fill SQFT (layout-first, but usable) ----------
-  // Minimal behavior: attempt GIS; if fails, show "Not found" only (as requested earlier).
-  function extractStreetForGis(full){
-    const first = (full || '').split(',')[0] || '';
-    return first
-      .replace(/\b(APT|UNIT|STE|SUITE|#)\b.*$/i,'')
-      .replace(/[^\w\s\-]/g,' ')
-      .replace(/\s+/g,' ')
-      .trim()
-      .toUpperCase();
-  }
-  function safeLike(str){ return (str || '').replace(/'/g, "''"); }
-  async function queryFirstMatch({base, where, outFields, returnGeometry=false, outSR=2264}){
-    const url = base + '?' + new URLSearchParams({
-      f:'json',
-      where,
-      outFields,
-      returnGeometry: returnGeometry ? 'true' : 'false',
-      outSR: String(outSR),
-      resultRecordCount: '1'
-    }).toString();
-    const r = await fetch(url);
-    const j = await r.json();
-    return j?.features?.[0] || null;
-  }
-  async function gisLookup(){
-    const status = $('gisStatus');
-    const county = $('gisCounty').value;
-    const fullAddr = ($('custAddress').value || '').trim();
-    status.className = 'statusTiny';
-    status.textContent = '';
-
-    if(!fullAddr){
-      status.textContent = 'Not found';
-      status.classList.add('bad');
-      return;
-    }
-    const street = extractStreetForGis(fullAddr);
-    if(!street){
-      status.textContent = 'Not found';
-      status.classList.add('bad');
-      return;
-    }
-
-    const whereLike = (field)=> `UPPER(${field}) LIKE '%${safeLike(street)}%'`;
-
-    try{
-      // Wake
-      if(county === 'wake'){
-        const feat = await queryFirstMatch({
-          base: 'https://maps.wakegov.com/arcgis/rest/services/Property/Parcels/FeatureServer/0/query',
-          where: whereLike('SITE_ADDRESS'),
-          outFields: 'HEATEDAREA'
-        });
-        const sqft = feat?.attributes?.HEATEDAREA;
-        if(Number.isFinite(sqft)){
-          $('sqft').value = String(Math.round(sqft));
-          status.textContent = '';
-          calc();
-          return;
-        }
-      }
-
-      // Durham
-      if(county === 'durham'){
-        const feat = await queryFirstMatch({
-          base: 'https://webgis.durhamnc.gov/server/rest/services/PublicServices/Property/MapServer/4/query',
-          where: whereLike('LOCATION_ADDR'),
-          outFields: 'HEATED_AREA'
-        });
-        const sqft = feat?.attributes?.HEATED_AREA;
-        if(Number.isFinite(sqft)){
-          $('sqft').value = String(Math.round(sqft));
-          status.textContent = '';
-          calc();
-          return;
-        }
-      }
-
-      status.textContent = 'Not found';
-      status.classList.add('bad');
-    }catch(e){
-      console.error(e);
-      status.textContent = 'Not found';
-      status.classList.add('bad');
-    }
-  }
-  $('gisLookup').addEventListener('click', gisLookup);
-
-  // "Use Address for Measure" just opens the Measure section and focuses address
-      if(det) det.open = true;
-    $('custAddress').focus();
-  });
-
-  // ---------- Map measure (optional) ----------
-  const GOOGLE_MAPS_API_KEY = 'YOUR_GOOGLE_MAPS_API_KEY'; // <- replace
-  let gmap, geocoder, drawingManager, activeShape, lastFeet = 0;
-
-  function setMapStatus(t){
-    const el = $('mapStatus');
-    el.textContent = t || '';
-  }
-  function enableMapBtns(on){
-    ['mapGoBtn','mapDrawBtn','mapClearBtn','mapSubmitBtn'].forEach(id=>{
-      $(id).disabled = !on;
-    });
-  }
-
-  function loadGoogleMapsScript(){
-    return new Promise((resolve,reject)=>{
-      if(window.google && window.google.maps){ resolve(); return; }
-      if(!GOOGLE_MAPS_API_KEY || GOOGLE_MAPS_API_KEY.includes('YOUR_')){
-        reject(new Error('Missing API key'));
-        return;
-      }
-      const s = document.createElement('script');
-      s.src = `https://maps.googleapis.com/maps/api/js?key=${GOOGLE_MAPS_API_KEY}&libraries=drawing,geometry,places&loading=async`;
-      s.async = true; s.defer = true;
-      s.onload = ()=>resolve();
-      s.onerror = ()=>reject(new Error('Failed to load Google Maps'));
-      document.head.appendChild(s);
-    });
-  }
-
-  function computePerimeterFeet(poly){
-    const path = poly.getPath();
-    if(!path || path.getLength()<2) return 0;
-    const pts=[];
-    for(let i=0;i<path.getLength();i++) pts.push(path.getAt(i));
-    pts.push(path.getAt(0));
-    const meters = google.maps.geometry.spherical.computeLength(pts);
-    return meters * 3.280839895;
-  }
-
-  function clearShape(){
-    if(activeShape){ activeShape.setMap(null); activeShape=null; }
-    lastFeet = 0;
-    setMapStatus('');
-    $('mapSubmitBtn').disabled = true;
-  }
-
-  async function initMap(){
-    setMapStatus('Loading…');
-    await loadGoogleMapsScript();
-    $('mapWrap').style.display = 'block';
-
-    gmap = new google.maps.Map($('gmap'), {
-      center:{lat:35.7796, lng:-78.6382},
-      zoom:12,
-      mapTypeId:'hybrid'
-    });
-    geocoder = new google.maps.Geocoder();
-
-    drawingManager = new google.maps.drawing.DrawingManager({
-      drawingMode:null,
-      drawingControl:false,
-      polygonOptions:{
-        fillColor:'#ff4fa3',
-        fillOpacity:0.22,
-        strokeColor:'#ff2f92',
-        strokeOpacity:0.9,
-        strokeWeight:2,
-        editable:true
-      }
-    });
-    drawingManager.setMap(gmap);
-
-    google.maps.event.addListener(drawingManager,'overlaycomplete',(e)=>{
-      clearShape();
-      drawingManager.setDrawingMode(null);
-      activeShape = e.overlay;
-
-      const update = ()=>{
-        lastFeet = computePerimeterFeet(activeShape);
-        setMapStatus(`Perimeter: ${Math.round(lastFeet).toLocaleString()} ft`);
-        $('mapSubmitBtn').disabled = !(lastFeet>0);
-      };
-      update();
-      google.maps.event.addListener(activeShape.getPath(),'set_at',update);
-      google.maps.event.addListener(activeShape.getPath(),'insert_at',update);
-      google.maps.event.addListener(activeShape.getPath(),'remove_at',update);
-    });
-
-    enableMapBtns(true);
-    setMapStatus('');
-  }
-
-  function findAddress(){
-    const addr = ($('custAddress').value||'').trim();
-    if(!addr){ setMapStatus('Enter address.'); return; }
-    setMapStatus('Finding…');
-    geocoder.geocode({address:addr},(results,status)=>{
-      if(status==='OK' && results && results[0]){
-        const loc = results[0].geometry.location;
-        gmap.setCenter(loc);
-        gmap.setZoom(20);
-        setMapStatus('');
-      }else{
-        setMapStatus('Not found.');
-      }
-    });
-  }
-
-  function draw(){
-    if(!drawingManager) return;
-    setMapStatus('Draw around the house. Double-click to finish.');
-    drawingManager.setDrawingMode(google.maps.drawing.OverlayType.POLYGON);
-  }
-
-  function submitLf(){
-    if(!(lastFeet>0)) return;
-    $('lf').value = String(Math.round(lastFeet));
-    setMapStatus('LF saved.');
-    calc();
-  }
-
-  $('mapLoadBtn').addEventListener('click', async ()=>{
-    try{
-      await initMap();
-    }catch(e){
-      console.error(e);
-      setMapStatus(e.message==='Missing API key' ? 'Add Google API key.' : 'Map failed to load.');
-    }
-  });
-  $('mapGoBtn').addEventListener('click', findAddress);
-  $('mapDrawBtn').addEventListener('click', draw);
-  $('mapClearBtn').addEventListener('click', clearShape);
-  $('mapSubmitBtn').addEventListener('click', submitLf);
-
-  // One-click measure: opens Measure, loads map, finds address, and starts drawing
-  $('measureBtn')?.addEventListener('click', async ()=>{
-    const det = document.querySelector('details');
-    if(det) det.open = true;
-
-    try{
-      if(!mapReady){ await initMap(); }
-      goToAddressOnMap();
-      startDrawPerimeter();
-    }catch(e){
-      console.error(e);
-      setMapStatus('Map not ready (check API key / billing / domain restriction).');
-    }
-  });
-
-
-  // ---------- Auto-fill date/time ----------
-  function pad2(n){ return String(n).padStart(2,'0'); }
-  (function initDateTime(){
-    const now = new Date();
-    $('topDate').value = `${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;
-    $('topTime').value = `${pad2(now.getHours())}:${pad2(now.getMinutes())}`;
-  })();
-
-  // ---------- Init ----------
-  syncToggleUI();
+  initTiers();
+  setNow();
+  updateChecklistChips();
+  updateTogglesUI();
   calc();
+})();
 </script>
 </body>
 </html>
