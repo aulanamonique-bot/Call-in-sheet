@@ -3,215 +3,212 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Quote Calculator</title>
+  <title>Lead Sheet</title>
   <style>
     :root{
-      --bg:#f7edf3;
+      --g:#16a34a;
+      --g2:#22c55e;
+      --bg:#f2fbf6;
       --panel:#ffffff;
-      --ink:#161616;
-      --muted:#6b6b73;
-      --line:#f0c1d9;
-      --line2:#eadde5;
-      --pink:#f43f95;
-      --pink2:#ec5da8;
-      --pinkSoft:#fff4fa;
-      --chip:#fff;
+      --ink:#0b1b12;
+      --muted:#51665c;
+      --line:#b7e4c7;
+      --line2:#d9f2e3;
+      --soft:#ecfdf3;
+      --soft2:#f5fff8;
       --shadow:0 10px 26px rgba(0,0,0,.06);
       --r:18px;
-      --r2:14px;
     }
     *{box-sizing:border-box}
     body{
       margin:0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       color:var(--ink);
-      background:var(--bg);
+      background:radial-gradient(1200px 700px at 20% -10%, #e7fff1 0%, var(--bg) 55%) fixed;
+      font-size:14px;
     }
-    .wrap{max-width:1360px;margin:14px auto;padding:0 12px 26px}
-    /* Top bar */
+    .wrap{max-width:1360px;margin:14px auto;padding:0 12px 28px}
+
+    /* Topbar */
     .topbar{
-      background:rgba(255,255,255,.9);
+      background:rgba(255,255,255,.92);
       border:1px solid var(--line2);
       border-radius:14px;
       box-shadow:var(--shadow);
       padding:12px;
       display:grid;
-      grid-template-columns: 1.2fr auto auto auto auto;
+      grid-template-columns:1.2fr auto auto auto auto;
       gap:10px;
       align-items:end;
       margin-bottom:14px;
     }
-    .brand h1{margin:0;font-size:20px;font-weight:950;letter-spacing:.35px}
-    .brand p{margin:3px 0 0;color:var(--muted);font-size:12px;font-weight:650}
+    .brand h1{margin:0;font-size:18px;font-weight:950;letter-spacing:.25px}
     .miniField{display:grid;gap:4px}
-    .miniField label{font-size:12px;font-weight:850;color:#3f3f46}
+    .miniField label{font-size:11px;font-weight:900;color:#254235;white-space:nowrap}
     .miniField input{
-      height:38px; padding:8px 10px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:#fff;
-      font-weight:800;
-      min-width:140px;
+      height:38px;padding:8px 10px;border:1px solid var(--line);
+      border-radius:12px;background:#fff;font-weight:750;font-size:13px;min-width:140px;outline:none;
     }
     .btn{
-      height:38px;
-      border-radius:12px;
-      padding:0 14px;
-      font-weight:900;
-      font-size:14px;
-      cursor:pointer;
-      border:1px solid transparent;
-      white-space:nowrap;
+      height:38px;border-radius:12px;padding:0 14px;font-weight:850;font-size:13px;
+      cursor:pointer;border:1px solid transparent;white-space:nowrap;
     }
-    .btn-primary{background:var(--pink);color:#fff}
-    .btn-soft{background:#ffecf5;color:#b10b5f;border-color:#ffc8e2}
-    .btn-ghost{background:#fff;color:#222;border-color:var(--line)}
+    .btn-primary{background:var(--g);color:#fff;box-shadow:0 8px 18px rgba(22,163,74,.20)}
+    .btn-soft{background:#eafff1;color:#0d5a2b;border-color:var(--line)}
     .btn:active{transform:translateY(1px)}
+
     /* Layout */
     .main{
       display:grid;
-      grid-template-columns: 360px 1fr 460px;
+      grid-template-columns:360px 1fr 460px;
       gap:14px;
-      align-items:start;
+      align-items:stretch;
     }
+    .stack{display:grid;gap:14px;align-content:start;min-width:0}
     .card{
       background:var(--panel);
       border:1px solid var(--line2);
       border-radius:var(--r);
       box-shadow:var(--shadow);
       overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      min-width:0;
     }
     .head{
-      background:linear-gradient(180deg,var(--pink2),var(--pink));
+      background:var(--g);
       color:#fff;
       padding:10px 14px;
       font-weight:950;
-      font-size:15px;
+      font-size:14px;
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap:10px;
+      border-bottom:1px solid rgba(0,0,0,.06);
     }
-    .body{padding:12px}
-    .stack{display:grid;gap:10px}
+    .body{padding:12px;flex:1;min-width:0}
     .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-    .field{display:grid;gap:4px}
-    .field label{font-size:12px;font-weight:850;color:#4a4a52;line-height:1.2}
+    .field{display:grid;gap:4px;min-width:0}
+    .field label{font-size:11px;font-weight:800;color:#29463a;line-height:1.15;white-space:nowrap}
     .field input,.field textarea{
-      width:100%; min-width:0;
-      height:40px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:#fff;
-      padding:8px 10px;
-      font-size:14px;
-      font-weight:750;
-      color:#1c1c22;
-      outline:none;
+      width:100%;min-width:0;height:40px;border:1px solid var(--line);border-radius:12px;
+      background:#fff;padding:8px 10px;font-size:13px;font-weight:700;color:#0e1b12;outline:none;
     }
-    .field textarea{height:86px;resize:vertical;line-height:1.25;padding-top:10px}
+    .field input:focus,.field textarea:focus{border-color:#6bd39a;box-shadow:0 0 0 3px rgba(34,197,94,.15)}
+    .field textarea{height:86px;resize:vertical;line-height:1.3;padding-top:10px}
     .field.compact input{height:36px}
-    input[type=number]::-webkit-outer-spin-button,
-    input[type=number]::-webkit-inner-spin-button{ -webkit-appearance:none; margin:0;}
-    input[type=number]{ -moz-appearance:textfield; }
+    input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+    input[type=number]{-moz-appearance:textfield}
+
     .sticky{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
+
     /* Checklist chips */
+    .miniPanel{
+      border:1px solid var(--line2);
+      border-radius:14px;
+      background:var(--soft);
+      padding:10px;
+      min-width:0;
+    }
+    .miniPanel h4{margin:0 0 8px;font-size:12px;font-weight:1000;color:#163527}
     .chipGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
     .chip{
       border:1px solid var(--line);
       border-radius:999px;
-      background:var(--chip);
+      background:#fff;
       height:38px;
       display:flex;align-items:center;justify-content:center;gap:8px;
-      font-weight:900;cursor:pointer;user-select:none;
+      font-weight:900;font-size:12px;cursor:pointer;user-select:none;color:#163527;
     }
-    .chip input{margin:0;width:16px;height:16px;accent-color:var(--pink)}
-    .chip.on{background:#fff0f7;border-color:#ff9dcb}
-    /* Center: quote read */
-    .quoteGrid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
+    .chip input{margin:0;width:16px;height:16px;accent-color:var(--g)}
+    .chip.on{background:var(--soft);border-color:#7ddfa8}
+
+    /* Quote cards */
+    .quoteGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .metric{
       border:1px solid var(--line);
       border-radius:14px;
-      background:#fff7fb;
+      background:linear-gradient(180deg,#fff,var(--soft2));
+      padding:10px;
+      min-width:0;
+    }
+    .metric .k{font-size:10.5px;font-weight:850;color:#2a4a3b}
+    .metric .v{font-size:18px;font-weight:950;margin:6px 0 2px;line-height:1.05}
+    .metric.big .v{font-size:20px}
+    .metric .sub{font-size:10.5px;color:#2a4a3b;font-weight:750}
+
+    .totalsPanel{
+      background:var(--soft);
+      border:1px solid var(--line2);
+      border-radius:14px;
       padding:10px;
     }
-    .metric .k{font-size:11px;font-weight:900;color:#50505a}
-    .metric .v{font-size:20px;font-weight:1000;margin:5px 0 2px;line-height:1.05}
-    .metric .sub{font-size:11px;color:#50505a;font-weight:800}
-    .metric.big .v{font-size:22px}
-    .divider{border-top:1px dashed var(--line);margin:10px 0}
+    .totalsList{display:grid;gap:8px}
+    .totalsRow{
+      display:flex;justify-content:space-between;gap:10px;
+      padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:#fff;
+      font-weight:900;
+    }
+    .totalsRow .lab{font-size:11px;color:#2a4a3b}
+    .totalsRow .amt{font-size:13px}
+
     /* Toggles */
     .toggles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
     .toggle{
-      height:40px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#fff;
-      font-weight:950;
-      cursor:pointer;
+      height:40px;border-radius:12px;border:1px solid var(--line);background:#fff;
+      font-weight:950;font-size:13px;cursor:pointer;color:#143022;
     }
-    .toggle.on{
-      background:var(--pink);
-      border-color:var(--pink);
-      color:#fff;
-    }
-    .hint{font-size:12px;color:var(--muted);font-weight:700}
-    /* Right: measurements + adjust */
-    .miniPanel{
-      border:1px solid var(--line2);
-      border-radius:14px;
-      background:var(--pinkSoft);
-      padding:10px;
-    }
-    .miniPanel h4{margin:0 0 8px;font-size:13px;font-weight:950}
-    details summary{cursor:pointer;font-weight:900}
-    table{width:100%;border-collapse:collapse;font-size:12px}
+    .toggle.on{background:var(--g);border-color:var(--g);color:#fff}
+
+    /* Tables */
+    details summary{cursor:pointer;font-weight:950;color:#163527;font-size:12px}
+    table{width:100%;border-collapse:collapse;font-size:11.5px}
     th,td{border:1px solid var(--line);padding:6px}
     th{text-align:left;background:#fff}
-    td.right{text-align:right;font-weight:900}
-    .adjustGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    td.right{text-align:right;font-weight:950}
+
+    /* Adjust */
+    .adjustGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .adjustBox{
       border:1px solid var(--line);
       border-radius:14px;
       background:#fff;
-      padding:10px;
+      padding:12px;
+      min-height:260px;
+      min-width:0;
     }
     .adjustBox h5{
-      margin:0 0 8px;
-      font-size:12px;
-      font-weight:1000;
-      color:#4d4d56;
-      display:flex;
-      justify-content:space-between;
-      gap:8px;
+      margin:0 0 10px;font-size:12px;font-weight:1000;color:#274536;
+      display:flex;justify-content:space-between;gap:8px;align-items:center;
     }
-    .smallGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-    .field.mini label{font-size:11px}
-    .readonly{background:#fff7fb;font-weight:900}
-    .totalsList{display:grid;gap:8px}
-    .totalsRow{
-      display:flex;justify-content:space-between;gap:10px;
-      padding:8px 10px;
-      border:1px solid var(--line);
-      border-radius:12px;
-      background:#fff;
-      font-weight:900;
+    .suggestBadge{
+      display:inline-block;
+      background: rgba(34,197,94,.16);
+      border: 1px solid rgba(34,197,94,.26);
+      color:#0f5130;
+      font-weight: 1000;
+      padding: 3px 8px;
+      border-radius: 999px;
+      margin-right: 6px;
+      line-height: 1;
+      font-size: 11px;
+      vertical-align: middle;
+      white-space:nowrap;
     }
-    .totalsRow .lab{font-size:12px;color:#4a4a52}
-    .totalsRow .amt{font-size:14px}
-    @media (max-width: 1180px){
+    .suggestNum{font-weight:1000;color:#0b3d23;white-space:nowrap}
+    .smallGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .readonly{background:var(--soft2);font-weight:900}
+
+    /* Responsive */
+    @media (max-width:1180px){
       .main{grid-template-columns:1fr}
       .sticky{position:static;max-height:none}
       .topbar{grid-template-columns:1fr 1fr 1fr;align-items:end}
       .brand{grid-column:1/-1}
     }
-    @media (max-width: 760px){
-      .row2,.row3,.toggle,.toggles,.quoteGrid,.adjustGrid,.smallGrid,.chipGrid{grid-template-columns:1fr}
+    @media (max-width:760px){
+      .row2,.quoteGrid,.adjustGrid,.smallGrid,.chipGrid,.toggles{grid-template-columns:1fr}
       .topbar{grid-template-columns:1fr}
       .miniField input{min-width:0}
     }
@@ -221,9 +218,7 @@
 <div class="wrap">
 
   <div class="topbar">
-    <div class="brand">
-      <h1>QUOTE CALCULATOR</h1>
-    </div>
+    <div class="brand"><h1>LEAD SHEET</h1></div>
 
     <div class="miniField">
       <label>Date</label>
@@ -234,52 +229,33 @@
       <input id="topTime" type="time">
     </div>
 
-    <button class="btn btn-primary" id="clearBtn" type="button">NEW LEAD (Clear)</button>
-    <button class="btn btn-soft" id="copyBtn" type="button">Copy Quote Line</button>
+    <button class="btn btn-primary" id="clearBtn" type="button">NEW LEAD</button>
+    <button class="btn btn-soft" id="copyBtn" type="button">COPY</button>
   </div>
 
   <div class="main">
 
-    <!-- LEFT: CUSTOMER INFO -->
+    <!-- LEFT -->
     <section class="card sticky">
       <div class="head">
-        <span>Customer info</span>
+        <span>CUSTOMER</span>
         <button class="btn btn-soft" id="collapseCustomer" type="button" style="height:30px;padding:0 10px;font-size:12px;">Collapse</button>
       </div>
       <div class="body stack" id="customerBody">
-        <div class="field">
-          <label>Customer Name</label>
-          <input id="custName" type="text" placeholder="First + Last">
-        </div>
-
-        <div class="field">
-          <label>Lead Source</label>
-          <input id="custLeadSource" type="text" placeholder="Call / Web / Referral / Other">
-        </div>
+        <div class="field"><label>NAME</label><input id="custName" type="text"></div>
+        <div class="field"><label>LEAD SOURCE</label><input id="custLeadSource" type="text"></div>
 
         <div class="row2">
-          <div class="field">
-            <label>Phone</label>
-            <input id="custPhone" type="text" placeholder="(###) ###-####">
-          </div>
-          <div class="field">
-            <label>Email</label>
-            <input id="custEmail" type="email" placeholder="name@email.com">
-          </div>
+          <div class="field"><label>PHONE</label><input id="custPhone" type="text"></div>
+          <div class="field"><label>EMAIL</label><input id="custEmail" type="email"></div>
         </div>
 
-        <div class="field">
-          <label>Address</label>
-          <input id="custAddress" type="text" placeholder="Street, City, State, ZIP">
-        </div>
+        <div class="field"><label>ADDRESS</label><input id="custAddress" type="text"></div>
+        <div class="field"><label>SERVICES NEEDED</label><input id="custServices" type="text"></div>
+        <div class="field"><label>NOTES</label><textarea id="custNotes"></textarea></div>
 
-        <div class="field">
-          <label>Notes</label>
-          <textarea id="custNotes" placeholder="Objections, pests, timing, gate code, special instructions..."></textarea>
-        </div>
-
-        <div class="miniPanel" style="background:#fff7fb;border-style:dashed;">
-          <h4>Checklist</h4>
+        <div class="miniPanel" style="background:#ffffff;border-style:dashed;">
+          <h4>CHECKLIST</h4>
           <div class="chipGrid">
             <label class="chip"><input type="checkbox" id="chkINT"> INT</label>
             <label class="chip"><input type="checkbox" id="chkPS"> PS</label>
@@ -292,43 +268,42 @@
       </div>
     </section>
 
-    <!-- CENTER: TOTALS + TOGGLES -->
+    <!-- CENTER -->
     <div class="stack">
       <section class="card">
-        <div class="head">Quote (read this)</div>
+        <div class="head"><span>QUOTE</span></div>
         <div class="body stack">
 
           <div class="quoteGrid">
             <div class="metric">
-              <div class="k">QT Rate</div>
+              <div class="k">QT RATE</div>
               <div class="v" id="qtRateDisplay">$0.00</div>
-              <div class="sub">Monthly: <span id="qtMonthlyDisplay">$0</span></div>
+              <div class="sub">MONTHLY <span id="qtMonthlyDisplay">$0</span></div>
             </div>
             <div class="metric">
-              <div class="k">SM Rate</div>
+              <div class="k">SM RATE</div>
               <div class="v" id="smRateDisplay">$0.00</div>
-              <div class="sub">Monthly: <span id="smMonthlyDisplay">$0</span></div>
+              <div class="sub">MONTHLY <span id="smMonthlyDisplay">$0</span></div>
             </div>
             <div class="metric big">
-              <div class="k">Total monthly</div>
+              <div class="k">TOTAL MONTHLY</div>
               <div class="v" id="totalMonthlyDisplay">$0 / mo</div>
-              <div class="sub">YIF Total: <span id="totalYifDisplay">$0.00</span></div>
+              <div class="sub">YIF <span id="totalYifDisplay">$0.00</span></div>
             </div>
             <div class="metric big">
-              <div class="k">Bundle total monthly</div>
+              <div class="k">BUNDLE MONTHLY</div>
               <div class="v" id="bundleMonthlyDisplay">$0 / mo</div>
-              <div class="sub">Bundle YIF: <span id="bundleYifDisplay">$0.00</span></div>
+              <div class="sub">YIF <span id="bundleYifDisplay">$0.00</span></div>
             </div>
           </div>
 
-          <div class="miniPanel" style="background:#fff7fb;border:1px solid var(--line);">
-            <h4>Totals</h4>
+          <div class="totalsPanel">
             <div class="totalsList">
-              <div class="totalsRow"><span class="lab">Bundle QT (pest after -$10)</span><span class="amt" id="bundleQtRow">$0.00</span></div>
-              <div class="totalsRow"><span class="lab">Plain total monthly (selected services)</span><span class="amt" id="plainMonthlyRow">$0 / mo</span></div>
-              <div class="totalsRow"><span class="lab">Bundle total monthly</span><span class="amt" id="bundleMonthlyRow">$0 / mo</span></div>
-              <div class="totalsRow"><span class="lab">Plain YIF total</span><span class="amt" id="plainYifRow">$0.00</span></div>
-              <div class="totalsRow"><span class="lab">Bundle YIF total</span><span class="amt" id="bundleYifRow">$0.00</span></div>
+              <div class="totalsRow"><span class="lab">BUNDLE QT</span><span class="amt" id="bundleQtRow">$0.00</span></div>
+              <div class="totalsRow"><span class="lab">PLAIN MONTHLY</span><span class="amt" id="plainMonthlyRow">$0 / mo</span></div>
+              <div class="totalsRow"><span class="lab">BUNDLE MONTHLY</span><span class="amt" id="bundleMonthlyRow">$0 / mo</span></div>
+              <div class="totalsRow"><span class="lab">PLAIN YIF</span><span class="amt" id="plainYifRow">$0.00</span></div>
+              <div class="totalsRow"><span class="lab">BUNDLE YIF</span><span class="amt" id="bundleYifRow">$0.00</span></div>
             </div>
           </div>
 
@@ -336,43 +311,34 @@
       </section>
 
       <section class="card">
-        <div class="head">Services</div>
+        <div class="head"><span>SERVICES</span></div>
         <div class="body stack">
           <div class="toggles">
-            <button class="toggle on" id="btnPest" type="button">Pest</button>
-            <button class="toggle" id="btnTermite" type="button">Termite (SM)</button>
+            <button class="toggle on" id="btnQT" type="button">QT</button>
+            <button class="toggle" id="btnSM" type="button">SM</button>
             <button class="toggle" id="btnYIF" type="button">YIF</button>
-            <button class="toggle" id="btnBundle" type="button">Bundle</button>
+            <button class="toggle" id="btnBundle" type="button">BUNDLE</button>
           </div>
-          </div>
+        </div>
       </section>
     </div>
 
-    <!-- RIGHT: MEASUREMENTS + ADJUST -->
+    <!-- RIGHT -->
     <div class="stack">
       <section class="card">
-        <div class="head">Measurements</div>
+        <div class="head"><span>MEASUREMENTS</span></div>
         <div class="body stack">
           <div class="miniPanel">
-            <h4>Measurements</h4>
+            <h4>ENTER</h4>
             <div class="row2">
-              <div class="field compact">
-                <label>SqFt</label>
-                <input id="sqft" type="number" min="0" step="1" placeholder="">
-              </div>
-              <div class="field compact">
-                <label>Linear ft (LF)</label>
-                <input id="lf" type="number" min="0" step="1" placeholder="">
-              </div>
+              <div class="field compact"><label>SQFT</label><input id="sqft" type="number" min="0" step="1"></div>
+              <div class="field compact"><label>LF</label><input id="lf" type="number" min="0" step="1"></div>
             </div>
-
-            <details style="margin-top:8px">
-              <summary>Show pricing tiers</summary>
+            <details style="margin-top:10px">
+              <summary>PRICING TIERS</summary>
               <div style="margin-top:8px;overflow:auto">
                 <table>
-                  <thead>
-                    <tr><th>SqFt Range</th><th class="right">QT Rate</th></tr>
-                  </thead>
+                  <thead><tr><th>SQFT</th><th class="right">QT</th></tr></thead>
                   <tbody id="tiersTable"></tbody>
                 </table>
               </div>
@@ -381,52 +347,34 @@
         </div>
       </section>
 
-      <section class="card">
-        <div class="head">Adjust rates (only if needed)</div>
+      <section class="card" id="adjustCard">
+        <div class="head"><span>ADJUST</span></div>
         <div class="body stack">
           <div class="adjustGrid">
 
             <div class="adjustBox">
-              <h5><span>PEST (QT)</span><span>Suggested: <span id="qtSuggestedLabel">$0.00</span></span></h5>
+              <h5>
+                <span>QT</span>
+                <span><span class="suggestBadge">SUGGESTED</span><span id="qtSuggestedLabel" class="suggestNum">$0.00</span></span>
+              </h5>
               <div class="smallGrid">
-                <div class="field mini">
-                  <label>QT Quote</label>
-                  <input id="pestQuote" type="number" step="0.01" placeholder="Auto">
-                </div>
-                <div class="field mini">
-                  <label>Initial Fee</label>
-                  <input id="pestInit" type="number" step="1" value="399">
-                </div>
-                <div class="field mini">
-                  <label>QT Monthly</label>
-                  <input id="pestMonthlyRead" class="readonly" type="text" readonly>
-                </div>
-                <div class="field mini">
-                  <label>Pest YIF</label>
-                  <input id="pestYifRead" class="readonly" type="text" readonly>
-                </div>
+                <div class="field mini"><label>QT QUOTE</label><input id="qtQuote" type="number" step="0.01"></div>
+                <div class="field mini"><label>INITIAL</label><input id="qtInit" type="number" step="1"></div>
+                <div class="field mini"><label>MONTHLY</label><input id="qtMonthlyRead" class="readonly" type="text" readonly></div>
+                <div class="field mini"><label>YIF</label><input id="qtYifRead" class="readonly" type="text" readonly></div>
               </div>
             </div>
 
             <div class="adjustBox">
-              <h5><span>TERMITE (SM)</span><span>Suggested: <span id="smSuggestedLabel">$0.00</span></span></h5>
+              <h5>
+                <span>SM</span>
+                <span><span class="suggestBadge">SUGGESTED</span><span id="smSuggestedLabel" class="suggestNum">$0.00</span></span>
+              </h5>
               <div class="smallGrid">
-                <div class="field mini">
-                  <label>SM Quote</label>
-                  <input id="termQuote" type="number" step="0.01" placeholder="Auto">
-                </div>
-                <div class="field mini">
-                  <label>SM Install Fee</label>
-                  <input id="termInstall" type="number" step="1" value="0">
-                </div>
-                <div class="field mini">
-                  <label>SM Monthly</label>
-                  <input id="smMonthlyRead" class="readonly" type="text" readonly>
-                </div>
-                <div class="field mini">
-                  <label>Termite YIF</label>
-                  <input id="termYifRead" class="readonly" type="text" readonly>
-                </div>
+                <div class="field mini"><label>SM QUOTE</label><input id="smQuote" type="number" step="0.01"></div>
+                <div class="field mini"><label>INSTALL</label><input id="smInstall" type="number" step="1" value="0"></div>
+                <div class="field mini"><label>MONTHLY</label><input id="smMonthlyRead" class="readonly" type="text" readonly></div>
+                <div class="field mini"><label>YIF</label><input id="smYifRead" class="readonly" type="text" readonly></div>
               </div>
             </div>
 
@@ -439,10 +387,11 @@
 </div>
 
 <script>
-(function(){
-  const YIF_DISCOUNT = 0.05;        // fixed 5%
-  const TERMITE_RATE_PER_LF = 1.5;  // yearly
-  const BUNDLE_DISC = 10;           // fixed $10 off QT
+(() => {
+  const YIF_DISCOUNT = 0.05;
+  const SM_RATE_PER_LF = 1.5;  // yearly
+  const SM_MIN_YEARLY = 300;
+  const BUNDLE_DISC = 10;
 
   const tiers = [
     {min:1000,max:1499,qt:139},
@@ -453,18 +402,32 @@
     {min:4500,max:999999,qt:219},
   ];
 
-  const $ = (id)=>document.getElementById(id);
-  const state = { pestOn:true, termiteOn:false, yifOn:false, bundleOn:false };
+  const $ = (id) => document.getElementById(id);
 
-  function money(n){ return (Number(n)||0).toLocaleString(undefined,{style:'currency',currency:'USD'}); }
-  function money0(n){ return (Number(n)||0).toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0}); }
-  function ceil(n){ return Math.ceil(Number(n)||0); }
+  const state = {
+    qtOn: true,
+    smOn: false,
+    yifOn: false,
+    bundleOn: false,
+    qtInitTouched: false,
+    smInstallTouched: false
+  };
+
+  function money(n){
+    const x = Number.isFinite(n) ? n : 0;
+    return x.toLocaleString(undefined,{style:'currency',currency:'USD'});
+  }
+  function money0(n){
+    const x = Number.isFinite(n) ? n : 0;
+    return x.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
+  }
+  function ceil(n){ return Math.ceil(Number.isFinite(n)?n:0); }
 
   function suggestQt(sqft){
     const s = Number(sqft);
-    if(!Number.isFinite(s) || s<=0) return 0;
+    if(!Number.isFinite(s) || s <= 0) return 0;
     for(const t of tiers){
-      if(s>=t.min && s<=t.max) return t.qt;
+      if(s >= t.min && s <= t.max) return t.qt;
     }
     return 0;
   }
@@ -478,14 +441,12 @@
   function initTiers(){
     const tb = $('tiersTable');
     tb.innerHTML = '';
-    tiers.forEach(t=>{
+    for(const t of tiers){
       const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${t.min.toLocaleString()} - ${t.max===999999 ? 'up' : t.max.toLocaleString()}</td>
-        <td class="right">${money(t.qt)}</td>
-      `;
+      tr.innerHTML = `<td>${t.min.toLocaleString()} - ${t.max===999999?'UP':t.max.toLocaleString()}</td>
+                      <td class="right">${money(t.qt)}</td>`;
       tb.appendChild(tr);
-    });
+    }
   }
 
   function updateChecklistChips(){
@@ -495,17 +456,21 @@
     });
   }
 
+  function setToggle(id, on){
+    $(id).classList.toggle('on', !!on);
+  }
+
   function updateTogglesUI(){
-    const map = [
-      ['btnPest', state.pestOn],
-      ['btnTermite', state.termiteOn],
-      ['btnYIF', state.yifOn],
-      ['btnBundle', state.bundleOn],
-    ];
-    map.forEach(([id,on])=>{
-      const b = $(id);
-      b.classList.toggle('on', !!on);
-    });
+    setToggle('btnQT', state.qtOn);
+    setToggle('btnSM', state.smOn);
+    setToggle('btnYIF', state.yifOn);
+    setToggle('btnBundle', state.bundleOn);
+  }
+
+  function clampNum(v, min, max){
+    const n = parseFloat(v);
+    if(!Number.isFinite(n)) return NaN;
+    return Math.min(max, Math.max(min, n));
   }
 
   function calc(){
@@ -513,56 +478,68 @@
     const lf = parseFloat($('lf').value);
 
     const qtSuggested = suggestQt(sqft);
-    const smSuggested = (Number.isFinite(lf) && lf>0) ? (lf * TERMITE_RATE_PER_LF) : 0;
+    const smSuggested = Number.isFinite(lf) && lf > 0 ? Math.max(SM_MIN_YEARLY, lf * SM_RATE_PER_LF) : SM_MIN_YEARLY;
 
     $('qtSuggestedLabel').textContent = money(qtSuggested);
     $('smSuggestedLabel').textContent = money(smSuggested);
 
-    const pestQuoteIn = parseFloat($('pestQuote').value);
-    const termQuoteIn = parseFloat($('termQuote').value);
+    const qtQuoteIn = parseFloat($('qtQuote').value);
+    const smQuoteIn = parseFloat($('smQuote').value);
 
-    const pestQtBase = Number.isFinite(pestQuoteIn) ? pestQuoteIn : qtSuggested;
-    const termSmBase = Number.isFinite(termQuoteIn) ? termQuoteIn : smSuggested;
+    const qtBase = Number.isFinite(qtQuoteIn) ? qtQuoteIn : qtSuggested;
+    const smBase = Number.isFinite(smQuoteIn) ? smQuoteIn : smSuggested;
 
-    const pestInit = parseFloat($('pestInit').value) || 0;
-    const termInstall = parseFloat($('termInstall').value) || 0;
+    // Auto initial fee = QT base unless user typed something
+    const qtInitRaw = ($('qtInit').value || '').trim();
+    let qtInit = parseFloat(qtInitRaw);
+    if(!Number.isFinite(qtInit)) qtInit = 0;
+    if(!state.qtInitTouched){
+      if(qtInitRaw === '' || qtInit === 0){
+        qtInit = qtBase;
+        if(Number.isFinite(qtInit) && qtInit > 0) $('qtInit').value = String(Math.round(qtInit));
+      }
+    }
 
-    const bundleApplies = state.bundleOn && state.pestOn && state.termiteOn;
-    const pestQtBundled = bundleApplies ? Math.max(0, pestQtBase - BUNDLE_DISC) : pestQtBase;
+    // Install fee (user editable, no auto here)
+    const smInstallRaw = ($('smInstall').value || '').trim();
+    let smInstall = parseFloat(smInstallRaw);
+    if(!Number.isFinite(smInstall)) smInstall = 0;
 
-    const pestMonthlyPlain = state.pestOn ? ceil(pestQtBase/3) : 0;
-    const pestMonthlyBundle = state.pestOn ? ceil(pestQtBundled/3) : 0;
-    const smMonthly = state.termiteOn ? ceil(termSmBase/12) : 0;
+    const bundleApplies = state.bundleOn && state.qtOn && state.smOn;
+    const qtBundled = bundleApplies ? Math.max(0, qtBase - BUNDLE_DISC) : qtBase;
+
+    const qtMonthlyPlain = state.qtOn ? ceil(qtBase/3) : 0;
+    const qtMonthlyBundle = state.qtOn ? ceil(qtBundled/3) : 0;
+    const smMonthly = state.smOn ? ceil(smBase/12) : 0;
 
     // YIF after fees
-    let pestYifPlain = 0, pestYifBundle = 0;
-    if(state.pestOn){
-      const basePlain = (pestQtBase*4) + pestInit;
-      const baseBundle = (pestQtBundled*4) + pestInit;
-      pestYifPlain = state.yifOn ? basePlain * (1 - YIF_DISCOUNT) : basePlain;
-      pestYifBundle = state.yifOn ? baseBundle * (1 - YIF_DISCOUNT) : baseBundle;
+    let qtYifPlain = 0, qtYifBundle = 0;
+    if(state.qtOn){
+      const basePlain = (qtBase*4) + qtInit;
+      const baseBundle = (qtBundled*4) + qtInit;
+      qtYifPlain = state.yifOn ? basePlain * (1 - YIF_DISCOUNT) : basePlain;
+      qtYifBundle = state.yifOn ? baseBundle * (1 - YIF_DISCOUNT) : baseBundle;
     }
 
     let smYif = 0;
-    if(state.termiteOn){
-      const base = termSmBase + termInstall;
+    if(state.smOn){
+      const base = smBase + smInstall;
       smYif = state.yifOn ? base * (1 - YIF_DISCOUNT) : base;
     }
 
-    const plainMonthlyTotal = (state.pestOn ? pestMonthlyPlain : 0) + (state.termiteOn ? smMonthly : 0);
-    const bundleMonthlyTotal = (state.pestOn ? pestMonthlyBundle : 0) + (state.termiteOn ? smMonthly : 0);
+    const plainMonthlyTotal = (state.qtOn ? qtMonthlyPlain : 0) + (state.smOn ? smMonthly : 0);
+    const bundleMonthlyTotal = (state.qtOn ? qtMonthlyBundle : 0) + (state.smOn ? smMonthly : 0);
 
-    const plainYifTotal = pestYifPlain + smYif;
-    const bundleYifTotal = pestYifBundle + smYif;
+    const plainYifTotal = qtYifPlain + smYif;
+    const bundleYifTotal = qtYifBundle + smYif;
 
-    // Center big readouts (respect current bundle toggle, but only applies when valid)
-    const shownQt = state.pestOn ? (bundleApplies ? pestQtBundled : pestQtBase) : 0;
-    const shownQtMo = state.pestOn ? (bundleApplies ? pestMonthlyBundle : pestMonthlyPlain) : 0;
+    const shownQt = state.qtOn ? (bundleApplies ? qtBundled : qtBase) : 0;
+    const shownQtMo = state.qtOn ? (bundleApplies ? qtMonthlyBundle : qtMonthlyPlain) : 0;
 
     $('qtRateDisplay').textContent = money(shownQt);
     $('qtMonthlyDisplay').textContent = money0(shownQtMo);
 
-    $('smRateDisplay').textContent = money(state.termiteOn ? termSmBase : 0);
+    $('smRateDisplay').textContent = money(state.smOn ? smBase : 0);
     $('smMonthlyDisplay').textContent = money0(smMonthly);
 
     $('totalMonthlyDisplay').textContent = `${money0(plainMonthlyTotal)} / mo`;
@@ -571,46 +548,46 @@
     $('bundleMonthlyDisplay').textContent = `${money0(bundleMonthlyTotal)} / mo`;
     $('bundleYifDisplay').textContent = money(bundleYifTotal);
 
-    // Totals panel
-    $('bundleQtRow').textContent = money(state.pestOn ? pestQtBundled : 0);
+    $('bundleQtRow').textContent = money(state.qtOn ? qtBundled : 0);
     $('plainMonthlyRow').textContent = `${money0(plainMonthlyTotal)} / mo`;
     $('bundleMonthlyRow').textContent = `${money0(bundleMonthlyTotal)} / mo`;
     $('plainYifRow').textContent = money(plainYifTotal);
     $('bundleYifRow').textContent = money(bundleYifTotal);
 
-    // Right read-only fields
-    $('pestMonthlyRead').value = money0(pestMonthlyPlain);
-    $('pestYifRead').value = money(pestYifPlain);
+    $('qtMonthlyRead').value = money0(qtMonthlyPlain);
+    $('qtYifRead').value = money(qtYifPlain);
 
     $('smMonthlyRead').value = money0(smMonthly);
-    $('termYifRead').value = money(smYif);
+    $('smYifRead').value = money(smYif);
 
-    // Copy line (uses current view + totals)
+    // Copy line
     const parts = [];
-    if(state.pestOn) parts.push(`QT ${money(shownQt)} (${money0(shownQtMo)}/mo)`);
-    if(state.termiteOn) parts.push(`SM ${money(termSmBase)} (${money0(smMonthly)}/mo)`);
+    if(state.qtOn) parts.push(`QT ${money(shownQt)} (${money0(shownQtMo)}/mo)`);
+    if(state.smOn) parts.push(`SM ${money(smBase)} (${money0(smMonthly)}/mo)`);
     if(state.yifOn) parts.push(`YIF ${money(bundleApplies ? bundleYifTotal : plainYifTotal)}`);
-    if(bundleApplies) parts.push(`Bundle (-$10/QT)`);
+    if(bundleApplies) parts.push(`BUNDLE`);
     $('copyBtn').dataset.quote = parts.join(' | ');
   }
 
   function clearAll(){
     setNow();
-    ['custName','custLeadSource','custPhone','custEmail','custAddress','custNotes'].forEach(id=>$(id).value='');
-    ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS'].forEach(id=>$(id).checked=false);
+    ['custName','custLeadSource','custPhone','custEmail','custAddress','custServices','custNotes'].forEach(id => $(id).value = '');
+    ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS'].forEach(id => $(id).checked = false);
     updateChecklistChips();
 
     $('sqft').value = '';
     $('lf').value = '';
-    $('pestQuote').value = '';
-    $('termQuote').value = '';
-    $('pestInit').value = '399';
-    $('termInstall').value = '0';
+    $('qtQuote').value = '';
+    $('smQuote').value = '';
+    $('qtInit').value = '';
+    $('smInstall').value = '0';
 
-    state.pestOn = true;
-    state.termiteOn = false;
+    state.qtOn = true;
+    state.smOn = false;
     state.yifOn = false;
     state.bundleOn = false;
+    state.qtInitTouched = false;
+    state.smInstallTouched = false;
     updateTogglesUI();
 
     calc();
@@ -621,31 +598,34 @@
     if(!txt) return;
     navigator.clipboard.writeText(txt).then(()=>{
       const old = $('copyBtn').textContent;
-      $('copyBtn').textContent = 'Copied';
+      $('copyBtn').textContent = 'COPIED';
       setTimeout(()=> $('copyBtn').textContent = old, 900);
-    }).catch(()=> alert('Copy failed. Copy manually.'));
+    }).catch(()=> alert('Copy failed'));
   }
 
-  // Wire
+  // Wire up
   $('collapseCustomer').addEventListener('click', ()=>{
     $('customerBody').classList.toggle('hide');
     $('collapseCustomer').textContent = $('customerBody').classList.contains('hide') ? 'Expand' : 'Collapse';
   });
 
-  ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS'].forEach(id=>{
+  ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS'].forEach(id => {
     $(id).addEventListener('change', updateChecklistChips);
   });
 
-  [['btnPest','pestOn'],['btnTermite','termiteOn'],['btnYIF','yifOn'],['btnBundle','bundleOn']]
-    .forEach(([id,key])=>{
-      $(id).addEventListener('click', ()=>{
-        state[key] = !state[key];
-        updateTogglesUI();
-        calc();
-      });
+  [['btnQT','qtOn'],['btnSM','smOn'],['btnYIF','yifOn'],['btnBundle','bundleOn']].forEach(([id,key])=>{
+    $(id).addEventListener('click', ()=>{
+      state[key] = !state[key];
+      updateTogglesUI();
+      calc();
     });
+  });
 
-  ['sqft','lf','pestQuote','pestInit','termQuote','termInstall'].forEach(id=>{
+  // Mark manual overrides
+  $('qtInit').addEventListener('input', ()=>{ state.qtInitTouched = true; calc(); });
+  $('smInstall').addEventListener('input', ()=>{ state.smInstallTouched = true; calc(); });
+
+  ['sqft','lf','qtQuote','qtInit','smQuote','smInstall'].forEach(id=>{
     $(id).addEventListener('input', calc);
   });
 
