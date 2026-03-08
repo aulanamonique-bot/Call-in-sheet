@@ -26,7 +26,6 @@
       font-size:14px;
     }
     .wrap{max-width:1380px;margin:14px auto;padding:0 12px 28px}
-
     .topbar{
       background:rgba(255,255,255,.92);
       border:1px solid var(--line2);
@@ -46,7 +45,6 @@
       height:38px;padding:8px 10px;border:1px solid var(--line);
       border-radius:12px;background:#fff;font-weight:750;font-size:13px;min-width:140px;outline:none;
     }
-
     .btn{
       height:38px;border-radius:12px;padding:0 14px;font-weight:850;font-size:13px;
       cursor:pointer;border:1px solid transparent;white-space:nowrap;
@@ -54,22 +52,20 @@
     .btn-primary{background:var(--g);color:#fff;box-shadow:0 8px 18px rgba(22,163,74,.20)}
     .btn-soft{background:#eafff1;color:#0d5a2b;border-color:var(--line)}
     .btn-dark{background:#0f1d15;color:#fff}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
     .btn:active{transform:translateY(1px)}
-
     .main{
       display:grid;
       grid-template-columns:370px minmax(0,1fr) 470px;
       gap:14px;
       align-items:start;
     }
-
     .column{
       display:grid;
       gap:14px;
       align-content:start;
       min-width:0;
     }
-
     .card{
       background:var(--panel);
       border:1px solid var(--line2);
@@ -90,10 +86,8 @@
       gap:10px;
     }
     .body{padding:12px;min-width:0}
-
     .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
-
     .field{display:grid;gap:4px;min-width:0}
     .field label{font-size:11px;font-weight:800;color:#29463a;line-height:1.15;white-space:nowrap}
     .field input,.field textarea,.field select{
@@ -102,17 +96,13 @@
     }
     .field textarea{height:86px;resize:vertical;line-height:1.3;padding-top:10px}
     .field input:focus,.field textarea:focus,.field select:focus{
-      border-color:#6bd39a;
-      box-shadow:0 0 0 3px rgba(34,197,94,.15);
+      border-color:#6bd39a;box-shadow:0 0 0 3px rgba(34,197,94,.15);
     }
     .readonly{background:var(--soft2);font-weight:900}
-
     input[type=number]::-webkit-outer-spin-button,
     input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     input[type=number]{-moz-appearance:textfield}
-
     .hide{display:none !important}
-
     .miniPanel{
       border:1px solid var(--line2);
       border-radius:14px;
@@ -120,7 +110,6 @@
       padding:10px;
     }
     .miniPanel h4{margin:0 0 8px;font-size:12px;font-weight:1000;color:#163527}
-
     .chipGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
     .chip{
       border:1px solid var(--line);
@@ -141,7 +130,6 @@
     }
     .chip input{margin:0;width:16px;height:16px;accent-color:var(--g)}
     .chip.on{background:var(--soft);border-color:#7ddfa8}
-
     .quoteGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .metric{
       border:1px solid var(--line);
@@ -154,7 +142,6 @@
     .metric .v{font-size:18px;font-weight:950;margin:6px 0 2px;line-height:1.05}
     .metric.big .v{font-size:20px}
     .metric .sub{font-size:10.5px;color:#2a4a3b;font-weight:750}
-
     .totalsPanel{
       background:var(--soft);
       border:1px solid var(--line2);
@@ -175,26 +162,17 @@
     }
     .totalsRow .lab{font-size:11px;color:#2a4a3b}
     .totalsRow .amt{font-size:13px}
-
     .toggles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
     .toggle{
-      height:40px;
-      border-radius:12px;
-      border:1px solid var(--line);
-      background:#fff;
-      font-weight:950;
-      font-size:13px;
-      cursor:pointer;
-      color:#143022;
+      height:40px;border-radius:12px;border:1px solid var(--line);background:#fff;
+      font-weight:950;font-size:13px;cursor:pointer;color:#143022;
     }
     .toggle.on{background:var(--g);border-color:var(--g);color:#fff}
-
     details summary{cursor:pointer;font-weight:950;color:#163527;font-size:12px}
     table{width:100%;border-collapse:collapse;font-size:11.5px}
     th,td{border:1px solid var(--line);padding:6px}
     th{text-align:left;background:#fff}
     td.right{text-align:right;font-weight:950}
-
     .adjustGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .adjustBox{
       border:1px solid var(--line);
@@ -204,14 +182,8 @@
       min-width:0;
     }
     .adjustBox h5{
-      margin:0 0 10px;
-      font-size:12px;
-      font-weight:1000;
-      color:#274536;
-      display:flex;
-      justify-content:space-between;
-      gap:8px;
-      align-items:center;
+      margin:0 0 10px;font-size:12px;font-weight:1000;color:#274536;
+      display:flex;justify-content:space-between;gap:8px;align-items:center;
     }
     .suggestBadge{
       display:inline-block;
@@ -229,7 +201,6 @@
     }
     .suggestNum{font-weight:1000;color:#0b3d23;white-space:nowrap}
     .smallGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-
     .statusBox{
       border:1px dashed var(--line);
       border-radius:14px;
@@ -240,9 +211,10 @@
       color:#244033;
       line-height:1.5;
     }
-
     .stackInside{display:grid;gap:12px}
-
+    .status-good{color:#0f7a35}
+    .status-bad{color:#a32020}
+    .status-warn{color:#7a5b00}
     @media (max-width:1180px){
       .main{grid-template-columns:1fr}
       .topbar{grid-template-columns:1fr 1fr 1fr}
@@ -260,24 +232,14 @@
 
   <div class="topbar">
     <div class="brand"><h1>LEAD SHEET CALCULATOR</h1></div>
-
-    <div class="miniField">
-      <label>Date</label>
-      <input id="topDate" type="date">
-    </div>
-
-    <div class="miniField">
-      <label>Time</label>
-      <input id="topTime" type="time">
-    </div>
-
+    <div class="miniField"><label>Date</label><input id="topDate" type="date"></div>
+    <div class="miniField"><label>Time</label><input id="topTime" type="time"></div>
     <button class="btn btn-primary" id="clearBtn" type="button">NEW LEAD</button>
     <button class="btn btn-soft" id="copyBtn" type="button">COPY QUOTE</button>
   </div>
 
   <div class="main">
 
-    <!-- LEFT COLUMN -->
     <div class="column">
       <section class="card">
         <div class="head">
@@ -328,7 +290,6 @@
               <label class="chip"><input type="checkbox" id="chkLB"> LB</label>
               <label class="chip"><input type="checkbox" id="chkRS"> RS</label>
             </div>
-
             <div style="margin-top:10px">
               <label class="chip" style="width:100%;justify-content:center;">
                 <input type="checkbox" id="chkAutopay"> AUTOPAY
@@ -339,7 +300,6 @@
       </section>
     </div>
 
-    <!-- CENTER COLUMN -->
     <div class="column">
       <section class="card">
         <div class="head"><span>QUOTE</span></div>
@@ -350,19 +310,16 @@
               <div class="v" id="qtRateDisplay">$0.00</div>
               <div class="sub">MONTHLY <span id="qtMonthlyDisplay">$0</span></div>
             </div>
-
             <div class="metric">
               <div class="k">SM RATE</div>
               <div class="v" id="smRateDisplay">$0.00</div>
               <div class="sub">MONTHLY <span id="smMonthlyDisplay">$0</span></div>
             </div>
-
             <div class="metric big">
               <div class="k">TOTAL MONTHLY</div>
               <div class="v" id="totalMonthlyDisplay">$0 / mo</div>
               <div class="sub">YIF <span id="totalYifDisplay">$0.00</span></div>
             </div>
-
             <div class="metric big">
               <div class="k">BUNDLE MONTHLY</div>
               <div class="v" id="bundleMonthlyDisplay">$0 / mo</div>
@@ -395,7 +352,6 @@
       </section>
     </div>
 
-    <!-- RIGHT COLUMN -->
     <div class="column">
       <section class="card">
         <div class="head"><span>MEASUREMENTS</span></div>
@@ -406,7 +362,6 @@
               <div class="field"><label>SQFT</label><input id="sqft" type="number" min="0" step="1"></div>
               <div class="field"><label>LF</label><input id="lf" type="number" min="0" step="1"></div>
             </div>
-
             <details style="margin-top:10px">
               <summary>PRICING TIERS</summary>
               <div style="margin-top:8px;overflow:auto">
@@ -456,8 +411,8 @@
       <section class="card">
         <div class="head"><span>SAVE & PUSH</span></div>
         <div class="body stackInside">
-          <div class="statusBox">
-            AppSheet save: not connected yet<br>
+          <div class="statusBox" id="saveStatusBox">
+            AppSheet save: not saved yet<br>
             FieldRoutes push: not connected yet
           </div>
 
@@ -469,7 +424,7 @@
           </div>
 
           <div class="row2">
-            <button class="btn btn-soft" type="button">SAVE LEAD</button>
+            <button class="btn btn-soft" type="button" id="saveLeadBtn">SAVE LEAD</button>
             <button class="btn btn-dark" type="button">PUSH TO FIELDROUTES</button>
           </div>
         </div>
@@ -567,6 +522,7 @@
     const lines = [];
     const customerName = $('custName').value.trim() || '—';
     const qtInitVal = parseFloat($('qtInit').value);
+
     lines.push(`Customer: ${customerName}`);
 
     if(state.qtOn){
@@ -651,25 +607,19 @@
 
     $('qtRateDisplay').textContent = money(shownQt);
     $('qtMonthlyDisplay').textContent = money0(shownQtMo);
-
     $('smRateDisplay').textContent = money(state.smOn ? smBase : 0);
     $('smMonthlyDisplay').textContent = money0(smMonthly);
-
     $('totalMonthlyDisplay').textContent = `${money0(plainMonthlyTotal)} / mo`;
     $('totalYifDisplay').textContent = money(plainYifTotal);
-
     $('bundleMonthlyDisplay').textContent = `${money0(bundleMonthlyTotal)} / mo`;
     $('bundleYifDisplay').textContent = money(bundleYifTotal);
-
     $('bundleQtRow').textContent = money(state.qtOn ? qtBundled : 0);
     $('plainMonthlyRow').textContent = `${money0(plainMonthlyTotal)} / mo`;
     $('bundleMonthlyRow').textContent = `${money0(bundleMonthlyTotal)} / mo`;
     $('plainYifRow').textContent = money(plainYifTotal);
     $('bundleYifRow').textContent = money(bundleYifTotal);
-
     $('qtMonthlyRead').value = money0(bundleApplies ? qtMonthlyBundle : qtMonthlyPlain);
     $('qtYifRead').value = money(bundleApplies ? qtYifBundle : qtYifPlain);
-
     $('smMonthlyRead').value = money0(smMonthly);
     $('smYifRead').value = money(smYif);
 
@@ -683,6 +633,103 @@
     if(bundleApplies) parts.push('BUNDLE');
     if($('chkAutopay').checked) parts.push('AUTOPAY');
     $('copyBtn').dataset.quote = parts.join(' | ');
+  }
+
+  function buildLeadPayload(){
+    const sqft = parseFloat($('sqft').value);
+    const lf = parseFloat($('lf').value);
+    const qtSuggested = suggestQt(sqft);
+    const smSuggested = Number.isFinite(lf) && lf > 0 ? Math.max(SM_MIN_YEARLY, lf * SM_RATE_PER_LF) : SM_MIN_YEARLY;
+
+    const qtQuoteIn = parseFloat($('qtQuote').value);
+    const smQuoteIn = parseFloat($('smQuote').value);
+    const qtBase = Number.isFinite(qtQuoteIn) ? qtQuoteIn : qtSuggested;
+    const smBase = Number.isFinite(smQuoteIn) ? smQuoteIn : smSuggested;
+    const smInstall = Number.isFinite(parseFloat($('smInstall').value)) ? parseFloat($('smInstall').value) : 0;
+
+    const bundleApplies = state.bundleOn && state.qtOn && state.smOn;
+    const qtToPush = bundleApplies ? Math.max(0, qtBase - BUNDLE_DISC) : qtBase;
+    const qtInitVal = Number.isFinite(parseFloat($('qtInit').value)) ? parseFloat($('qtInit').value) : qtToPush;
+
+    const servicesNeeded = [];
+    if(state.qtOn) servicesNeeded.push('QT');
+    if(state.smOn) servicesNeeded.push('SM');
+    if($('chkINT').checked) servicesNeeded.push('Interior');
+    if($('chkPS').checked) servicesNeeded.push('Power Spray');
+    if($('chkWD').checked) servicesNeeded.push('Web Dust');
+    if($('chkGR').checked) servicesNeeded.push('Granulate');
+    if($('chkLB').checked) servicesNeeded.push('Leaf Blow');
+    if($('chkRS').checked) servicesNeeded.push('Reservices');
+
+    const fullName = ($('custName').value || '').trim();
+
+    return {
+      timestampDate: $('topDate').value || '',
+      timestampTime: $('topTime').value || '',
+      notes: $('custNotes').value || '',
+      source: $('custLeadSource').value || '',
+      customerName: fullName,
+      phone: $('custPhone').value || '',
+      email: $('custEmail').value || '',
+      address: $('custAddress').value || '',
+      city: $('custCity').value || '',
+      state: $('custState').value || '',
+      zip: $('custZip').value || '',
+      county: $('custCounty').value || '',
+      interior: $('chkINT').checked ? 'Y' : 'N',
+      powerSpray: $('chkPS').checked ? 'Y' : 'N',
+      webDust: $('chkWD').checked ? 'Y' : 'N',
+      granulate: $('chkGR').checked ? 'Y' : 'N',
+      leafBlow: $('chkLB').checked ? 'Y' : 'N',
+      reservices: $('chkRS').checked ? 'Y' : 'N',
+      servicesNeeded: servicesNeeded.join(', '),
+      quoteInitial: state.qtOn ? qtInitVal : '',
+      quoteQT: state.qtOn ? qtToPush : '',
+      liquidUpgrade: 'N',
+      termiteInstallFee: state.smOn ? smInstall : '',
+      termiteAnnual: state.smOn ? smBase : '',
+      paymentType: $('chkAutopay').checked ? 'Autopay' : ($('paymentType').value || ''),
+      status: 'Pending',
+      audited: 'N'
+    };
+  }
+
+  async function saveLead(){
+    const btn = $('saveLeadBtn');
+    const statusBox = $('saveStatusBox');
+
+    const payload = buildLeadPayload();
+
+    if(!payload.customerName || !payload.phone || !payload.email || !payload.address){
+      statusBox.innerHTML = '<span class="status-bad">AppSheet save: missing required customer fields</span><br>FieldRoutes push: not connected yet';
+      return;
+    }
+
+    btn.disabled = true;
+    const oldText = btn.textContent;
+    btn.textContent = 'SAVING...';
+
+    try {
+      const res = await fetch('/.netlify/functions/save-lead', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if(!res.ok || !data.ok){
+        throw new Error(data.error || 'Save failed');
+      }
+
+      statusBox.innerHTML = `<span class="status-good">AppSheet save: saved</span><br>FieldRoutes push: not connected yet`;
+      btn.textContent = 'SAVED';
+      setTimeout(() => { btn.textContent = oldText; btn.disabled = false; }, 1200);
+    } catch (err){
+      statusBox.innerHTML = `<span class="status-bad">AppSheet save: ${err.message}</span><br>FieldRoutes push: not connected yet`;
+      btn.textContent = oldText;
+      btn.disabled = false;
+    }
   }
 
   function clearAll(){
@@ -705,6 +752,8 @@
     state.yifOn = false;
     state.bundleOn = false;
     state.qtInitTouched = false;
+
+    $('saveStatusBox').innerHTML = 'AppSheet save: not saved yet<br>FieldRoutes push: not connected yet';
 
     updateTogglesUI();
     calc();
@@ -755,6 +804,7 @@
     $(id).addEventListener('change', calc);
   });
 
+  $('saveLeadBtn').addEventListener('click', saveLead);
   $('clearBtn').addEventListener('click', clearAll);
   $('copyBtn').addEventListener('click', copyQuote);
 
