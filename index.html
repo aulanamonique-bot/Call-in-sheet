@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Lead Sheet Calculator - Step 1</title>
+  <title>Lead Sheet Calculator</title>
   <style>
     :root{
       --g:#16a34a;
@@ -26,6 +26,7 @@
       font-size:14px;
     }
     .wrap{max-width:1380px;margin:14px auto;padding:0 12px 28px}
+
     .topbar{
       background:rgba(255,255,255,.92);
       border:1px solid var(--line2);
@@ -45,6 +46,7 @@
       height:38px;padding:8px 10px;border:1px solid var(--line);
       border-radius:12px;background:#fff;font-weight:750;font-size:13px;min-width:140px;outline:none;
     }
+
     .btn{
       height:38px;border-radius:12px;padding:0 14px;font-weight:850;font-size:13px;
       cursor:pointer;border:1px solid transparent;white-space:nowrap;
@@ -53,16 +55,27 @@
     .btn-soft{background:#eafff1;color:#0d5a2b;border-color:var(--line)}
     .btn-dark{background:#0f1d15;color:#fff}
     .btn:active{transform:translateY(1px)}
-    .main{display:grid;grid-template-columns:370px 1fr 470px;gap:14px;align-items:start}
-    .stack{display:grid;gap:14px;align-content:start;min-width:0}
+
+    .main{
+      display:grid;
+      grid-template-columns:370px minmax(0,1fr) 470px;
+      gap:14px;
+      align-items:start;
+    }
+
+    .column{
+      display:grid;
+      gap:14px;
+      align-content:start;
+      min-width:0;
+    }
+
     .card{
       background:var(--panel);
       border:1px solid var(--line2);
       border-radius:var(--r);
       box-shadow:var(--shadow);
       overflow:hidden;
-      display:flex;
-      flex-direction:column;
       min-width:0;
     }
     .head{
@@ -75,44 +88,60 @@
       align-items:center;
       justify-content:space-between;
       gap:10px;
-      border-bottom:1px solid rgba(0,0,0,.06);
     }
-    .body{padding:12px;flex:1;min-width:0}
+    .body{padding:12px;min-width:0}
+
     .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+
     .field{display:grid;gap:4px;min-width:0}
     .field label{font-size:11px;font-weight:800;color:#29463a;line-height:1.15;white-space:nowrap}
     .field input,.field textarea,.field select{
       width:100%;min-width:0;height:40px;border:1px solid var(--line);border-radius:12px;
       background:#fff;padding:8px 10px;font-size:13px;font-weight:700;color:#0e1b12;outline:none;
     }
-    .field input:focus,.field textarea:focus,.field select:focus{border-color:#6bd39a;box-shadow:0 0 0 3px rgba(34,197,94,.15)}
     .field textarea{height:86px;resize:vertical;line-height:1.3;padding-top:10px}
-    .field.compact input{height:36px}
+    .field input:focus,.field textarea:focus,.field select:focus{
+      border-color:#6bd39a;
+      box-shadow:0 0 0 3px rgba(34,197,94,.15);
+    }
     .readonly{background:var(--soft2);font-weight:900}
-    .sticky{position:sticky;top:12px;max-height:calc(100vh - 24px);overflow:auto}
-    .hide{display:none !important}
-    input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
     input[type=number]{-moz-appearance:textfield}
+
+    .hide{display:none !important}
+
     .miniPanel{
       border:1px solid var(--line2);
       border-radius:14px;
       background:var(--soft);
       padding:10px;
-      min-width:0;
     }
     .miniPanel h4{margin:0 0 8px;font-size:12px;font-weight:1000;color:#163527}
+
     .chipGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
     .chip{
       border:1px solid var(--line);
       border-radius:999px;
       background:#fff;
-      height:38px;
-      display:flex;align-items:center;justify-content:center;gap:8px;
-      font-weight:900;font-size:12px;cursor:pointer;user-select:none;color:#163527;
+      min-height:38px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      font-weight:900;
+      font-size:12px;
+      cursor:pointer;
+      user-select:none;
+      color:#163527;
+      padding:0 8px;
+      text-align:center;
     }
     .chip input{margin:0;width:16px;height:16px;accent-color:var(--g)}
     .chip.on{background:var(--soft);border-color:#7ddfa8}
+
     .quoteGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .metric{
       border:1px solid var(--line);
@@ -125,103 +154,222 @@
     .metric .v{font-size:18px;font-weight:950;margin:6px 0 2px;line-height:1.05}
     .metric.big .v{font-size:20px}
     .metric .sub{font-size:10.5px;color:#2a4a3b;font-weight:750}
-    .totalsPanel{background:var(--soft);border:1px solid var(--line2);border-radius:14px;padding:10px}
+
+    .totalsPanel{
+      background:var(--soft);
+      border:1px solid var(--line2);
+      border-radius:14px;
+      padding:10px;
+      margin-top:12px;
+    }
     .totalsList{display:grid;gap:8px}
-    .totalsRow{display:flex;justify-content:space-between;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:12px;background:#fff;font-weight:900}
+    .totalsRow{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:8px 10px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background:#fff;
+      font-weight:900;
+    }
     .totalsRow .lab{font-size:11px;color:#2a4a3b}
     .totalsRow .amt{font-size:13px}
+
     .toggles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-    .toggle{height:40px;border-radius:12px;border:1px solid var(--line);background:#fff;font-weight:950;font-size:13px;cursor:pointer;color:#143022}
+    .toggle{
+      height:40px;
+      border-radius:12px;
+      border:1px solid var(--line);
+      background:#fff;
+      font-weight:950;
+      font-size:13px;
+      cursor:pointer;
+      color:#143022;
+    }
     .toggle.on{background:var(--g);border-color:var(--g);color:#fff}
+
     details summary{cursor:pointer;font-weight:950;color:#163527;font-size:12px}
     table{width:100%;border-collapse:collapse;font-size:11.5px}
     th,td{border:1px solid var(--line);padding:6px}
     th{text-align:left;background:#fff}
     td.right{text-align:right;font-weight:950}
+
     .adjustGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    .adjustBox{border:1px solid var(--line);border-radius:14px;background:#fff;padding:12px;min-height:260px;min-width:0}
-    .adjustBox h5{margin:0 0 10px;font-size:12px;font-weight:1000;color:#274536;display:flex;justify-content:space-between;gap:8px;align-items:center}
-    .suggestBadge{display:inline-block;background:rgba(34,197,94,.16);border:1px solid rgba(34,197,94,.26);color:#0f5130;font-weight:1000;padding:3px 8px;border-radius:999px;margin-right:6px;line-height:1;font-size:11px;vertical-align:middle;white-space:nowrap}
+    .adjustBox{
+      border:1px solid var(--line);
+      border-radius:14px;
+      background:#fff;
+      padding:12px;
+      min-width:0;
+    }
+    .adjustBox h5{
+      margin:0 0 10px;
+      font-size:12px;
+      font-weight:1000;
+      color:#274536;
+      display:flex;
+      justify-content:space-between;
+      gap:8px;
+      align-items:center;
+    }
+    .suggestBadge{
+      display:inline-block;
+      background:rgba(34,197,94,.16);
+      border:1px solid rgba(34,197,94,.26);
+      color:#0f5130;
+      font-weight:1000;
+      padding:3px 8px;
+      border-radius:999px;
+      margin-right:6px;
+      line-height:1;
+      font-size:11px;
+      vertical-align:middle;
+      white-space:nowrap;
+    }
     .suggestNum{font-weight:1000;color:#0b3d23;white-space:nowrap}
     .smallGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .statusBox{border:1px dashed var(--line);border-radius:14px;padding:12px;background:#fff;font-size:12px;font-weight:800;color:#244033;line-height:1.5}
-    @media (max-width:1180px){.main{grid-template-columns:1fr}.sticky{position:static;max-height:none}.topbar{grid-template-columns:1fr 1fr 1fr;align-items:end}.brand{grid-column:1/-1}}
-    @media (max-width:760px){.row2,.row3,.quoteGrid,.adjustGrid,.smallGrid,.chipGrid,.toggles{grid-template-columns:1fr}.topbar{grid-template-columns:1fr}.miniField input{min-width:0}}
+
+    .statusBox{
+      border:1px dashed var(--line);
+      border-radius:14px;
+      padding:12px;
+      background:#fff;
+      font-size:12px;
+      font-weight:800;
+      color:#244033;
+      line-height:1.5;
+    }
+
+    .stackInside{display:grid;gap:12px}
+
+    @media (max-width:1180px){
+      .main{grid-template-columns:1fr}
+      .topbar{grid-template-columns:1fr 1fr 1fr}
+      .brand{grid-column:1/-1}
+    }
+    @media (max-width:760px){
+      .topbar{grid-template-columns:1fr}
+      .row2,.row3,.quoteGrid,.adjustGrid,.smallGrid,.chipGrid,.toggles{grid-template-columns:1fr}
+      .miniField input{min-width:0}
+    }
   </style>
 </head>
 <body>
 <div class="wrap">
+
   <div class="topbar">
     <div class="brand"><h1>LEAD SHEET CALCULATOR</h1></div>
-    <div class="miniField"><label>Date</label><input id="topDate" type="date"></div>
-    <div class="miniField"><label>Time</label><input id="topTime" type="time"></div>
+
+    <div class="miniField">
+      <label>Date</label>
+      <input id="topDate" type="date">
+    </div>
+
+    <div class="miniField">
+      <label>Time</label>
+      <input id="topTime" type="time">
+    </div>
+
     <button class="btn btn-primary" id="clearBtn" type="button">NEW LEAD</button>
     <button class="btn btn-soft" id="copyBtn" type="button">COPY QUOTE</button>
   </div>
 
   <div class="main">
-    <section class="card sticky">
-      <div class="head">
-        <span>CUSTOMER INFO</span>
-        <button class="btn btn-soft" id="collapseCustomer" type="button" style="height:30px;padding:0 10px;font-size:12px;">Collapse</button>
-      </div>
-      <div class="body stack" id="customerBody">
-        <div class="field"><label>CUSTOMER NAME</label><input id="custName" type="text"></div>
-        <div class="field"><label>LEAD SOURCE</label><input id="custLeadSource" type="text"></div>
-        <div class="row2">
-          <div class="field"><label>PHONE</label><input id="custPhone" type="tel"></div>
-          <div class="field"><label>EMAIL</label><input id="custEmail" type="email"></div>
-        </div>
-        <div class="field"><label>ADDRESS</label><input id="custAddress" type="text"></div>
-        <div class="row3">
-          <div class="field"><label>CITY</label><input id="custCity" type="text"></div>
-          <div class="field"><label>STATE</label><input id="custState" type="text" value="NC"></div>
-          <div class="field"><label>ZIP</label><input id="custZip" type="text"></div>
-        </div>
-        <div class="row2">
-          <div class="field"><label>COUNTY</label><input id="custCounty" type="text"></div>
-          <div class="field"><label>PAYMENT TYPE</label>
-            <select id="paymentType">
-              <option value=""></option>
-              <option value="Card">Card</option>
-              <option value="Cash">Cash</option>
-              <option value="Check">Check</option>
-              <option value="Autopay">Autopay</option>
-            </select>
-          </div>
-        </div>
-        <div class="field"><label>SERVICES NEEDED</label><input id="custServices" type="text"></div>
-        <div class="field"><label>NOTES</label><textarea id="custNotes"></textarea></div>
-        <div class="miniPanel" style="background:#fff;border-style:dashed;">
-          <h4>CHECKLIST</h4>
-          <div class="chipGrid">
-            <label class="chip"><input type="checkbox" id="chkINT"> INT</label>
-            <label class="chip"><input type="checkbox" id="chkPS"> PS</label>
-            <label class="chip"><input type="checkbox" id="chkWD"> WD</label>
-            <label class="chip"><input type="checkbox" id="chkGR"> GR</label>
-            <label class="chip"><input type="checkbox" id="chkLB"> LB</label>
-            <label class="chip"><input type="checkbox" id="chkRS"> RS</label>
-          </div>
-          <div style="margin-top:10px">
-            <label class="chip" style="width:100%;justify-content:center;">
-              <input type="checkbox" id="chkAutopay"> AUTOPAY
-            </label>
-          </div>
-        </div>
-        
-      </div>
-    </section>
 
-    <div class="stack">
+    <!-- LEFT COLUMN -->
+    <div class="column">
+      <section class="card">
+        <div class="head">
+          <span>CUSTOMER INFO</span>
+          <button class="btn btn-soft" id="collapseCustomer" type="button" style="height:30px;padding:0 10px;font-size:12px;">Collapse</button>
+        </div>
+        <div class="body stackInside" id="customerBody">
+          <div class="field"><label>CUSTOMER NAME</label><input id="custName" type="text"></div>
+          <div class="field"><label>LEAD SOURCE</label><input id="custLeadSource" type="text"></div>
+
+          <div class="row2">
+            <div class="field"><label>PHONE</label><input id="custPhone" type="tel"></div>
+            <div class="field"><label>EMAIL</label><input id="custEmail" type="email"></div>
+          </div>
+
+          <div class="field"><label>ADDRESS</label><input id="custAddress" type="text"></div>
+
+          <div class="row3">
+            <div class="field"><label>CITY</label><input id="custCity" type="text"></div>
+            <div class="field"><label>STATE</label><input id="custState" type="text" value="NC"></div>
+            <div class="field"><label>ZIP</label><input id="custZip" type="text"></div>
+          </div>
+
+          <div class="row2">
+            <div class="field"><label>COUNTY</label><input id="custCounty" type="text"></div>
+            <div class="field">
+              <label>PAYMENT TYPE</label>
+              <select id="paymentType">
+                <option value=""></option>
+                <option value="Card">Card</option>
+                <option value="Cash">Cash</option>
+                <option value="Check">Check</option>
+                <option value="Autopay">Autopay</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field"><label>SERVICES NEEDED</label><input id="custServices" type="text"></div>
+          <div class="field"><label>NOTES</label><textarea id="custNotes"></textarea></div>
+
+          <div class="miniPanel" style="background:#fff;border-style:dashed;">
+            <h4>CHECKLIST</h4>
+            <div class="chipGrid">
+              <label class="chip"><input type="checkbox" id="chkINT"> INT</label>
+              <label class="chip"><input type="checkbox" id="chkPS"> PS</label>
+              <label class="chip"><input type="checkbox" id="chkWD"> WD</label>
+              <label class="chip"><input type="checkbox" id="chkGR"> GR</label>
+              <label class="chip"><input type="checkbox" id="chkLB"> LB</label>
+              <label class="chip"><input type="checkbox" id="chkRS"> RS</label>
+            </div>
+
+            <div style="margin-top:10px">
+              <label class="chip" style="width:100%;justify-content:center;">
+                <input type="checkbox" id="chkAutopay"> AUTOPAY
+              </label>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- CENTER COLUMN -->
+    <div class="column">
       <section class="card">
         <div class="head"><span>QUOTE</span></div>
-        <div class="body stack">
+        <div class="body">
           <div class="quoteGrid">
-            <div class="metric"><div class="k">QT RATE</div><div class="v" id="qtRateDisplay">$0.00</div><div class="sub">MONTHLY <span id="qtMonthlyDisplay">$0</span></div></div>
-            <div class="metric"><div class="k">SM RATE</div><div class="v" id="smRateDisplay">$0.00</div><div class="sub">MONTHLY <span id="smMonthlyDisplay">$0</span></div></div>
-            <div class="metric big"><div class="k">TOTAL MONTHLY</div><div class="v" id="totalMonthlyDisplay">$0 / mo</div><div class="sub">YIF <span id="totalYifDisplay">$0.00</span></div></div>
-            <div class="metric big"><div class="k">BUNDLE MONTHLY</div><div class="v" id="bundleMonthlyDisplay">$0 / mo</div><div class="sub">YIF <span id="bundleYifDisplay">$0.00</span></div></div>
+            <div class="metric">
+              <div class="k">QT RATE</div>
+              <div class="v" id="qtRateDisplay">$0.00</div>
+              <div class="sub">MONTHLY <span id="qtMonthlyDisplay">$0</span></div>
+            </div>
+
+            <div class="metric">
+              <div class="k">SM RATE</div>
+              <div class="v" id="smRateDisplay">$0.00</div>
+              <div class="sub">MONTHLY <span id="smMonthlyDisplay">$0</span></div>
+            </div>
+
+            <div class="metric big">
+              <div class="k">TOTAL MONTHLY</div>
+              <div class="v" id="totalMonthlyDisplay">$0 / mo</div>
+              <div class="sub">YIF <span id="totalYifDisplay">$0.00</span></div>
+            </div>
+
+            <div class="metric big">
+              <div class="k">BUNDLE MONTHLY</div>
+              <div class="v" id="bundleMonthlyDisplay">$0 / mo</div>
+              <div class="sub">YIF <span id="bundleYifDisplay">$0.00</span></div>
+            </div>
           </div>
+
           <div class="totalsPanel">
             <div class="totalsList">
               <div class="totalsRow"><span class="lab">BUNDLE QT</span><span class="amt" id="bundleQtRow">$0.00</span></div>
@@ -236,7 +384,7 @@
 
       <section class="card">
         <div class="head"><span>SERVICES</span></div>
-        <div class="body stack">
+        <div class="body">
           <div class="toggles">
             <button class="toggle on" id="btnQT" type="button">QT</button>
             <button class="toggle" id="btnSM" type="button">SM</button>
@@ -245,41 +393,20 @@
           </div>
         </div>
       </section>
-
-      </div>
-
-    <div class="stack">
-      
-
-      <section class="card">
-        <div class="head"><span>SAVE & PUSH</span></div>
-        <div class="body stack">
-          <div class="statusBox">
-            AppSheet save: not connected yet<br>
-            FieldRoutes push: not connected yet
-          </div>
-          <div class="statusBox" id="pushPreview">
-            Customer: —<br>
-            QT Subscription: —<br>
-            SM Subscription: —<br>
-            SM Install Addon: —
-          </div>
-          <div class="row2">
-            <button class="btn btn-soft" type="button">SAVE LEAD</button>
-            <button class="btn btn-dark" type="button">PUSH TO FIELDROUTES</button>
-          </div>
-        </div>
-      </section>
     </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="column">
       <section class="card">
         <div class="head"><span>MEASUREMENTS</span></div>
-        <div class="body stack">
+        <div class="body">
           <div class="miniPanel">
             <h4>ENTER</h4>
             <div class="row2">
-              <div class="field compact"><label>SQFT</label><input id="sqft" type="number" min="0" step="1"></div>
-              <div class="field compact"><label>LF</label><input id="lf" type="number" min="0" step="1"></div>
+              <div class="field"><label>SQFT</label><input id="sqft" type="number" min="0" step="1"></div>
+              <div class="field"><label>LF</label><input id="lf" type="number" min="0" step="1"></div>
             </div>
+
             <details style="margin-top:10px">
               <summary>PRICING TIERS</summary>
               <div style="margin-top:8px;overflow:auto">
@@ -295,30 +422,60 @@
 
       <section class="card">
         <div class="head"><span>ADJUST</span></div>
-        <div class="body stack">
+        <div class="body">
           <div class="adjustGrid">
             <div class="adjustBox">
-              <h5><span>QT</span><span><span class="suggestBadge">SUGGESTED</span><span id="qtSuggestedLabel" class="suggestNum">$0.00</span></span></h5>
+              <h5>
+                <span>QT</span>
+                <span><span class="suggestBadge">SUGGESTED</span><span id="qtSuggestedLabel" class="suggestNum">$0.00</span></span>
+              </h5>
               <div class="smallGrid">
-                <div class="field mini"><label>QT QUOTE</label><input id="qtQuote" type="number" step="0.01"></div>
-                <div class="field mini"><label>INITIAL</label><input id="qtInit" type="number" step="1"></div>
-                <div class="field mini"><label>MONTHLY</label><input id="qtMonthlyRead" class="readonly" type="text" readonly></div>
-                <div class="field mini"><label>YIF</label><input id="qtYifRead" class="readonly" type="text" readonly></div>
+                <div class="field"><label>QT QUOTE</label><input id="qtQuote" type="number" step="0.01"></div>
+                <div class="field"><label>INITIAL</label><input id="qtInit" type="number" step="1"></div>
+                <div class="field"><label>MONTHLY</label><input id="qtMonthlyRead" class="readonly" type="text" readonly></div>
+                <div class="field"><label>YIF</label><input id="qtYifRead" class="readonly" type="text" readonly></div>
               </div>
             </div>
+
             <div class="adjustBox">
-              <h5><span>SM</span><span><span class="suggestBadge">SUGGESTED</span><span id="smSuggestedLabel" class="suggestNum">$0.00</span></span></h5>
+              <h5>
+                <span>SM</span>
+                <span><span class="suggestBadge">SUGGESTED</span><span id="smSuggestedLabel" class="suggestNum">$0.00</span></span>
+              </h5>
               <div class="smallGrid">
-                <div class="field mini"><label>SM QUOTE</label><input id="smQuote" type="number" step="0.01"></div>
-                <div class="field mini"><label>INSTALL FEE</label><input id="smInstall" type="number" step="1" value="0"></div>
-                <div class="field mini"><label>MONTHLY</label><input id="smMonthlyRead" class="readonly" type="text" readonly></div>
-                <div class="field mini"><label>YIF</label><input id="smYifRead" class="readonly" type="text" readonly></div>
+                <div class="field"><label>SM QUOTE</label><input id="smQuote" type="number" step="0.01"></div>
+                <div class="field"><label>INSTALL FEE</label><input id="smInstall" type="number" step="1" value="0"></div>
+                <div class="field"><label>MONTHLY</label><input id="smMonthlyRead" class="readonly" type="text" readonly></div>
+                <div class="field"><label>YIF</label><input id="smYifRead" class="readonly" type="text" readonly></div>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      <section class="card">
+        <div class="head"><span>SAVE & PUSH</span></div>
+        <div class="body stackInside">
+          <div class="statusBox">
+            AppSheet save: not connected yet<br>
+            FieldRoutes push: not connected yet
+          </div>
+
+          <div class="statusBox" id="pushPreview">
+            Customer: —<br>
+            QT Subscription: —<br>
+            SM Subscription: —<br>
+            SM Install Addon: —
+          </div>
+
+          <div class="row2">
+            <button class="btn btn-soft" type="button">SAVE LEAD</button>
+            <button class="btn btn-dark" type="button">PUSH TO FIELDROUTES</button>
+          </div>
+        </div>
+      </section>
     </div>
+
   </div>
 </div>
 
@@ -328,6 +485,7 @@
   const SM_RATE_PER_LF = 1.5;
   const SM_MIN_YEARLY = 300;
   const BUNDLE_DISC = 10;
+
   const tiers = [
     {min:1000,max:1499,qt:139},
     {min:1500,max:2499,qt:159},
@@ -336,104 +494,275 @@
     {min:4000,max:4499,qt:209},
     {min:4500,max:999999,qt:219},
   ];
+
   const $ = (id) => document.getElementById(id);
-  const state = {qtOn:true,smOn:false,yifOn:false,bundleOn:false,qtInitTouched:false,smInstallTouched:false};
-  function money(n){const x = Number.isFinite(n) ? n : 0; return x.toLocaleString(undefined,{style:'currency',currency:'USD'});}
-  function money0(n){const x = Number.isFinite(n) ? n : 0; return x.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});}
-  function ceil(n){return Math.ceil(Number.isFinite(n) ? n : 0);}
-  function suggestQt(sqft){const s = Number(sqft); if(!Number.isFinite(s) || s <= 0) return 0; for(const t of tiers){ if(s >= t.min && s <= t.max) return t.qt; } return 0;}
-  function setNow(){const d = new Date(); $('topDate').value = d.toISOString().slice(0,10); $('topTime').value = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');}
-  function initTiers(){const tb = $('tiersTable'); tb.innerHTML = ''; for(const t of tiers){ const tr = document.createElement('tr'); tr.innerHTML = `<td>${t.min.toLocaleString()} - ${t.max === 999999 ? 'UP' : t.max.toLocaleString()}</td><td class="right">${money(t.qt)}</td>`; tb.appendChild(tr);} }
-  function updateChecklistChips(){document.querySelectorAll('.chip').forEach(c => { const i = c.querySelector('input'); c.classList.toggle('on', !!i?.checked); });}
-  function setToggle(id, on){$(id).classList.toggle('on', !!on);}
-  function updateTogglesUI(){setToggle('btnQT', state.qtOn); setToggle('btnSM', state.smOn); setToggle('btnYIF', state.yifOn); setToggle('btnBundle', state.bundleOn);}
+
+  const state = {
+    qtOn: true,
+    smOn: false,
+    yifOn: false,
+    bundleOn: false,
+    qtInitTouched: false
+  };
+
+  function money(n){
+    const x = Number.isFinite(n) ? n : 0;
+    return x.toLocaleString(undefined,{style:'currency',currency:'USD'});
+  }
+
+  function money0(n){
+    const x = Number.isFinite(n) ? n : 0;
+    return x.toLocaleString(undefined,{style:'currency',currency:'USD',maximumFractionDigits:0});
+  }
+
+  function ceil(n){
+    return Math.ceil(Number.isFinite(n) ? n : 0);
+  }
+
+  function suggestQt(sqft){
+    const s = Number(sqft);
+    if(!Number.isFinite(s) || s <= 0) return 0;
+    for(const t of tiers){
+      if(s >= t.min && s <= t.max) return t.qt;
+    }
+    return 0;
+  }
+
+  function setNow(){
+    const d = new Date();
+    $('topDate').value = d.toISOString().slice(0,10);
+    $('topTime').value = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  }
+
+  function initTiers(){
+    const tb = $('tiersTable');
+    tb.innerHTML = '';
+    for(const t of tiers){
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td>${t.min.toLocaleString()} - ${t.max === 999999 ? 'UP' : t.max.toLocaleString()}</td>
+                      <td class="right">${money(t.qt)}</td>`;
+      tb.appendChild(tr);
+    }
+  }
+
+  function updateChecklistChips(){
+    document.querySelectorAll('.chip').forEach(c => {
+      const i = c.querySelector('input');
+      c.classList.toggle('on', !!i?.checked);
+    });
+  }
+
+  function setToggle(id, on){
+    $(id).classList.toggle('on', !!on);
+  }
+
+  function updateTogglesUI(){
+    setToggle('btnQT', state.qtOn);
+    setToggle('btnSM', state.smOn);
+    setToggle('btnYIF', state.yifOn);
+    setToggle('btnBundle', state.bundleOn);
+  }
+
   function updatePushPreview(qtPriceToPush, smQuoteToPush, smInstallToPush){
     const lines = [];
     const customerName = $('custName').value.trim() || '—';
+    const qtInitVal = parseFloat($('qtInit').value);
     lines.push(`Customer: ${customerName}`);
-    if(state.qtOn){ lines.push(`QT Subscription: Service 4 • ${money(qtPriceToPush)} initial ${money(parseFloat($('qtInit').value) || qtPriceToPush)}`); } else { lines.push('QT Subscription: —'); }
-    if(state.smOn){ lines.push(`SM Subscription: Service 7 • ${money(smQuoteToPush)} initial ${money(smQuoteToPush)}`); lines.push(`SM Install Addon: ${money(smInstallToPush)}`); } else { lines.push('SM Subscription: —'); lines.push('SM Install Addon: —'); }
+
+    if(state.qtOn){
+      lines.push(`QT Subscription: Service 4 • ${money(qtPriceToPush)} initial ${money(Number.isFinite(qtInitVal) ? qtInitVal : qtPriceToPush)}`);
+    } else {
+      lines.push('QT Subscription: —');
+    }
+
+    if(state.smOn){
+      lines.push(`SM Subscription: Service 7 • ${money(smQuoteToPush)} initial ${money(smQuoteToPush)}`);
+      lines.push(`SM Install Addon: ${money(smInstallToPush)}`);
+    } else {
+      lines.push('SM Subscription: —');
+      lines.push('SM Install Addon: —');
+    }
+
     $('pushPreview').innerHTML = lines.join('<br>');
   }
+
   function calc(){
     const sqft = parseFloat($('sqft').value);
     const lf = parseFloat($('lf').value);
+
     const qtSuggested = suggestQt(sqft);
-    const smSuggested = Number.isFinite(lf) && lf > 0 ? Math.max(SM_MIN_YEARLY, lf * SM_RATE_PER_LF) : SM_MIN_YEARLY;
+    const smSuggested = Number.isFinite(lf) && lf > 0
+      ? Math.max(SM_MIN_YEARLY, lf * SM_RATE_PER_LF)
+      : SM_MIN_YEARLY;
+
     $('qtSuggestedLabel').textContent = money(qtSuggested);
     $('smSuggestedLabel').textContent = money(smSuggested);
+
     const qtQuoteIn = parseFloat($('qtQuote').value);
     const smQuoteIn = parseFloat($('smQuote').value);
+
     const qtBase = Number.isFinite(qtQuoteIn) ? qtQuoteIn : qtSuggested;
     const smBase = Number.isFinite(smQuoteIn) ? smQuoteIn : smSuggested;
+
     const qtInitRaw = ($('qtInit').value || '').trim();
     let qtInit = parseFloat(qtInitRaw);
     if(!Number.isFinite(qtInit)) qtInit = 0;
-    if(!state.qtInitTouched){ if(qtInitRaw === '' || qtInit === 0){ qtInit = qtBase; if(Number.isFinite(qtInit) && qtInit > 0){ $('qtInit').value = String(Math.round(qtInit)); } } }
-    const smInstallRaw = ($('smInstall').value || '').trim();
-    let smInstall = parseFloat(smInstallRaw);
+
+    if(!state.qtInitTouched && (qtInitRaw === '' || qtInit === 0)){
+      qtInit = qtBase;
+      if(Number.isFinite(qtInit) && qtInit > 0){
+        $('qtInit').value = String(Math.round(qtInit));
+      }
+    }
+
+    let smInstall = parseFloat($('smInstall').value);
     if(!Number.isFinite(smInstall)) smInstall = 0;
+
     const bundleApplies = state.bundleOn && state.qtOn && state.smOn;
     const qtBundled = bundleApplies ? Math.max(0, qtBase - BUNDLE_DISC) : qtBase;
+
     const qtMonthlyPlain = state.qtOn ? ceil(qtBase / 3) : 0;
     const qtMonthlyBundle = state.qtOn ? ceil(qtBundled / 3) : 0;
     const smMonthly = state.smOn ? ceil(smBase / 12) : 0;
-    let qtYifPlain = 0, qtYifBundle = 0;
-    if(state.qtOn){ const basePlain = (qtBase * 4) + qtInit; const baseBundle = (qtBundled * 4) + qtInit; qtYifPlain = state.yifOn ? basePlain * (1 - YIF_DISCOUNT) : basePlain; qtYifBundle = state.yifOn ? baseBundle * (1 - YIF_DISCOUNT) : baseBundle; }
+
+    let qtYifPlain = 0;
+    let qtYifBundle = 0;
+    if(state.qtOn){
+      const basePlain = (qtBase * 4) + qtInit;
+      const baseBundle = (qtBundled * 4) + qtInit;
+      qtYifPlain = state.yifOn ? basePlain * (1 - YIF_DISCOUNT) : basePlain;
+      qtYifBundle = state.yifOn ? baseBundle * (1 - YIF_DISCOUNT) : baseBundle;
+    }
+
     let smYif = 0;
-    if(state.smOn){ const base = smBase + smInstall; smYif = state.yifOn ? base * (1 - YIF_DISCOUNT) : base; }
+    if(state.smOn){
+      const base = smBase + smInstall;
+      smYif = state.yifOn ? base * (1 - YIF_DISCOUNT) : base;
+    }
+
     const plainMonthlyTotal = (state.qtOn ? qtMonthlyPlain : 0) + (state.smOn ? smMonthly : 0);
     const bundleMonthlyTotal = (state.qtOn ? qtMonthlyBundle : 0) + (state.smOn ? smMonthly : 0);
+
     const plainYifTotal = qtYifPlain + smYif;
     const bundleYifTotal = qtYifBundle + smYif;
+
     const shownQt = state.qtOn ? (bundleApplies ? qtBundled : qtBase) : 0;
     const shownQtMo = state.qtOn ? (bundleApplies ? qtMonthlyBundle : qtMonthlyPlain) : 0;
+
     $('qtRateDisplay').textContent = money(shownQt);
     $('qtMonthlyDisplay').textContent = money0(shownQtMo);
+
     $('smRateDisplay').textContent = money(state.smOn ? smBase : 0);
     $('smMonthlyDisplay').textContent = money0(smMonthly);
+
     $('totalMonthlyDisplay').textContent = `${money0(plainMonthlyTotal)} / mo`;
     $('totalYifDisplay').textContent = money(plainYifTotal);
+
     $('bundleMonthlyDisplay').textContent = `${money0(bundleMonthlyTotal)} / mo`;
     $('bundleYifDisplay').textContent = money(bundleYifTotal);
+
     $('bundleQtRow').textContent = money(state.qtOn ? qtBundled : 0);
     $('plainMonthlyRow').textContent = `${money0(plainMonthlyTotal)} / mo`;
     $('bundleMonthlyRow').textContent = `${money0(bundleMonthlyTotal)} / mo`;
     $('plainYifRow').textContent = money(plainYifTotal);
     $('bundleYifRow').textContent = money(bundleYifTotal);
+
     $('qtMonthlyRead').value = money0(bundleApplies ? qtMonthlyBundle : qtMonthlyPlain);
     $('qtYifRead').value = money(bundleApplies ? qtYifBundle : qtYifPlain);
+
     $('smMonthlyRead').value = money0(smMonthly);
     $('smYifRead').value = money(smYif);
+
     updatePushPreview(bundleApplies ? qtBundled : qtBase, smBase, smInstall);
+
     const parts = [];
     if(state.qtOn) parts.push(`QT ${money(shownQt)} (${money0(shownQtMo)}/mo)`);
     if(state.smOn) parts.push(`SM ${money(smBase)} (${money0(smMonthly)}/mo)`);
     if(state.smOn && smInstall > 0) parts.push(`INSTALL ${money(smInstall)}`);
     if(state.yifOn) parts.push(`YIF ${money(bundleApplies ? bundleYifTotal : plainYifTotal)}`);
-    if(bundleApplies) parts.push(`BUNDLE`);
-    if($('chkAutopay').checked) parts.push(`AUTOPAY`);
+    if(bundleApplies) parts.push('BUNDLE');
+    if($('chkAutopay').checked) parts.push('AUTOPAY');
     $('copyBtn').dataset.quote = parts.join(' | ');
   }
+
   function clearAll(){
     setNow();
-    ['custName','custLeadSource','custPhone','custEmail','custAddress','custCity','custState','custZip','custCounty','custServices','custNotes','sqft','lf','qtQuote','qtInit','smQuote'].forEach(id => $(id).value = '');
-    $('custState').value = 'NC'; $('paymentType').value = ''; $('smInstall').value = '0';
+    [
+      'custName','custLeadSource','custPhone','custEmail','custAddress',
+      'custCity','custZip','custCounty','custServices','custNotes',
+      'sqft','lf','qtQuote','qtInit','smQuote'
+    ].forEach(id => $(id).value = '');
+
+    $('custState').value = 'NC';
+    $('paymentType').value = '';
+    $('smInstall').value = '0';
+
     ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS','chkAutopay'].forEach(id => $(id).checked = false);
     updateChecklistChips();
-    state.qtOn = true; state.smOn = false; state.yifOn = false; state.bundleOn = false; state.qtInitTouched = false; state.smInstallTouched = false;
-    updateTogglesUI(); calc();
+
+    state.qtOn = true;
+    state.smOn = false;
+    state.yifOn = false;
+    state.bundleOn = false;
+    state.qtInitTouched = false;
+
+    updateTogglesUI();
+    calc();
   }
-  function copyQuote(){ const txt = $('copyBtn').dataset.quote || ''; if(!txt) return; navigator.clipboard.writeText(txt).then(() => { const old = $('copyBtn').textContent; $('copyBtn').textContent = 'COPIED'; setTimeout(() => $('copyBtn').textContent = old, 900); }).catch(() => alert('Copy failed')); }
-  $('collapseCustomer').addEventListener('click', () => { $('customerBody').classList.toggle('hide'); $('collapseCustomer').textContent = $('customerBody').classList.contains('hide') ? 'Expand' : 'Collapse'; });
-  ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS','chkAutopay'].forEach(id => { $(id).addEventListener('change', () => { updateChecklistChips(); calc(); }); });
-  [['btnQT','qtOn'],['btnSM','smOn'],['btnYIF','yifOn'],['btnBundle','bundleOn']].forEach(([id,key]) => { $(id).addEventListener('click', () => { state[key] = !state[key]; updateTogglesUI(); calc(); }); });
-  $('qtInit').addEventListener('input', () => { state.qtInitTouched = true; calc(); });
-  $('smInstall').addEventListener('input', () => { state.smInstallTouched = true; calc(); });
-  ['sqft','lf','qtQuote','qtInit','smQuote','smInstall','custName','custLeadSource','custPhone','custEmail','custAddress','custCity','custState','custZip','custCounty','custServices','custNotes','paymentType'].forEach(id => { $(id).addEventListener('input', calc); $(id).addEventListener('change', calc); });
+
+  function copyQuote(){
+    const txt = $('copyBtn').dataset.quote || '';
+    if(!txt) return;
+    navigator.clipboard.writeText(txt).then(() => {
+      const old = $('copyBtn').textContent;
+      $('copyBtn').textContent = 'COPIED';
+      setTimeout(() => $('copyBtn').textContent = old, 900);
+    }).catch(() => alert('Copy failed'));
+  }
+
+  $('collapseCustomer').addEventListener('click', () => {
+    $('customerBody').classList.toggle('hide');
+    $('collapseCustomer').textContent = $('customerBody').classList.contains('hide') ? 'Expand' : 'Collapse';
+  });
+
+  ['chkINT','chkPS','chkWD','chkGR','chkLB','chkRS','chkAutopay'].forEach(id => {
+    $(id).addEventListener('change', () => {
+      updateChecklistChips();
+      calc();
+    });
+  });
+
+  [['btnQT','qtOn'],['btnSM','smOn'],['btnYIF','yifOn'],['btnBundle','bundleOn']].forEach(([id,key]) => {
+    $(id).addEventListener('click', () => {
+      state[key] = !state[key];
+      updateTogglesUI();
+      calc();
+    });
+  });
+
+  $('qtInit').addEventListener('input', () => {
+    state.qtInitTouched = true;
+    calc();
+  });
+
+  [
+    'sqft','lf','qtQuote','qtInit','smQuote','smInstall',
+    'custName','custLeadSource','custPhone','custEmail','custAddress',
+    'custCity','custState','custZip','custCounty','custServices','custNotes',
+    'paymentType'
+  ].forEach(id => {
+    $(id).addEventListener('input', calc);
+    $(id).addEventListener('change', calc);
+  });
+
   $('clearBtn').addEventListener('click', clearAll);
   $('copyBtn').addEventListener('click', copyQuote);
-  initTiers(); setNow(); updateChecklistChips(); updateTogglesUI(); calc();
+
+  initTiers();
+  setNow();
+  updateChecklistChips();
+  updateTogglesUI();
+  calc();
 })();
 </script>
 </body>
