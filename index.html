@@ -1,34 +1,394 @@
-<!-- SAVE & PUSH SECTION (HIDDEN FOR NOW) -->
-<section class="card hide" id="savePushSection">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lead Sheet Calculator</title>
 
-  <div class="head">
-    <span>SAVE & PUSH</span>
-  </div>
+<style>
 
-  <div class="body stackInside">
+body{
+font-family:Arial,Helvetica,sans-serif;
+background:#f5f7f6;
+margin:0;
+padding:20px;
+color:#222;
+}
 
-    <div class="statusBox" id="saveStatusBox">
-      AppSheet save: not enabled<br>
-      FieldRoutes push: not enabled
-    </div>
+.container{
+max-width:1200px;
+margin:auto;
+}
 
-    <div class="statusBox" id="pushPreview">
-      Customer: —<br>
-      QT Subscription: —<br>
-      SM Subscription: —<br>
-      SM Install Addon: —
-    </div>
+h1{
+margin-bottom:20px;
+}
 
-    <div class="row2">
-      <button class="btn btn-soft" type="button" id="saveLeadBtn">
-        SAVE LEAD
-      </button>
+.grid{
+display:grid;
+grid-template-columns:350px 1fr 350px;
+gap:20px;
+}
 
-      <button class="btn btn-dark" type="button" id="pushFieldRoutesBtn">
-        PUSH TO FIELDROUTES
-      </button>
-    </div>
+.card{
+background:white;
+border-radius:10px;
+padding:15px;
+box-shadow:0 2px 8px rgba(0,0,0,.08);
+}
 
-  </div>
+label{
+font-size:12px;
+font-weight:bold;
+display:block;
+margin-top:10px;
+}
 
-</section>
+input,select,textarea{
+width:100%;
+padding:8px;
+border:1px solid #ccc;
+border-radius:6px;
+margin-top:4px;
+}
+
+textarea{
+height:80px;
+}
+
+button{
+margin-top:15px;
+padding:10px 15px;
+border:none;
+border-radius:6px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.primary{
+background:#2aa84a;
+color:white;
+}
+
+.secondary{
+background:#eee;
+}
+
+.metric{
+background:#f7faf8;
+border:1px solid #e2eee7;
+border-radius:8px;
+padding:10px;
+margin-bottom:10px;
+}
+
+.metric h3{
+margin:0;
+font-size:13px;
+color:#444;
+}
+
+.metric div{
+font-size:18px;
+font-weight:bold;
+}
+
+.toggleRow{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+margin-top:15px;
+}
+
+.toggle{
+padding:10px;
+border:1px solid #ccc;
+border-radius:8px;
+background:#fff;
+cursor:pointer;
+font-weight:bold;
+}
+
+.toggle.active{
+background:#2aa84a;
+color:white;
+border-color:#2aa84a;
+}
+
+.tiers table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+.tiers th,.tiers td{
+border:1px solid #ddd;
+padding:6px;
+font-size:12px;
+}
+
+.right{
+text-align:right;
+}
+
+.hide{
+display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Lead Sheet Calculator</h1>
+
+<div class="grid">
+
+<!-- CUSTOMER -->
+
+<div class="card">
+
+<h3>Customer Info</h3>
+
+<label>Customer Name</label>
+<input id="name">
+
+<label>Lead Source</label>
+<input id="source">
+
+<label>Phone</label>
+<input id="phone">
+
+<label>Email</label>
+<input id="email">
+
+<label>Address</label>
+<input id="address">
+
+<label>City</label>
+<input id="city">
+
+<label>State</label>
+<input id="state" value="NC">
+
+<label>Zip</label>
+<input id="zip">
+
+<label>County</label>
+<input id="county">
+
+<label>Payment Type</label>
+<select id="payment">
+<option></option>
+<option>Card</option>
+<option>Cash</option>
+<option>Check</option>
+<option>Autopay</option>
+</select>
+
+<label>Services Needed</label>
+<input id="services">
+
+<label>Notes</label>
+<textarea id="notes"></textarea>
+
+<label>
+<input type="checkbox" id="autopay">
+ Autopay
+</label>
+
+</div>
+
+
+<!-- QUOTE -->
+
+<div class="card">
+
+<h3>Quote</h3>
+
+<div class="metric">
+<h3>QT Rate</h3>
+<div id="qtRate">$0</div>
+</div>
+
+<div class="metric">
+<h3>SM Rate</h3>
+<div id="smRate">$0</div>
+</div>
+
+<div class="metric">
+<h3>Total Monthly</h3>
+<div id="monthly">$0</div>
+</div>
+
+<div class="metric">
+<h3>YIF Total</h3>
+<div id="yif">$0</div>
+</div>
+
+<div class="toggleRow">
+
+<button class="toggle active" id="qtBtn">QT</button>
+<button class="toggle" id="smBtn">SM</button>
+<button class="toggle" id="yifBtn">YIF</button>
+<button class="toggle" id="bundleBtn">BUNDLE</button>
+
+</div>
+
+<button class="secondary" id="copyBtn">
+Copy Quote
+</button>
+
+<button class="primary" id="clearBtn">
+New Lead
+</button>
+
+</div>
+
+
+<!-- MEASUREMENTS -->
+
+<div class="card">
+
+<h3>Measurements</h3>
+
+<label>Square Footage</label>
+<input id="sqft" type="number">
+
+<label>Linear Feet</label>
+<input id="lf" type="number">
+
+<div class="tiers">
+
+<h4>QT Tiers</h4>
+
+<table>
+<tr>
+<th>SQFT</th>
+<th class="right">QT</th>
+</tr>
+
+<tr><td>1000-1499</td><td class="right">$139</td></tr>
+<tr><td>1500-2499</td><td class="right">$159</td></tr>
+<tr><td>2500-3499</td><td class="right">$179</td></tr>
+<tr><td>3500-3999</td><td class="right">$199</td></tr>
+<tr><td>4000-4499</td><td class="right">$209</td></tr>
+<tr><td>4500+</td><td class="right">$219</td></tr>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+let qtOn=true
+let smOn=false
+let yifOn=false
+let bundle=false
+
+const tiers=[
+{min:1000,max:1499,price:139},
+{min:1500,max:2499,price:159},
+{min:2500,max:3499,price:179},
+{min:3500,max:3999,price:199},
+{min:4000,max:4499,price:209},
+{min:4500,max:999999,price:219}
+]
+
+function suggestQT(sqft){
+
+for(let t of tiers){
+
+if(sqft>=t.min && sqft<=t.max){
+return t.price
+}
+
+}
+
+return 0
+
+}
+
+function calc(){
+
+let sqft=parseFloat(document.getElementById("sqft").value)
+let lf=parseFloat(document.getElementById("lf").value)
+
+let qt=suggestQT(sqft)
+let sm=Math.max(300,lf*1.5)
+
+if(!qtOn) qt=0
+if(!smOn) sm=0
+
+if(bundle && qtOn && smOn) qt-=10
+
+let monthly=Math.ceil(qt/3)+Math.ceil(sm/12)
+
+let yifTotal=(qt*4)+sm
+
+if(yifOn) yifTotal*=0.95
+
+document.getElementById("qtRate").innerText="$"+qt
+document.getElementById("smRate").innerText="$"+sm
+document.getElementById("monthly").innerText="$"+monthly+"/mo"
+document.getElementById("yif").innerText="$"+Math.round(yifTotal)
+
+}
+
+document.getElementById("sqft").oninput=calc
+document.getElementById("lf").oninput=calc
+
+document.getElementById("qtBtn").onclick=()=>{
+qtOn=!qtOn
+document.getElementById("qtBtn").classList.toggle("active")
+calc()
+}
+
+document.getElementById("smBtn").onclick=()=>{
+smOn=!smOn
+document.getElementById("smBtn").classList.toggle("active")
+calc()
+}
+
+document.getElementById("yifBtn").onclick=()=>{
+yifOn=!yifOn
+document.getElementById("yifBtn").classList.toggle("active")
+calc()
+}
+
+document.getElementById("bundleBtn").onclick=()=>{
+bundle=!bundle
+document.getElementById("bundleBtn").classList.toggle("active")
+calc()
+}
+
+document.getElementById("copyBtn").onclick=()=>{
+
+let text=
+document.getElementById("qtRate").innerText+
+" | "+
+document.getElementById("smRate").innerText+
+" | "+
+document.getElementById("monthly").innerText
+
+navigator.clipboard.writeText(text)
+
+alert("Quote copied")
+
+}
+
+document.getElementById("clearBtn").onclick=()=>{
+location.reload()
+}
+
+</script>
+
+</body>
+</html>
